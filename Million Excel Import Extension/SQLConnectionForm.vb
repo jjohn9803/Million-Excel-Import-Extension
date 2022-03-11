@@ -13,20 +13,27 @@ Public Class SQL_Connection_Form
     Private uid As String
     Private pwd As String
     Public form2 As New ExcelImporter
+    Public form3 As New Maintainance_Form
     Private Sub SQL_Connection_Form_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.StartPosition = FormStartPosition.CenterScreen
         cbPasswordOption.SelectedIndex = 0
         pwd_mode = 0
-        form2Load()
         getFileInfo()
         getServerList()
+        tabFormLoad()
     End Sub
-    Private Sub form2Load()
+    Private Sub tabFormLoad()
         form2.TopLevel = False
         form2.FormBorderStyle = Windows.Forms.FormBorderStyle.None
         form2.Location = New System.Drawing.Point(0, 0)
         form2.Visible = False
-        TabPage2.Controls.Add(form2)
+        TabPageExcel.Controls.Add(form2)
+
+        form3.TopLevel = False
+        form3.FormBorderStyle = Windows.Forms.FormBorderStyle.None
+        form3.Location = New System.Drawing.Point(0, 0)
+        form3.Visible = False
+        TabPageMaintain.Controls.Add(form3)
     End Sub
     Private Sub getFileInfo()
         'Try
@@ -85,7 +92,7 @@ Public Class SQL_Connection_Form
     Private Function getConnectionSetting() As String
         Return returnUpperFolder(Application.StartupPath(), 2) + "setting.dll"
     End Function
-    Private Function returnUpperFolder(filePath As String, times As Integer)
+    Public Function returnUpperFolder(filePath As String, times As Integer)
         For index As Integer = 1 To times
             filePath = Path.GetFullPath(Path.Combine(filePath, "..\"))
         Next
@@ -246,8 +253,14 @@ Public Class SQL_Connection_Form
             form2.Visible = True
             Me.WindowState = FormWindowState.Maximized
             form2.WindowState = FormWindowState.Maximized
+        ElseIf TabControl1.SelectedTab.TabIndex = 2 Then
+            form3.Visible = True
+            Me.WindowState = FormWindowState.Maximized
+            form3.WindowState = FormWindowState.Maximized
+            form3.readMaintainSetting()
         Else
             form2.Visible = False
+            form3.Visible = False
             Me.WindowState = FormWindowState.Normal
         End If
     End Sub

@@ -22,93 +22,121 @@ Partial Class ExcelImporter
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
-        Me.dgvExcel = New System.Windows.Forms.DataGridView()
-        Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog()
         Me.Panel1 = New System.Windows.Forms.Panel()
-        Me.Label1 = New System.Windows.Forms.Label()
+        Me.FlowLayoutPanel1 = New System.Windows.Forms.FlowLayoutPanel()
         Me.Label2 = New System.Windows.Forms.Label()
         Me.txtFileName = New System.Windows.Forms.TextBox()
+        Me.Label1 = New System.Windows.Forms.Label()
         Me.cbSheet = New System.Windows.Forms.ComboBox()
-        Me.Panel3 = New System.Windows.Forms.Panel()
+        Me.Label4 = New System.Windows.Forms.Label()
+        Me.ComboBox2 = New System.Windows.Forms.ComboBox()
+        Me.btnCreateTemplate = New System.Windows.Forms.Button()
         Me.Panel2 = New System.Windows.Forms.Panel()
         Me.btnImport = New System.Windows.Forms.Button()
         Me.Label3 = New System.Windows.Forms.Label()
         Me.ComboBox1 = New System.Windows.Forms.ComboBox()
-        CType(Me.dgvExcel, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.Panel3 = New System.Windows.Forms.Panel()
+        Me.dgvExcel = New System.Windows.Forms.DataGridView()
         Me.Panel1.SuspendLayout()
-        Me.Panel3.SuspendLayout()
+        Me.FlowLayoutPanel1.SuspendLayout()
         Me.Panel2.SuspendLayout()
+        Me.Panel3.SuspendLayout()
+        CType(Me.dgvExcel, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
-        '
-        'dgvExcel
-        '
-        Me.dgvExcel.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.DisplayedCells
-        Me.dgvExcel.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.DisplayedHeaders
-        Me.dgvExcel.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.dgvExcel.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.dgvExcel.Location = New System.Drawing.Point(0, 0)
-        Me.dgvExcel.Name = "dgvExcel"
-        Me.dgvExcel.Size = New System.Drawing.Size(800, 390)
-        Me.dgvExcel.TabIndex = 0
-        '
-        'OpenFileDialog1
-        '
-        Me.OpenFileDialog1.FileName = "OpenFileDialog1"
         '
         'Panel1
         '
-        Me.Panel1.Controls.Add(Me.Label1)
-        Me.Panel1.Controls.Add(Me.Label2)
-        Me.Panel1.Controls.Add(Me.txtFileName)
-        Me.Panel1.Controls.Add(Me.cbSheet)
+        Me.Panel1.Controls.Add(Me.FlowLayoutPanel1)
         Me.Panel1.Dock = System.Windows.Forms.DockStyle.Top
         Me.Panel1.Location = New System.Drawing.Point(0, 0)
         Me.Panel1.Name = "Panel1"
-        Me.Panel1.Size = New System.Drawing.Size(800, 60)
+        Me.Panel1.Size = New System.Drawing.Size(800, 73)
         Me.Panel1.TabIndex = 7
         '
-        'Label1
+        'FlowLayoutPanel1
         '
-        Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(483, 13)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(38, 13)
-        Me.Label1.TabIndex = 11
-        Me.Label1.Text = "Sheet:"
+        Me.FlowLayoutPanel1.Controls.Add(Me.Label2)
+        Me.FlowLayoutPanel1.Controls.Add(Me.txtFileName)
+        Me.FlowLayoutPanel1.Controls.Add(Me.Label1)
+        Me.FlowLayoutPanel1.Controls.Add(Me.cbSheet)
+        Me.FlowLayoutPanel1.Controls.Add(Me.Label4)
+        Me.FlowLayoutPanel1.Controls.Add(Me.ComboBox2)
+        Me.FlowLayoutPanel1.Controls.Add(Me.btnCreateTemplate)
+        Me.FlowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.FlowLayoutPanel1.Location = New System.Drawing.Point(0, 0)
+        Me.FlowLayoutPanel1.Name = "FlowLayoutPanel1"
+        Me.FlowLayoutPanel1.Size = New System.Drawing.Size(800, 73)
+        Me.FlowLayoutPanel1.TabIndex = 14
         '
         'Label2
         '
         Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(12, 13)
+        Me.Label2.Location = New System.Drawing.Point(50, 0)
+        Me.Label2.Margin = New System.Windows.Forms.Padding(50, 0, 3, 0)
         Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(52, 13)
+        Me.Label2.Padding = New System.Windows.Forms.Padding(0, 5, 0, 5)
+        Me.Label2.Size = New System.Drawing.Size(52, 23)
         Me.Label2.TabIndex = 10
         Me.Label2.Text = "Filename:"
         '
         'txtFileName
         '
-        Me.txtFileName.Location = New System.Drawing.Point(70, 10)
+        Me.txtFileName.Location = New System.Drawing.Point(108, 3)
         Me.txtFileName.Name = "txtFileName"
         Me.txtFileName.Size = New System.Drawing.Size(387, 20)
         Me.txtFileName.TabIndex = 9
+        '
+        'Label1
+        '
+        Me.Label1.AutoSize = True
+        Me.Label1.Location = New System.Drawing.Point(548, 0)
+        Me.Label1.Margin = New System.Windows.Forms.Padding(50, 0, 3, 0)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Padding = New System.Windows.Forms.Padding(0, 5, 0, 5)
+        Me.Label1.Size = New System.Drawing.Size(38, 23)
+        Me.Label1.TabIndex = 11
+        Me.Label1.Text = "Sheet:"
         '
         'cbSheet
         '
         Me.cbSheet.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cbSheet.FormattingEnabled = True
-        Me.cbSheet.Location = New System.Drawing.Point(527, 10)
+        Me.cbSheet.Location = New System.Drawing.Point(3, 29)
         Me.cbSheet.Name = "cbSheet"
         Me.cbSheet.Size = New System.Drawing.Size(261, 21)
         Me.cbSheet.TabIndex = 6
         '
-        'Panel3
+        'Label4
         '
-        Me.Panel3.Controls.Add(Me.dgvExcel)
-        Me.Panel3.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.Panel3.Location = New System.Drawing.Point(0, 60)
-        Me.Panel3.Name = "Panel3"
-        Me.Panel3.Size = New System.Drawing.Size(800, 390)
-        Me.Panel3.TabIndex = 9
+        Me.Label4.AutoSize = True
+        Me.Label4.Location = New System.Drawing.Point(317, 26)
+        Me.Label4.Margin = New System.Windows.Forms.Padding(50, 0, 3, 0)
+        Me.Label4.Name = "Label4"
+        Me.Label4.Padding = New System.Windows.Forms.Padding(0, 5, 0, 5)
+        Me.Label4.Size = New System.Drawing.Size(37, 23)
+        Me.Label4.TabIndex = 12
+        Me.Label4.Text = "Type: "
+        '
+        'ComboBox2
+        '
+        Me.ComboBox2.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.ComboBox2.FormattingEnabled = True
+        Me.ComboBox2.Items.AddRange(New Object() {"Quotation"})
+        Me.ComboBox2.Location = New System.Drawing.Point(360, 29)
+        Me.ComboBox2.Name = "ComboBox2"
+        Me.ComboBox2.Size = New System.Drawing.Size(121, 21)
+        Me.ComboBox2.TabIndex = 13
+        '
+        'btnCreateTemplate
+        '
+        Me.btnCreateTemplate.Enabled = False
+        Me.btnCreateTemplate.Location = New System.Drawing.Point(559, 29)
+        Me.btnCreateTemplate.Margin = New System.Windows.Forms.Padding(75, 3, 3, 3)
+        Me.btnCreateTemplate.Name = "btnCreateTemplate"
+        Me.btnCreateTemplate.Size = New System.Drawing.Size(133, 23)
+        Me.btnCreateTemplate.TabIndex = 14
+        Me.btnCreateTemplate.Text = "Generate Template"
+        Me.btnCreateTemplate.UseVisualStyleBackColor = True
         '
         'Panel2
         '
@@ -147,32 +175,49 @@ Partial Class ExcelImporter
         Me.ComboBox1.Size = New System.Drawing.Size(202, 21)
         Me.ComboBox1.TabIndex = 0
         '
+        'Panel3
+        '
+        Me.Panel3.Controls.Add(Me.dgvExcel)
+        Me.Panel3.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.Panel3.Location = New System.Drawing.Point(0, 73)
+        Me.Panel3.Name = "Panel3"
+        Me.Panel3.Size = New System.Drawing.Size(800, 317)
+        Me.Panel3.TabIndex = 12
+        '
+        'dgvExcel
+        '
+        Me.dgvExcel.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.DisplayedCells
+        Me.dgvExcel.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.DisplayedHeaders
+        Me.dgvExcel.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
+        Me.dgvExcel.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.dgvExcel.Location = New System.Drawing.Point(0, 0)
+        Me.dgvExcel.Name = "dgvExcel"
+        Me.dgvExcel.Size = New System.Drawing.Size(800, 317)
+        Me.dgvExcel.TabIndex = 1
+        '
         'ExcelImporter
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.AutoSize = True
         Me.ClientSize = New System.Drawing.Size(800, 450)
-        Me.Controls.Add(Me.Panel2)
         Me.Controls.Add(Me.Panel3)
+        Me.Controls.Add(Me.Panel2)
         Me.Controls.Add(Me.Panel1)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
         Me.Name = "ExcelImporter"
         Me.Text = "Million Excel Import Extension"
-        CType(Me.dgvExcel, System.ComponentModel.ISupportInitialize).EndInit()
         Me.Panel1.ResumeLayout(False)
-        Me.Panel1.PerformLayout()
-        Me.Panel3.ResumeLayout(False)
+        Me.FlowLayoutPanel1.ResumeLayout(False)
+        Me.FlowLayoutPanel1.PerformLayout()
         Me.Panel2.ResumeLayout(False)
         Me.Panel2.PerformLayout()
+        Me.Panel3.ResumeLayout(False)
+        CType(Me.dgvExcel, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
     End Sub
-
-    Friend WithEvents dgvExcel As DataGridView
-    Friend WithEvents OpenFileDialog1 As OpenFileDialog
     Friend WithEvents Panel1 As Panel
-    Friend WithEvents Panel3 As Panel
     Friend WithEvents cbSheet As ComboBox
     Friend WithEvents Label2 As Label
     Friend WithEvents txtFileName As TextBox
@@ -181,4 +226,10 @@ Partial Class ExcelImporter
     Friend WithEvents ComboBox1 As ComboBox
     Friend WithEvents btnImport As Button
     Friend WithEvents Label3 As Label
+    Friend WithEvents Panel3 As Panel
+    Friend WithEvents dgvExcel As DataGridView
+    Friend WithEvents ComboBox2 As ComboBox
+    Friend WithEvents Label4 As Label
+    Friend WithEvents btnCreateTemplate As Button
+    Friend WithEvents FlowLayoutPanel1 As FlowLayoutPanel
 End Class

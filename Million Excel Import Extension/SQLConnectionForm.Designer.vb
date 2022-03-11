@@ -23,9 +23,7 @@ Partial Class SQL_Connection_Form
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Me.cbDatabase = New System.Windows.Forms.ComboBox()
-        Me.lblSQLStatus = New System.Windows.Forms.Label()
         Me.btnSql = New System.Windows.Forms.Button()
-        Me.Label1 = New System.Windows.Forms.Label()
         Me.Label2 = New System.Windows.Forms.Label()
         Me.Label3 = New System.Windows.Forms.Label()
         Me.cbServerList = New System.Windows.Forms.ComboBox()
@@ -40,10 +38,15 @@ Partial Class SQL_Connection_Form
         Me.Label6 = New System.Windows.Forms.Label()
         Me.cbShowPassword = New System.Windows.Forms.CheckBox()
         Me.TabControl1 = New System.Windows.Forms.TabControl()
-        Me.Setting = New System.Windows.Forms.TabPage()
-        Me.TabPage2 = New System.Windows.Forms.TabPage()
+        Me.TabPageSetting = New System.Windows.Forms.TabPage()
+        Me.TabPageExcel = New System.Windows.Forms.TabPage()
+        Me.TabPageMaintain = New System.Windows.Forms.TabPage()
+        Me.Panel1 = New System.Windows.Forms.Panel()
+        Me.Label1 = New System.Windows.Forms.Label()
+        Me.lblSQLStatus = New System.Windows.Forms.Label()
         Me.TabControl1.SuspendLayout()
-        Me.Setting.SuspendLayout()
+        Me.TabPageSetting.SuspendLayout()
+        Me.Panel1.SuspendLayout()
         Me.SuspendLayout()
         '
         'cbDatabase
@@ -56,17 +59,6 @@ Partial Class SQL_Connection_Form
         Me.cbDatabase.Size = New System.Drawing.Size(278, 21)
         Me.cbDatabase.TabIndex = 12
         '
-        'lblSQLStatus
-        '
-        Me.lblSQLStatus.AutoSize = True
-        Me.lblSQLStatus.BackColor = System.Drawing.Color.Transparent
-        Me.lblSQLStatus.ForeColor = System.Drawing.Color.DarkRed
-        Me.lblSQLStatus.Location = New System.Drawing.Point(264, 136)
-        Me.lblSQLStatus.Name = "lblSQLStatus"
-        Me.lblSQLStatus.Size = New System.Drawing.Size(73, 13)
-        Me.lblSQLStatus.TabIndex = 11
-        Me.lblSQLStatus.Text = "Disconnected"
-        '
         'btnSql
         '
         Me.btnSql.Location = New System.Drawing.Point(115, 131)
@@ -75,15 +67,6 @@ Partial Class SQL_Connection_Form
         Me.btnSql.TabIndex = 9
         Me.btnSql.Text = "Connect"
         Me.btnSql.UseVisualStyleBackColor = True
-        '
-        'Label1
-        '
-        Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(215, 136)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(43, 13)
-        Me.Label1.TabIndex = 10
-        Me.Label1.Text = "Status: "
         '
         'Label2
         '
@@ -205,73 +188,116 @@ Partial Class SQL_Connection_Form
         '
         'TabControl1
         '
-        Me.TabControl1.Controls.Add(Me.Setting)
-        Me.TabControl1.Controls.Add(Me.TabPage2)
+        Me.TabControl1.Controls.Add(Me.TabPageSetting)
+        Me.TabControl1.Controls.Add(Me.TabPageExcel)
+        Me.TabControl1.Controls.Add(Me.TabPageMaintain)
         Me.TabControl1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.TabControl1.Location = New System.Drawing.Point(0, 0)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(396, 280)
+        Me.TabControl1.Size = New System.Drawing.Size(396, 284)
         Me.TabControl1.TabIndex = 27
         '
-        'Setting
+        'TabPageSetting
         '
-        Me.Setting.Controls.Add(Me.Label2)
-        Me.Setting.Controls.Add(Me.cbShowPassword)
-        Me.Setting.Controls.Add(Me.cbServerList)
-        Me.Setting.Controls.Add(Me.Label6)
-        Me.Setting.Controls.Add(Me.btnSql)
-        Me.Setting.Controls.Add(Me.Label5)
-        Me.Setting.Controls.Add(Me.lblSQLStatus)
-        Me.Setting.Controls.Add(Me.txtPassword)
-        Me.Setting.Controls.Add(Me.Label1)
-        Me.Setting.Controls.Add(Me.txtUserId)
-        Me.Setting.Controls.Add(Me.cbPasswordOption)
-        Me.Setting.Controls.Add(Me.Label4)
-        Me.Setting.Controls.Add(Me.cbDatabase)
-        Me.Setting.Controls.Add(Me.Label3)
-        Me.Setting.Controls.Add(Me.btnTestConnection)
-        Me.Setting.Controls.Add(Me.btnSave)
-        Me.Setting.Controls.Add(Me.btnClose)
-        Me.Setting.Location = New System.Drawing.Point(4, 22)
-        Me.Setting.Name = "Setting"
-        Me.Setting.Padding = New System.Windows.Forms.Padding(3)
-        Me.Setting.Size = New System.Drawing.Size(388, 254)
-        Me.Setting.TabIndex = 0
-        Me.Setting.Text = "Setting"
-        Me.Setting.UseVisualStyleBackColor = True
+        Me.TabPageSetting.Controls.Add(Me.Label2)
+        Me.TabPageSetting.Controls.Add(Me.cbShowPassword)
+        Me.TabPageSetting.Controls.Add(Me.cbServerList)
+        Me.TabPageSetting.Controls.Add(Me.Label6)
+        Me.TabPageSetting.Controls.Add(Me.btnSql)
+        Me.TabPageSetting.Controls.Add(Me.Label5)
+        Me.TabPageSetting.Controls.Add(Me.txtPassword)
+        Me.TabPageSetting.Controls.Add(Me.txtUserId)
+        Me.TabPageSetting.Controls.Add(Me.cbPasswordOption)
+        Me.TabPageSetting.Controls.Add(Me.Label4)
+        Me.TabPageSetting.Controls.Add(Me.cbDatabase)
+        Me.TabPageSetting.Controls.Add(Me.Label3)
+        Me.TabPageSetting.Controls.Add(Me.btnTestConnection)
+        Me.TabPageSetting.Controls.Add(Me.btnSave)
+        Me.TabPageSetting.Controls.Add(Me.btnClose)
+        Me.TabPageSetting.Location = New System.Drawing.Point(4, 22)
+        Me.TabPageSetting.Name = "TabPageSetting"
+        Me.TabPageSetting.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPageSetting.Size = New System.Drawing.Size(388, 258)
+        Me.TabPageSetting.TabIndex = 0
+        Me.TabPageSetting.Text = "Setting"
+        Me.TabPageSetting.UseVisualStyleBackColor = True
         '
-        'TabPage2
+        'TabPageExcel
         '
-        Me.TabPage2.Location = New System.Drawing.Point(4, 22)
-        Me.TabPage2.Name = "TabPage2"
-        Me.TabPage2.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage2.Size = New System.Drawing.Size(388, 254)
-        Me.TabPage2.TabIndex = 1
-        Me.TabPage2.Text = "Import Excel"
-        Me.TabPage2.UseVisualStyleBackColor = True
+        Me.TabPageExcel.Location = New System.Drawing.Point(4, 22)
+        Me.TabPageExcel.Name = "TabPageExcel"
+        Me.TabPageExcel.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPageExcel.Size = New System.Drawing.Size(388, 254)
+        Me.TabPageExcel.TabIndex = 1
+        Me.TabPageExcel.Text = "Import Excel"
+        Me.TabPageExcel.UseVisualStyleBackColor = True
+        '
+        'TabPageMaintain
+        '
+        Me.TabPageMaintain.Location = New System.Drawing.Point(4, 22)
+        Me.TabPageMaintain.Name = "TabPageMaintain"
+        Me.TabPageMaintain.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPageMaintain.Size = New System.Drawing.Size(388, 254)
+        Me.TabPageMaintain.TabIndex = 2
+        Me.TabPageMaintain.Text = "Maintainance"
+        Me.TabPageMaintain.UseVisualStyleBackColor = True
+        '
+        'Panel1
+        '
+        Me.Panel1.Controls.Add(Me.Label1)
+        Me.Panel1.Controls.Add(Me.lblSQLStatus)
+        Me.Panel1.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.Panel1.Location = New System.Drawing.Point(0, 264)
+        Me.Panel1.Name = "Panel1"
+        Me.Panel1.Size = New System.Drawing.Size(396, 20)
+        Me.Panel1.TabIndex = 29
+        '
+        'Label1
+        '
+        Me.Label1.AutoSize = True
+        Me.Label1.Dock = System.Windows.Forms.DockStyle.Right
+        Me.Label1.Location = New System.Drawing.Point(280, 0)
+        Me.Label1.Margin = New System.Windows.Forms.Padding(3, 1, 3, 0)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(43, 13)
+        Me.Label1.TabIndex = 10
+        Me.Label1.Text = "Status: "
+        '
+        'lblSQLStatus
+        '
+        Me.lblSQLStatus.AutoSize = True
+        Me.lblSQLStatus.BackColor = System.Drawing.Color.Transparent
+        Me.lblSQLStatus.Dock = System.Windows.Forms.DockStyle.Right
+        Me.lblSQLStatus.ForeColor = System.Drawing.Color.DarkRed
+        Me.lblSQLStatus.Location = New System.Drawing.Point(323, 0)
+        Me.lblSQLStatus.Name = "lblSQLStatus"
+        Me.lblSQLStatus.Size = New System.Drawing.Size(73, 13)
+        Me.lblSQLStatus.TabIndex = 11
+        Me.lblSQLStatus.Text = "Disconnected"
         '
         'SQL_Connection_Form
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(396, 280)
+        Me.ClientSize = New System.Drawing.Size(396, 284)
+        Me.Controls.Add(Me.Panel1)
         Me.Controls.Add(Me.TabControl1)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle
         Me.Name = "SQL_Connection_Form"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "SQL Connection Form"
         Me.TabControl1.ResumeLayout(False)
-        Me.Setting.ResumeLayout(False)
-        Me.Setting.PerformLayout()
+        Me.TabPageSetting.ResumeLayout(False)
+        Me.TabPageSetting.PerformLayout()
+        Me.Panel1.ResumeLayout(False)
+        Me.Panel1.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
 
     Friend WithEvents cbDatabase As ComboBox
-    Friend WithEvents lblSQLStatus As Label
     Friend WithEvents btnSql As Button
-    Friend WithEvents Label1 As Label
     Friend WithEvents Label2 As Label
     Friend WithEvents Label3 As Label
     Friend WithEvents cbServerList As ComboBox
@@ -286,6 +312,10 @@ Partial Class SQL_Connection_Form
     Friend WithEvents Label6 As Label
     Friend WithEvents cbShowPassword As CheckBox
     Friend WithEvents TabControl1 As TabControl
-    Friend WithEvents Setting As TabPage
-    Friend WithEvents TabPage2 As TabPage
+    Friend WithEvents TabPageSetting As TabPage
+    Friend WithEvents TabPageExcel As TabPage
+    Friend WithEvents TabPageMaintain As TabPage
+    Friend WithEvents Panel1 As Panel
+    Friend WithEvents Label1 As Label
+    Friend WithEvents lblSQLStatus As Label
 End Class
