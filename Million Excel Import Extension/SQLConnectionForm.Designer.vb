@@ -228,7 +228,7 @@ Partial Class SQL_Connection_Form
         Me.TabPageExcel.Location = New System.Drawing.Point(4, 22)
         Me.TabPageExcel.Name = "TabPageExcel"
         Me.TabPageExcel.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPageExcel.Size = New System.Drawing.Size(388, 254)
+        Me.TabPageExcel.Size = New System.Drawing.Size(388, 258)
         Me.TabPageExcel.TabIndex = 1
         Me.TabPageExcel.Text = "Import Excel"
         Me.TabPageExcel.UseVisualStyleBackColor = True
@@ -238,7 +238,7 @@ Partial Class SQL_Connection_Form
         Me.TabPageMaintain.Location = New System.Drawing.Point(4, 22)
         Me.TabPageMaintain.Name = "TabPageMaintain"
         Me.TabPageMaintain.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPageMaintain.Size = New System.Drawing.Size(388, 254)
+        Me.TabPageMaintain.Size = New System.Drawing.Size(388, 258)
         Me.TabPageMaintain.TabIndex = 2
         Me.TabPageMaintain.Text = "Maintainance"
         Me.TabPageMaintain.UseVisualStyleBackColor = True

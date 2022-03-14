@@ -28,18 +28,18 @@ Partial Class ExcelImporter
         Me.txtFileName = New System.Windows.Forms.TextBox()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.cbSheet = New System.Windows.Forms.ComboBox()
-        Me.Label4 = New System.Windows.Forms.Label()
-        Me.ComboBox2 = New System.Windows.Forms.ComboBox()
-        Me.btnCreateTemplate = New System.Windows.Forms.Button()
         Me.Panel2 = New System.Windows.Forms.Panel()
+        Me.FlowLayoutPanel2 = New System.Windows.Forms.FlowLayoutPanel()
+        Me.Label4 = New System.Windows.Forms.Label()
+        Me.cbType = New System.Windows.Forms.ComboBox()
+        Me.btnCreateTemplate = New System.Windows.Forms.Button()
         Me.btnImport = New System.Windows.Forms.Button()
-        Me.Label3 = New System.Windows.Forms.Label()
-        Me.ComboBox1 = New System.Windows.Forms.ComboBox()
         Me.Panel3 = New System.Windows.Forms.Panel()
         Me.dgvExcel = New System.Windows.Forms.DataGridView()
         Me.Panel1.SuspendLayout()
         Me.FlowLayoutPanel1.SuspendLayout()
         Me.Panel2.SuspendLayout()
+        Me.FlowLayoutPanel2.SuspendLayout()
         Me.Panel3.SuspendLayout()
         CType(Me.dgvExcel, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
@@ -59,9 +59,6 @@ Partial Class ExcelImporter
         Me.FlowLayoutPanel1.Controls.Add(Me.txtFileName)
         Me.FlowLayoutPanel1.Controls.Add(Me.Label1)
         Me.FlowLayoutPanel1.Controls.Add(Me.cbSheet)
-        Me.FlowLayoutPanel1.Controls.Add(Me.Label4)
-        Me.FlowLayoutPanel1.Controls.Add(Me.ComboBox2)
-        Me.FlowLayoutPanel1.Controls.Add(Me.btnCreateTemplate)
         Me.FlowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.FlowLayoutPanel1.Location = New System.Drawing.Point(0, 0)
         Me.FlowLayoutPanel1.Name = "FlowLayoutPanel1"
@@ -71,8 +68,8 @@ Partial Class ExcelImporter
         'Label2
         '
         Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(50, 0)
-        Me.Label2.Margin = New System.Windows.Forms.Padding(50, 0, 3, 0)
+        Me.Label2.Location = New System.Drawing.Point(50, 15)
+        Me.Label2.Margin = New System.Windows.Forms.Padding(50, 15, 3, 0)
         Me.Label2.Name = "Label2"
         Me.Label2.Padding = New System.Windows.Forms.Padding(0, 5, 0, 5)
         Me.Label2.Size = New System.Drawing.Size(52, 23)
@@ -81,7 +78,8 @@ Partial Class ExcelImporter
         '
         'txtFileName
         '
-        Me.txtFileName.Location = New System.Drawing.Point(108, 3)
+        Me.txtFileName.Location = New System.Drawing.Point(108, 15)
+        Me.txtFileName.Margin = New System.Windows.Forms.Padding(3, 15, 3, 3)
         Me.txtFileName.Name = "txtFileName"
         Me.txtFileName.Size = New System.Drawing.Size(387, 20)
         Me.txtFileName.TabIndex = 9
@@ -89,8 +87,8 @@ Partial Class ExcelImporter
         'Label1
         '
         Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(548, 0)
-        Me.Label1.Margin = New System.Windows.Forms.Padding(50, 0, 3, 0)
+        Me.Label1.Location = New System.Drawing.Point(548, 15)
+        Me.Label1.Margin = New System.Windows.Forms.Padding(50, 15, 3, 0)
         Me.Label1.Name = "Label1"
         Me.Label1.Padding = New System.Windows.Forms.Padding(0, 5, 0, 5)
         Me.Label1.Size = New System.Drawing.Size(38, 23)
@@ -101,79 +99,75 @@ Partial Class ExcelImporter
         '
         Me.cbSheet.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cbSheet.FormattingEnabled = True
-        Me.cbSheet.Location = New System.Drawing.Point(3, 29)
+        Me.cbSheet.Location = New System.Drawing.Point(3, 53)
+        Me.cbSheet.Margin = New System.Windows.Forms.Padding(3, 15, 3, 3)
         Me.cbSheet.Name = "cbSheet"
         Me.cbSheet.Size = New System.Drawing.Size(261, 21)
         Me.cbSheet.TabIndex = 6
         '
-        'Label4
-        '
-        Me.Label4.AutoSize = True
-        Me.Label4.Location = New System.Drawing.Point(317, 26)
-        Me.Label4.Margin = New System.Windows.Forms.Padding(50, 0, 3, 0)
-        Me.Label4.Name = "Label4"
-        Me.Label4.Padding = New System.Windows.Forms.Padding(0, 5, 0, 5)
-        Me.Label4.Size = New System.Drawing.Size(37, 23)
-        Me.Label4.TabIndex = 12
-        Me.Label4.Text = "Type: "
-        '
-        'ComboBox2
-        '
-        Me.ComboBox2.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.ComboBox2.FormattingEnabled = True
-        Me.ComboBox2.Items.AddRange(New Object() {"Quotation"})
-        Me.ComboBox2.Location = New System.Drawing.Point(360, 29)
-        Me.ComboBox2.Name = "ComboBox2"
-        Me.ComboBox2.Size = New System.Drawing.Size(121, 21)
-        Me.ComboBox2.TabIndex = 13
-        '
-        'btnCreateTemplate
-        '
-        Me.btnCreateTemplate.Enabled = False
-        Me.btnCreateTemplate.Location = New System.Drawing.Point(559, 29)
-        Me.btnCreateTemplate.Margin = New System.Windows.Forms.Padding(75, 3, 3, 3)
-        Me.btnCreateTemplate.Name = "btnCreateTemplate"
-        Me.btnCreateTemplate.Size = New System.Drawing.Size(133, 23)
-        Me.btnCreateTemplate.TabIndex = 14
-        Me.btnCreateTemplate.Text = "Generate Template"
-        Me.btnCreateTemplate.UseVisualStyleBackColor = True
-        '
         'Panel2
         '
-        Me.Panel2.Controls.Add(Me.btnImport)
-        Me.Panel2.Controls.Add(Me.Label3)
-        Me.Panel2.Controls.Add(Me.ComboBox1)
+        Me.Panel2.Controls.Add(Me.FlowLayoutPanel2)
         Me.Panel2.Dock = System.Windows.Forms.DockStyle.Bottom
         Me.Panel2.Location = New System.Drawing.Point(0, 390)
         Me.Panel2.Name = "Panel2"
         Me.Panel2.Size = New System.Drawing.Size(800, 60)
         Me.Panel2.TabIndex = 11
         '
+        'FlowLayoutPanel2
+        '
+        Me.FlowLayoutPanel2.Controls.Add(Me.Label4)
+        Me.FlowLayoutPanel2.Controls.Add(Me.cbType)
+        Me.FlowLayoutPanel2.Controls.Add(Me.btnCreateTemplate)
+        Me.FlowLayoutPanel2.Controls.Add(Me.btnImport)
+        Me.FlowLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.FlowLayoutPanel2.Location = New System.Drawing.Point(0, 0)
+        Me.FlowLayoutPanel2.Name = "FlowLayoutPanel2"
+        Me.FlowLayoutPanel2.Size = New System.Drawing.Size(800, 60)
+        Me.FlowLayoutPanel2.TabIndex = 18
+        '
+        'Label4
+        '
+        Me.Label4.AutoSize = True
+        Me.Label4.Location = New System.Drawing.Point(50, 15)
+        Me.Label4.Margin = New System.Windows.Forms.Padding(50, 15, 3, 0)
+        Me.Label4.Name = "Label4"
+        Me.Label4.Padding = New System.Windows.Forms.Padding(0, 5, 0, 5)
+        Me.Label4.Size = New System.Drawing.Size(37, 23)
+        Me.Label4.TabIndex = 19
+        Me.Label4.Text = "Type: "
+        '
+        'cbType
+        '
+        Me.cbType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cbType.FormattingEnabled = True
+        Me.cbType.Items.AddRange(New Object() {"Quotation"})
+        Me.cbType.Location = New System.Drawing.Point(93, 15)
+        Me.cbType.Margin = New System.Windows.Forms.Padding(3, 15, 3, 3)
+        Me.cbType.Name = "cbType"
+        Me.cbType.Size = New System.Drawing.Size(209, 21)
+        Me.cbType.TabIndex = 20
+        '
+        'btnCreateTemplate
+        '
+        Me.btnCreateTemplate.Enabled = False
+        Me.btnCreateTemplate.Location = New System.Drawing.Point(380, 15)
+        Me.btnCreateTemplate.Margin = New System.Windows.Forms.Padding(75, 15, 3, 3)
+        Me.btnCreateTemplate.Name = "btnCreateTemplate"
+        Me.btnCreateTemplate.Size = New System.Drawing.Size(133, 23)
+        Me.btnCreateTemplate.TabIndex = 21
+        Me.btnCreateTemplate.Text = "Generate Template"
+        Me.btnCreateTemplate.UseVisualStyleBackColor = True
+        '
         'btnImport
         '
-        Me.btnImport.Location = New System.Drawing.Point(473, 18)
+        Me.btnImport.Location = New System.Drawing.Point(591, 15)
+        Me.btnImport.Margin = New System.Windows.Forms.Padding(75, 15, 3, 3)
         Me.btnImport.Name = "btnImport"
         Me.btnImport.Size = New System.Drawing.Size(75, 23)
-        Me.btnImport.TabIndex = 13
+        Me.btnImport.TabIndex = 18
         Me.btnImport.Text = "Import"
         Me.btnImport.UseVisualStyleBackColor = True
-        '
-        'Label3
-        '
-        Me.Label3.AutoSize = True
-        Me.Label3.Location = New System.Drawing.Point(167, 23)
-        Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(51, 13)
-        Me.Label3.TabIndex = 12
-        Me.Label3.Text = "Import to:"
-        '
-        'ComboBox1
-        '
-        Me.ComboBox1.FormattingEnabled = True
-        Me.ComboBox1.Location = New System.Drawing.Point(224, 20)
-        Me.ComboBox1.Name = "ComboBox1"
-        Me.ComboBox1.Size = New System.Drawing.Size(202, 21)
-        Me.ComboBox1.TabIndex = 0
         '
         'Panel3
         '
@@ -211,7 +205,8 @@ Partial Class ExcelImporter
         Me.FlowLayoutPanel1.ResumeLayout(False)
         Me.FlowLayoutPanel1.PerformLayout()
         Me.Panel2.ResumeLayout(False)
-        Me.Panel2.PerformLayout()
+        Me.FlowLayoutPanel2.ResumeLayout(False)
+        Me.FlowLayoutPanel2.PerformLayout()
         Me.Panel3.ResumeLayout(False)
         CType(Me.dgvExcel, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
@@ -223,13 +218,12 @@ Partial Class ExcelImporter
     Friend WithEvents txtFileName As TextBox
     Friend WithEvents Panel2 As Panel
     Friend WithEvents Label1 As Label
-    Friend WithEvents ComboBox1 As ComboBox
-    Friend WithEvents btnImport As Button
-    Friend WithEvents Label3 As Label
     Friend WithEvents Panel3 As Panel
     Friend WithEvents dgvExcel As DataGridView
-    Friend WithEvents ComboBox2 As ComboBox
-    Friend WithEvents Label4 As Label
-    Friend WithEvents btnCreateTemplate As Button
     Friend WithEvents FlowLayoutPanel1 As FlowLayoutPanel
+    Friend WithEvents FlowLayoutPanel2 As FlowLayoutPanel
+    Friend WithEvents Label4 As Label
+    Friend WithEvents cbType As ComboBox
+    Friend WithEvents btnCreateTemplate As Button
+    Friend WithEvents btnImport As Button
 End Class
