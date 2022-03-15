@@ -11,7 +11,7 @@ Public Class ExcelImporter
     Private statusConnection As Boolean
     Private pwd_query As String
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-
+        btnCreateTemplate.Enabled = True
     End Sub
     Private Sub init()
         serverName = SQL_Connection_Form.serverName
@@ -19,6 +19,7 @@ Public Class ExcelImporter
         myConn = SQL_Connection_Form.myConn
         statusConnection = SQL_Connection_Form.statusConnection
         pwd_query = SQL_Connection_Form.pwd_query
+        'MsgBox(serverName + vbTab + database + vbTab + myConn.ToString + vbTab + statusConnection.ToString + vbTab + pwd_query)
     End Sub
     Private Sub cbSheet_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbSheet.SelectedIndexChanged
         Dim dt As DataTable = tables(cbSheet.SelectedItem.ToString())
@@ -38,6 +39,24 @@ Public Class ExcelImporter
                                 tables = result.Tables
                                 cbSheet.Items.Clear()
                                 For Each table As DataTable In tables
+                                    For Each row As DataRow In table.Rows
+                                        'If Not (row.ItemArray(1).ToString.Equals(String.Empty)) Then
+                                        '    If row.ItemArray(1).GetType.ToString = "System.DateTime" Then
+                                        '        MsgBox(DateTime.FromOADate(CDbl(Val(row.ItemArray(1).ToString))))
+                                        '    End If
+
+                                        'End If
+                                    Next
+                                    'Dim strs As String = ""
+                                    'For Each row As DataRow In table.Rows
+                                    '    'strDetail = row.Item("Detail")
+                                    '    If Not (row.Item(1).ToString.Equals(String.Empty)) Then
+                                    '        MsgBox(row.Item(1).ToString)
+                                    '    End If
+
+                                    '    'strs += CStr(row.Item(1)) + vbTab
+                                    'Next row
+                                    'MsgBox(strs)
                                     cbSheet.Items.Add(table.TableName)
                                 Next
                             End Using
@@ -54,7 +73,8 @@ Public Class ExcelImporter
     End Sub
 
     Private Sub CreateTemplate_Click(sender As Object, e As EventArgs) Handles btnCreateTemplate.Click
-        excelTemplate(cbType.Text.ToString)
+        test()
+        'excelTemplate(cbType.Text.ToString)
     End Sub
     Private Sub excelTemplate(templateType As String)
         Using workbook As New XLWorkbook
@@ -113,52 +133,70 @@ Public Class ExcelImporter
     Private Sub cbType_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbType.SelectedIndexChanged
         If Not (cbType.SelectedItem.ToString.Equals(String.Empty)) Then
             btnCreateTemplate.Enabled = True
+            btnImport.Enabled = True
         Else
             btnCreateTemplate.Enabled = False
+            btnImport.Enabled = False
         End If
     End Sub
 
     Private Sub btnImport_Click(sender As Object, e As EventArgs) Handles btnImport.Click
         Dim importType = "Quotation"
         Dim tableExcelSetting As DataTableCollection
-        Try
-            Using stream = File.Open(getMaintainSetting, FileMode.Open, FileAccess.Read)
-                Using reader As IExcelDataReader = ExcelReaderFactory.CreateReader(stream)
-                    Dim result As DataSet = reader.AsDataSet(New ExcelDataSetConfiguration() With {
+        'Try
+        Using stream = File.Open(getMaintainSetting, FileMode.Open, FileAccess.Read)
+            Using reader As IExcelDataReader = ExcelReaderFactory.CreateReader(stream)
+                Dim result As DataSet = reader.AsDataSet(New ExcelDataSetConfiguration() With {
                                                                  .ConfigureDataTable = Function(__) New ExcelDataTableConfiguration() With {
                                                                  .UseHeaderRow = True}})
-                    tableExcelSetting = result.Tables
-                    Dim quotationTable As New ArrayList()
-                    Dim quotationDescTable As New ArrayList()
-                    For i As Integer = 0 To dgvExcel.ColumnCount - 1
-                        Dim dgvHeader = dgvExcel.Columns(i).HeaderText
-                        Dim dtTemp As DataTable = tableExcelSetting("Quotation")
-                        For Each row As DataRow In dtTemp.Rows
-                            Dim sql_value = row(0).ToString
-                            Dim excel_value = row(1).ToString
-                            If excel_value.Equals(dgvHeader) Then
-                                quotationTable.Add(sql_value)
-                            End If
-                        Next
-                        Dim dtTemp2 As DataTable = tableExcelSetting("Quotation Desc")
-                        For Each row As DataRow In dtTemp2.Rows
-                            Dim sql_value = row(0).ToString
-                            Dim excel_value = row(1).ToString
-                            If excel_value.Equals(dgvHeader) Then
-                                quotationDescTable.Add(sql_value)
-                            End If
-                        Next
-                    Next
-                    Dim strs As String = ""
-                    For Each str As String In quotationDescTable
-                        strs += str + vbTab
-                    Next
-                    MsgBox(strs)
-                End Using
+                tableExcelSetting = result.Tables
+                Dim queryTable As New ArrayList
+                If cbType.Text.Equals("Quotation") Then
+                    queryTable.Add(New ArrayList)
+                    queryTable.Add(New ArrayList)
+                    queryTable(0).add("Quotation") '0
+                    queryTable(0).add("squote") '1
+                    queryTable(1).add("Quotation Desc")
+                    queryTable(1).add("squotedet")
+                End If
+                writeIntoQueryTable(tableExcelSetting, queryTable)
+                'Dim strs As String = ""
+                'For i As Integer = 1 To queryTable(0).count - 1
+                '    strs += queryTable(0)(i) + vbNewLine
+                'Next
+                'MsgBox(strs)
+
+
+
+                'MsgBox()
+                'Command = strs.Substring(1, strs.Length - 1)
+                'Using myConn
+                '    Using command As New SqlCommand("INSERT INTO table_master(item, price) VALUES(@item, @price)",
+                '                                    myConn)
+
+                '        myConn.Open()
+
+                '        ' Create and add the parameters, just one time here with dummy values or'
+                '        ' use the full syntax to create each single the parameter'
+                '        command.Parameters.AddWithValue("@item", "")
+                '        command.Parameters.AddWithValue("@price", 0)
+
+                '        For Each r As DataGridViewRow In dgvMain.Rows
+                '            If (Not String.IsNullOrWhiteSpace(r.Cells(1).Value)) Then
+
+                '                command.Parameters("@item").Value = r.Cells(1).Value.Trim
+                '                command.Parameters("@price").Value = r.Cells(2).Value
+                '                command.ExecuteNonQuery()
+                '            End If
+                '        Next
+
+                '    End Using
+                'End Using
             End Using
-        Catch ex As Exception
-            MsgBox(ex.Message, MsgBoxStyle.Critical)
-        End Try
+        End Using
+        'Catch ex As Exception
+        '    MsgBox(ex.Message, MsgBoxStyle.Critical)
+        'End Try
         'Try
         '    myConn = New SqlConnection("Data Source=" + serverName + ";" &
         '                            "Initial Catalog=master;" + pwd_query)
@@ -185,5 +223,195 @@ Public Class ExcelImporter
         '        MsgBox(ex.Message, MsgBoxStyle.Critical, Me.Text)
         '    End If
         'End Try
+    End Sub
+    Private Sub writeIntoQueryTable(tableExcelSetting As DataTableCollection, queryTable As ArrayList)
+        'writeIntoQueryTable(tableExcelSetting, queryTable)
+        Dim sql_format_arraylist = New ArrayList
+        Dim excel_format_arraylist = New ArrayList
+        For j As Integer = 0 To queryTable.Count - 1
+            sql_format_arraylist.Add(New ArrayList)
+            excel_format_arraylist.Add(New ArrayList)
+            Dim dtTemp As DataTable = tableExcelSetting(queryTable(j)(0))
+            For Each row As DataRow In dtTemp.Rows
+                Dim sql_value = row(0).ToString
+                Dim excel_value = row(1).ToString
+                For i As Integer = 0 To dgvExcel.ColumnCount - 1
+                    Dim dgvHeader = dgvExcel.Columns(i).HeaderText
+                    If excel_value.Equals(dgvHeader) Then
+                        'queryTable(j).Add(sql_value)
+                        sql_format_arraylist(j).add(sql_value)
+                        excel_format_arraylist(j).add(excel_value)
+                        'quotationTable.Add(sql_value)
+                    End If
+                Next
+            Next
+        Next
+        'For i As Integer = 0 To sql_format_arraylist.Count - 1
+        '    Dim strs = ""
+        '    For Each str As String In sql_format_arraylist(i)
+        '        strs += str + vbTab
+        '    Next
+        '    MsgBox(strs)
+        'Next
+        'For Each al As ArrayList In sql_format_arraylist
+        '    Dim strs = ""
+        '    For Each str As String In al
+        '        strs += str + vbTab
+        '    Next
+        '    MsgBox(strs)
+        'Next
+        For m As Integer = 0 To queryTable.Count - 1
+            Dim query As String = "INSERT INTO " + queryTable(m)(1) + " ("
+            Dim values As String = ""
+            For n As Integer = 0 To sql_format_arraylist(m).Count - 1
+                values += "," + sql_format_arraylist(m)(n)
+            Next
+            query += values.Substring(1, values.Length - 1) + ") VALUES ("
+            values = ""
+            For b As Integer = 0 To sql_format_arraylist(m).Count - 1
+                values += ",@" + sql_format_arraylist(m)(b)
+            Next
+            query += values.Substring(1, values.Length - 1) + ")"
+            'MsgBox(query)
+            queryTable(m).add(query)
+        Next
+        For Each al As ArrayList In queryTable
+            Dim strs = ""
+            For Each str As String In al
+                strs += str + vbNewLine
+            Next
+            'MsgBox(strs)
+        Next
+        For i As Integer = 0 To queryTable.Count - 1
+            init()
+            Using myConn = New SqlConnection("Data Source=" + serverName + ";" & "Initial Catalog=" + database + ";" + pwd_query)
+                Using command As New SqlCommand(queryTable(i)(2), myConn)
+                    'command.CommandType = Text
+                    ' Create and add the parameters, just one time here with dummy values or'
+                    ' use the full syntax to create each single the parameter'
+                    For y As Integer = 0 To excel_format_arraylist.Count - 1
+                        'MsgBox("Excel:" + vbTab + excel_format_arraylist(i)(y))
+                    Next
+                    For j As Integer = 0 To sql_format_arraylist(i).count - 1
+                        'command.Parameters.AddWithValue("@" + sql_format_arraylist(i)(j), "")
+                    Next
+                    For row As Integer = 0 To dgvExcel.RowCount - 2
+                        Using r As DataGridViewRow = dgvExcel.Rows(row)
+                            Dim queryable As Boolean
+                            queryable = False
+                            'Dim strtemp As String = ""
+                            For q As Integer = 0 To r.Cells.Count - 1
+                                Dim cellValue As Object = r.Cells(q).Value.ToString.Trim
+                                Dim headerText As String = dgvExcel.Columns(q).HeaderText.Trim
+                                If Not (cellValue.Equals(String.Empty)) Then
+                                    For y As Integer = 0 To excel_format_arraylist(i).Count - 1
+                                        Dim excel_temp = excel_format_arraylist(i)(y).ToString.Trim
+                                        'MsgBox(excel_temp + vbTab + headerText)
+                                        If excel_temp.Equals(headerText) Then
+                                            Dim sql_temp = sql_format_arraylist(i)(y).ToString.Trim
+                                            command.Parameters.Add("@" + sql_format_arraylist(i)(y), SqlDbType.Char).Value = cellValue
+                                            MsgBox(excel_temp + vbTab + headerText)
+                                            'MsgBox(headerText + vbTab + cellValue)
+                                            'command.Parameters("@" + sql_temp).Value = cellValue
+                                            queryable = True
+                                        End If
+                                    Next
+                                End If
+                            Next
+                            'MsgBox(strtemp)
+                            If queryable Then
+                                'MsgBox(command.c)
+                                myConn.Open()
+                                command.ExecuteNonQuery()
+                                myConn.Close()
+                            End If
+                        End Using
+                    Next
+
+                End Using
+            End Using
+        Next
+        'For i As Integer = 0 To queryTable.Count - 1
+        '    init()
+        '    Using myConn = New SqlConnection("Data Source=" + serverName + ";" & "Initial Catalog=" + database + ";" + pwd_query)
+        '        Using command As New SqlCommand(queryTable(i)(2), myConn)
+        '            'command.CommandType = Text
+        '            myConn.Open()
+        '            ' Create and add the parameters, just one time here with dummy values or'
+        '            ' use the full syntax to create each single the parameter'
+        '            For j As Integer = 0 To sql_format_arraylist(i).count - 1
+        '                'command.Parameters.AddWithValue("@" + sql_format_arraylist(i)(j), "")
+        '            Next
+        '            For row As Integer = 0 To dgvExcel.RowCount - 2
+        '                Using r As DataGridViewRow = dgvExcel.Rows(row)
+        '                    Dim queryable As Boolean
+        '                    queryable = False
+        '                    'Dim strtemp As String = ""
+        '                    For q As Integer = 0 To r.Cells.Count - 1
+        '                        Dim cellValue As Object = r.Cells(q).Value
+        '                        Dim headerText As String = dgvExcel.Columns(q).HeaderText
+        '                        If Not (cellValue.ToString.Trim.Equals(String.Empty)) Then
+        '                            For y As Integer = 0 To excel_format_arraylist.Count - 1
+        '                                Dim excel_temp = excel_format_arraylist(i)(y).ToString.Trim
+        '                                If excel_temp.Equals(headerText) Then
+        '                                    Dim sql_temp = sql_format_arraylist(i)(y).ToString.Trim
+
+        '                                    command.Parameters.AddWithValue("@" + sql_format_arraylist(i)(y), cellValue.ToString)
+        '                                    command.Parameters("@" + sql_temp).Value = cellValue
+        '                                    queryable = True
+        '                                End If
+        '                            Next
+        '                        End If
+        '                    Next
+        '                    'MsgBox(strtemp)
+        '                    If queryable Then
+        '                        'MsgBox(command.c)
+        '                        command.ExecuteNonQuery()
+        '                    End If
+        '                End Using
+        '            Next
+        '            'For Each r As DataGridViewRow In dgvExcel.Rows
+        '            '    'MsgBox("rock")
+        '            '    'Dim strtemp As String = ""
+        '            '    'For q As Integer = 0 To r.Cells.Count - 1
+        '            '    '    Dim cellValue = r.Cells(q).Value.ToString.Trim
+        '            '    '    If Not (cellValue.Equals(String.Empty)) Then
+        '            '    '        strtemp += cellValue + vbTab
+        '            '    '    End If
+        '            '    'Next
+        '            '    'If Not (strtemp.Equals(String.Empty)) Then
+        '            '    '    MsgBox(strtemp)
+        '            '    'End If
+        '            '    'MsgBox(r.Cells.Count)
+        '            '    'If (Not String.IsNullOrWhiteSpace(r.Cells(1).Value)) Then
+        '            '    '    For k As Integer = 0 To excel_format_arraylist(i).count - 1
+        '            '    '        command.Parameters.AddWithValue("@" + sql_format_arraylist(i)(k), "")
+        '            '    '        command.Parameters("@" + sql_format_arraylist(i)(k)).Value = r.Cells(1).Value.Trim
+        '            '    '    Next
+        '            '    '    command.Parameters("@item").Value = r.Cells(1).Value.Trim
+        '            '    '    command.Parameters("@price").Value = r.Cells(2).Value
+        '            '    '    command.ExecuteNonQuery()
+        '            '    'End If
+        '            'Next
+        '            myConn.Close()
+        '        End Using
+        '    End Using
+        'Next
+    End Sub
+    Private Sub test()
+        dgvExcel.Columns(1).DefaultCellStyle.Format = "d"
+        'init()
+        'myConn = New SqlConnection("Data Source=" + serverName + ";" & "Initial Catalog=test_database;" + pwd_query)
+        'Dim command As New SqlCommand("INSERT INTO table_1(name,lastupdate,price) VALUES (@name,@lastupdate,@price)", myConn)
+        'command.Parameters.Add("@name", SqlDbType.Char).Value = "Name1"
+        'command.Parameters.Add("@lastupdate", SqlDbType.Char).Value = "2022-04-05 00:00:00.000"
+        'command.Parameters.Add("@price", SqlDbType.Char).Value = 585
+        'myConn.Open()
+        'If command.ExecuteNonQuery = 1 Then
+        '    MsgBox("win")
+        'Else
+        '    MsgBox("lose")
+        'End If
+        'myConn.Close()
     End Sub
 End Class
