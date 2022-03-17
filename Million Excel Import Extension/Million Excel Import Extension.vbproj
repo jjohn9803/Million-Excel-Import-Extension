@@ -132,6 +132,12 @@
       <DependentUpon>ExcelImporter.vb</DependentUpon>
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Function Form.Designer.vb">
+      <DependentUpon>Function Form.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Function Form.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Maintainance Form.Designer.vb">
       <DependentUpon>Maintainance Form.vb</DependentUpon>
     </Compile>
@@ -164,6 +170,9 @@
   <ItemGroup>
     <EmbeddedResource Include="ExcelImporter.resx">
       <DependentUpon>ExcelImporter.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Function Form.resx">
+      <DependentUpon>Function Form.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Maintainance Form.resx">
       <DependentUpon>Maintainance Form.vb</DependentUpon>

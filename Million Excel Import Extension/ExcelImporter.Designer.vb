@@ -33,9 +33,10 @@ Partial Class ExcelImporter
         Me.Panel2 = New System.Windows.Forms.Panel()
         Me.FlowLayoutPanel2 = New System.Windows.Forms.FlowLayoutPanel()
         Me.Label4 = New System.Windows.Forms.Label()
-        Me.cbType = New System.Windows.Forms.ComboBox()
+        Me.txtType = New System.Windows.Forms.TextBox()
         Me.btnCreateTemplate = New System.Windows.Forms.Button()
         Me.btnImport = New System.Windows.Forms.Button()
+        Me.btnSync = New System.Windows.Forms.Button()
         Me.Panel3 = New System.Windows.Forms.Panel()
         Me.dgvExcel = New System.Windows.Forms.DataGridView()
         Me.Panel1.SuspendLayout()
@@ -52,7 +53,7 @@ Partial Class ExcelImporter
         Me.Panel1.Dock = System.Windows.Forms.DockStyle.Top
         Me.Panel1.Location = New System.Drawing.Point(0, 0)
         Me.Panel1.Name = "Panel1"
-        Me.Panel1.Size = New System.Drawing.Size(800, 73)
+        Me.Panel1.Size = New System.Drawing.Size(908, 73)
         Me.Panel1.TabIndex = 7
         '
         'FlowLayoutPanel1
@@ -64,7 +65,7 @@ Partial Class ExcelImporter
         Me.FlowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.FlowLayoutPanel1.Location = New System.Drawing.Point(0, 0)
         Me.FlowLayoutPanel1.Name = "FlowLayoutPanel1"
-        Me.FlowLayoutPanel1.Size = New System.Drawing.Size(800, 73)
+        Me.FlowLayoutPanel1.Size = New System.Drawing.Size(908, 73)
         Me.FlowLayoutPanel1.TabIndex = 14
         '
         'Label2
@@ -101,7 +102,7 @@ Partial Class ExcelImporter
         '
         Me.cbSheet.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cbSheet.FormattingEnabled = True
-        Me.cbSheet.Location = New System.Drawing.Point(3, 53)
+        Me.cbSheet.Location = New System.Drawing.Point(592, 15)
         Me.cbSheet.Margin = New System.Windows.Forms.Padding(3, 15, 3, 3)
         Me.cbSheet.Name = "cbSheet"
         Me.cbSheet.Size = New System.Drawing.Size(261, 21)
@@ -113,19 +114,20 @@ Partial Class ExcelImporter
         Me.Panel2.Dock = System.Windows.Forms.DockStyle.Bottom
         Me.Panel2.Location = New System.Drawing.Point(0, 390)
         Me.Panel2.Name = "Panel2"
-        Me.Panel2.Size = New System.Drawing.Size(800, 60)
+        Me.Panel2.Size = New System.Drawing.Size(908, 60)
         Me.Panel2.TabIndex = 11
         '
         'FlowLayoutPanel2
         '
         Me.FlowLayoutPanel2.Controls.Add(Me.Label4)
-        Me.FlowLayoutPanel2.Controls.Add(Me.cbType)
+        Me.FlowLayoutPanel2.Controls.Add(Me.txtType)
         Me.FlowLayoutPanel2.Controls.Add(Me.btnCreateTemplate)
         Me.FlowLayoutPanel2.Controls.Add(Me.btnImport)
+        Me.FlowLayoutPanel2.Controls.Add(Me.btnSync)
         Me.FlowLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill
         Me.FlowLayoutPanel2.Location = New System.Drawing.Point(0, 0)
         Me.FlowLayoutPanel2.Name = "FlowLayoutPanel2"
-        Me.FlowLayoutPanel2.Size = New System.Drawing.Size(800, 60)
+        Me.FlowLayoutPanel2.Size = New System.Drawing.Size(908, 60)
         Me.FlowLayoutPanel2.TabIndex = 18
         '
         'Label4
@@ -139,22 +141,19 @@ Partial Class ExcelImporter
         Me.Label4.TabIndex = 19
         Me.Label4.Text = "Type: "
         '
-        'cbType
+        'txtType
         '
-        Me.cbType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cbType.FormattingEnabled = True
-        Me.cbType.Items.AddRange(New Object() {"Quotation"})
-        Me.cbType.Location = New System.Drawing.Point(93, 15)
-        Me.cbType.Margin = New System.Windows.Forms.Padding(3, 15, 3, 3)
-        Me.cbType.Name = "cbType"
-        Me.cbType.Size = New System.Drawing.Size(209, 21)
-        Me.cbType.TabIndex = 20
+        Me.txtType.Enabled = False
+        Me.txtType.Location = New System.Drawing.Point(100, 17)
+        Me.txtType.Margin = New System.Windows.Forms.Padding(10, 17, 3, 0)
+        Me.txtType.Name = "txtType"
+        Me.txtType.Size = New System.Drawing.Size(160, 20)
+        Me.txtType.TabIndex = 23
         '
         'btnCreateTemplate
         '
-        Me.btnCreateTemplate.Enabled = False
-        Me.btnCreateTemplate.Location = New System.Drawing.Point(380, 15)
-        Me.btnCreateTemplate.Margin = New System.Windows.Forms.Padding(75, 15, 3, 3)
+        Me.btnCreateTemplate.Location = New System.Drawing.Point(313, 15)
+        Me.btnCreateTemplate.Margin = New System.Windows.Forms.Padding(50, 15, 3, 3)
         Me.btnCreateTemplate.Name = "btnCreateTemplate"
         Me.btnCreateTemplate.Size = New System.Drawing.Size(133, 23)
         Me.btnCreateTemplate.TabIndex = 21
@@ -163,14 +162,23 @@ Partial Class ExcelImporter
         '
         'btnImport
         '
-        Me.btnImport.Enabled = False
-        Me.btnImport.Location = New System.Drawing.Point(591, 15)
-        Me.btnImport.Margin = New System.Windows.Forms.Padding(75, 15, 3, 3)
+        Me.btnImport.Location = New System.Drawing.Point(499, 15)
+        Me.btnImport.Margin = New System.Windows.Forms.Padding(50, 15, 3, 3)
         Me.btnImport.Name = "btnImport"
-        Me.btnImport.Size = New System.Drawing.Size(75, 23)
+        Me.btnImport.Size = New System.Drawing.Size(133, 23)
         Me.btnImport.TabIndex = 18
         Me.btnImport.Text = "Import"
         Me.btnImport.UseVisualStyleBackColor = True
+        '
+        'btnSync
+        '
+        Me.btnSync.Location = New System.Drawing.Point(685, 15)
+        Me.btnSync.Margin = New System.Windows.Forms.Padding(50, 15, 3, 3)
+        Me.btnSync.Name = "btnSync"
+        Me.btnSync.Size = New System.Drawing.Size(133, 23)
+        Me.btnSync.TabIndex = 22
+        Me.btnSync.Text = "Sync"
+        Me.btnSync.UseVisualStyleBackColor = True
         '
         'Panel3
         '
@@ -178,7 +186,7 @@ Partial Class ExcelImporter
         Me.Panel3.Dock = System.Windows.Forms.DockStyle.Fill
         Me.Panel3.Location = New System.Drawing.Point(0, 73)
         Me.Panel3.Name = "Panel3"
-        Me.Panel3.Size = New System.Drawing.Size(800, 317)
+        Me.Panel3.Size = New System.Drawing.Size(908, 317)
         Me.Panel3.TabIndex = 12
         '
         'dgvExcel
@@ -200,7 +208,7 @@ Partial Class ExcelImporter
         Me.dgvExcel.Dock = System.Windows.Forms.DockStyle.Fill
         Me.dgvExcel.Location = New System.Drawing.Point(0, 0)
         Me.dgvExcel.Name = "dgvExcel"
-        Me.dgvExcel.Size = New System.Drawing.Size(800, 317)
+        Me.dgvExcel.Size = New System.Drawing.Size(908, 317)
         Me.dgvExcel.TabIndex = 1
         '
         'ExcelImporter
@@ -208,11 +216,11 @@ Partial Class ExcelImporter
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.AutoSize = True
-        Me.ClientSize = New System.Drawing.Size(800, 450)
+        Me.ClientSize = New System.Drawing.Size(908, 450)
         Me.Controls.Add(Me.Panel3)
         Me.Controls.Add(Me.Panel2)
         Me.Controls.Add(Me.Panel1)
-        Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
+        Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow
         Me.Name = "ExcelImporter"
         Me.Text = "Million Excel Import Extension"
         Me.Panel1.ResumeLayout(False)
@@ -237,7 +245,8 @@ Partial Class ExcelImporter
     Friend WithEvents FlowLayoutPanel1 As FlowLayoutPanel
     Friend WithEvents FlowLayoutPanel2 As FlowLayoutPanel
     Friend WithEvents Label4 As Label
-    Friend WithEvents cbType As ComboBox
     Friend WithEvents btnCreateTemplate As Button
     Friend WithEvents btnImport As Button
+    Friend WithEvents btnSync As Button
+    Friend WithEvents txtType As TextBox
 End Class

@@ -9,10 +9,13 @@ Public Class SQL_Connection_Form
     Public myConn As SqlConnection
     Public statusConnection As Boolean
     Public pwd_query As String
+    Public import_type As String
     Private pwd_mode As Integer
     Private uid As String
     Private pwd As String
-    Public form2 As New ExcelImporter
+    'Public form2 As New ExcelImporter
+    Private form_default_size As New Size
+    Public form2 As New Function_Form
     Public form3 As New Maintainance_Form
     Private Sub SQL_Connection_Form_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.StartPosition = FormStartPosition.CenterScreen
@@ -23,6 +26,8 @@ Public Class SQL_Connection_Form
         tabFormLoad()
     End Sub
     Private Sub tabFormLoad()
+        form_default_size = Me.Size
+
         form2.TopLevel = False
         form2.FormBorderStyle = Windows.Forms.FormBorderStyle.None
         form2.Location = New System.Drawing.Point(0, 0)
@@ -251,7 +256,8 @@ Public Class SQL_Connection_Form
     Private Sub TabControl1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles TabControl1.SelectedIndexChanged
         If TabControl1.SelectedTab.TabIndex = 1 Then
             form2.Visible = True
-            Me.WindowState = FormWindowState.Maximized
+            Me.Size = form2.Size
+            'Me.WindowState = FormWindowState.Maximized
             form2.WindowState = FormWindowState.Maximized
         ElseIf TabControl1.SelectedTab.TabIndex = 2 Then
             form3.Visible = True
@@ -261,11 +267,13 @@ Public Class SQL_Connection_Form
         Else
             form2.Visible = False
             form3.Visible = False
+            Me.Size = form_default_size
             Me.WindowState = FormWindowState.Normal
         End If
     End Sub
     Public Sub closeForm()
-        ExcelImporter.Close()
+        Function_Form.Close()
+        'ExcelImporter.Close()
         Maintainance_Form.Close()
         Me.Close()
     End Sub

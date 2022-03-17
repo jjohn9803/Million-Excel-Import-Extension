@@ -10,8 +10,10 @@ Public Class ExcelImporter
     Private myConn As SqlConnection
     Private statusConnection As Boolean
     Private pwd_query As String
+    Private import_type As String
+    Private data_type_group As New List(Of String) From {"one", "two", "three"}
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        btnCreateTemplate.Enabled = True
+        init()
     End Sub
     Private Sub init()
         serverName = SQL_Connection_Form.serverName
@@ -19,6 +21,8 @@ Public Class ExcelImporter
         myConn = SQL_Connection_Form.myConn
         statusConnection = SQL_Connection_Form.statusConnection
         pwd_query = SQL_Connection_Form.pwd_query
+        import_type = SQL_Connection_Form.import_type
+        txtType.Text = import_type
         'MsgBox(serverName + vbTab + database + vbTab + myConn.ToString + vbTab + statusConnection.ToString + vbTab + pwd_query)
     End Sub
     Private Sub cbSheet_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbSheet.SelectedIndexChanged
@@ -130,15 +134,15 @@ Public Class ExcelImporter
     Private Function getMaintainSetting() As String
         Return SQL_Connection_Form.returnUpperFolder(Application.StartupPath(), 2) + "maintain.xls"
     End Function
-    Private Sub cbType_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbType.SelectedIndexChanged
-        If Not (cbType.SelectedItem.ToString.Equals(String.Empty)) Then
-            btnCreateTemplate.Enabled = True
-            btnImport.Enabled = True
-        Else
-            btnCreateTemplate.Enabled = False
-            btnImport.Enabled = False
-        End If
-    End Sub
+    'Private Sub cbType_SelectedIndexChanged(sender As Object, e As EventArgs)
+    '    If Not (cbType.SelectedItem.ToString.Equals(String.Empty)) Then
+    '        btnCreateTemplate.Enabled = True
+    '        btnImport.Enabled = True
+    '    Else
+    '        btnCreateTemplate.Enabled = False
+    '        btnImport.Enabled = False
+    '    End If
+    'End Sub
 
     Private Sub btnImport_Click(sender As Object, e As EventArgs) Handles btnImport.Click
         Dim importType = "Quotation"
@@ -151,15 +155,18 @@ Public Class ExcelImporter
                                                                  .UseHeaderRow = True}})
                 tableExcelSetting = result.Tables
                 Dim queryTable As New ArrayList
-                If cbType.Text.Equals("Quotation") Then
+                If txtType.Text.Equals("Quotation") Then
                     queryTable.Add(New ArrayList)
                     queryTable.Add(New ArrayList)
                     queryTable(0).add("Quotation") '0
                     queryTable(0).add("squote") '1
                     queryTable(1).add("Quotation Desc")
                     queryTable(1).add("squotedet")
+                ElseIf txtType.Text.Equals("SalesOrder") Then
+
                 End If
-                writeIntoQueryTable(tableExcelSetting, queryTable)
+                quotationWriteIntoSQL(tableExcelSetting, queryTable)
+                'writeIntoQueryTable(tableExcelSetting, queryTable)
                 'Dim strs As String = ""
                 'For i As Integer = 1 To queryTable(0).count - 1
                 '    strs += queryTable(0)(i) + vbNewLine
@@ -224,23 +231,165 @@ Public Class ExcelImporter
         '    End If
         'End Try
     End Sub
-    Private Sub writeIntoQueryTable(tableExcelSetting As DataTableCollection, queryTable As ArrayList)
-        'writeIntoQueryTable(tableExcelSetting, queryTable)
+    Private Sub quotationWriteIntoSQL(tableExcelSetting As DataTableCollection, queryTable As ArrayList)
         Dim sql_format_arraylist = New ArrayList
         Dim excel_format_arraylist = New ArrayList
+        Dim data_type_arraylist = New ArrayList
         For j As Integer = 0 To queryTable.Count - 1
             sql_format_arraylist.Add(New ArrayList)
             excel_format_arraylist.Add(New ArrayList)
+            data_type_arraylist.Add(New ArrayList)
             Dim dtTemp As DataTable = tableExcelSetting(queryTable(j)(0))
             For Each row As DataRow In dtTemp.Rows
                 Dim sql_value = row(0).ToString
                 Dim excel_value = row(1).ToString
+                Dim data_type = row(4).ToString
+                sql_format_arraylist(j).add(sql_value)
+                data_type_arraylist(j).add(data_type)
+                For i As Integer = 0 To dgvExcel.ColumnCount - 1
+                    Dim dgvHeader = dgvExcel.Columns(i).HeaderText
+                    If excel_value.Equals(dgvHeader) Then
+                        'queryTable(j).Add(sql_value)
+                        'sql_format_arraylist(j).add(sql_value)
+                        excel_format_arraylist(j).add(excel_value)
+                        'quotationTable.Add(sql_value)
+                    End If
+                Next
+            Next
+        Next
+        'For i As Integer = 0 To sql_format_arraylist.Count - 1
+        '    Dim v = 0
+        '    Dim strs = ""
+        '    For Each str As String In sql_format_arraylist(i)
+        '        strs += str + vbTab
+        '        v += 1
+        '    Next
+        '    MsgBox(v.ToString + " (sql Count) : " + strs)
+        'Next
+        'For i As Integer = 0 To excel_format_arraylist.Count - 1
+        '    Dim v = 0
+        '    Dim strs = ""
+        '    For Each str As String In excel_format_arraylist(i)
+        '        strs += str + vbTab
+        '        v += 1
+        '    Next
+        '    MsgBox(v.ToString + " (excel Count) : " + strs)
+        'Next
+        For m As Integer = 0 To queryTable.Count - 1
+            Dim query As String = "INSERT INTO " + queryTable(m)(1) + " ("
+            Dim values As String = ""
+            For n As Integer = 0 To sql_format_arraylist(m).Count - 1
+                values += "," + sql_format_arraylist(m)(n)
+            Next
+            query += values.Substring(1, values.Length - 1) + ") VALUES ("
+            values = ""
+            For b As Integer = 0 To sql_format_arraylist(m).Count - 1
+                values += ",@" + sql_format_arraylist(m)(b)
+            Next
+            query += values.Substring(1, values.Length - 1) + ")"
+            'MsgBox(query)
+            queryTable(m).add(query)
+        Next
+        For Each al As ArrayList In queryTable
+            Dim strs = ""
+            For Each str As String In al
+                strs += str + vbNewLine
+            Next
+            'MsgBox(strs)
+        Next
+        For i As Integer = 0 To queryTable.Count - 1
+            init()
+            Using myConn = New SqlConnection("Data Source=" + serverName + ";" & "Initial Catalog=" + database + ";" + pwd_query)
+                Using command As New SqlCommand(queryTable(i)(2), myConn)
+                    'command.CommandType = Text
+                    ' Create and add the parameters, just one time here with dummy values or'
+                    ' use the full syntax to create each single the parameter'
+                    For y As Integer = 0 To excel_format_arraylist.Count - 1
+                        'MsgBox("Excel:" + vbTab + excel_format_arraylist(i)(y))
+                    Next
+                    For j As Integer = 0 To sql_format_arraylist(i).count - 1
+                        'command.Parameters.AddWithValue("@" + sql_format_arraylist(i)(j), "")
+                    Next
+                    For u As Integer = 0 To sql_format_arraylist.Count - 1
+                        Dim sql_temp = sql_format_arraylist(i)(u).ToString.Trim
+                        For row As Integer = 0 To dgvExcel.RowCount - 2
+                            Using r As DataGridViewRow = dgvExcel.Rows(row)
+                                Dim queryable As Boolean
+                                queryable = False
+                                'Dim strtemp As String = ""
+                                For q As Integer = 0 To r.Cells.Count - 1
+                                    Dim cellValue As Object = r.Cells(q).Value.ToString.Trim
+                                    Dim headerText As String = dgvExcel.Columns(q).HeaderText.Trim
+                                    Dim matched_with_header = False
+                                    For y As Integer = 0 To excel_format_arraylist(i).Count - 1
+                                        Dim excel_temp = excel_format_arraylist(i)(y).ToString.Trim
+                                        'MsgBox(excel_temp + vbTab + headerText)
+                                        If excel_temp.Equals(headerText) Then
+                                            If Not (cellValue.Equals(String.Empty)) Then
+                                                command.Parameters.Add("@" + sql_temp, SqlDbType.Char).Value = cellValue
+                                            Else
+                                                If data_type_arraylist(i)(y).ToString.Contains("char") Or data_type_arraylist(i)(y).ToString.Contains("text") Then
+                                                    command.Parameters.Add("@" + sql_temp, SqlDbType.Char).Value = " "
+                                                    'MsgBox("CHAR->" + excel_temp)
+                                                ElseIf data_type_arraylist(i)(y).ToString.Contains("date") Or data_type_arraylist(i)(y).ToString.Contains("time") Then
+                                                    command.Parameters.Add("@" + sql_temp, SqlDbType.Char).Value = New DateTime
+                                                    'MsgBox("DATETIME->" + excel_temp)
+                                                Else
+                                                    command.Parameters.Add("@" + sql_temp, SqlDbType.Char).Value = 0
+                                                    'MsgBox("NUMBER->" + excel_temp)
+                                                End If
+                                            End If
+                                            queryable = True
+                                        Else
+                                            If data_type_arraylist(i)(y).ToString.Contains("char") Or data_type_arraylist(i)(y).ToString.Contains("text") Then
+                                                command.Parameters.Add("@" + sql_temp, SqlDbType.Char).Value = " "
+                                                'MsgBox("CHAR->" + excel_temp)
+                                            ElseIf data_type_arraylist(i)(y).ToString.Contains("date") Or data_type_arraylist(i)(y).ToString.Contains("time") Then
+                                                command.Parameters.Add("@" + sql_temp, SqlDbType.Char).Value = New DateTime
+                                                'MsgBox("DATETIME->" + excel_temp)
+                                            Else
+                                                command.Parameters.Add("@" + sql_temp, SqlDbType.Char).Value = 0
+                                                'MsgBox("NUMBER->" + excel_temp)
+                                            End If
+                                        End If
+                                    Next
+                                Next
+                                If queryable Then
+                                    MsgBox(command.CommandText)
+                                    myConn.Open()
+                                    command.ExecuteNonQuery()
+                                    myConn.Close()
+                                End If
+                            End Using
+                        Next
+                    Next
+
+
+                End Using
+            End Using
+        Next
+    End Sub
+    Private Sub writeIntoQueryTable(tableExcelSetting As DataTableCollection, queryTable As ArrayList)
+        'writeIntoQueryTable(tableExcelSetting, queryTable)
+        Dim sql_format_arraylist = New ArrayList
+        Dim excel_format_arraylist = New ArrayList
+        Dim data_type_arraylist = New ArrayList
+        For j As Integer = 0 To queryTable.Count - 1
+            sql_format_arraylist.Add(New ArrayList)
+            excel_format_arraylist.Add(New ArrayList)
+            data_type_arraylist.Add(New ArrayList)
+            Dim dtTemp As DataTable = tableExcelSetting(queryTable(j)(0))
+            For Each row As DataRow In dtTemp.Rows
+                Dim sql_value = row(0).ToString
+                Dim excel_value = row(1).ToString
+                Dim data_type = row(4).ToString
                 For i As Integer = 0 To dgvExcel.ColumnCount - 1
                     Dim dgvHeader = dgvExcel.Columns(i).HeaderText
                     If excel_value.Equals(dgvHeader) Then
                         'queryTable(j).Add(sql_value)
                         sql_format_arraylist(j).add(sql_value)
                         excel_format_arraylist(j).add(excel_value)
+                        data_type_arraylist(j).add(data_type)
                         'quotationTable.Add(sql_value)
                     End If
                 Next
@@ -253,7 +402,7 @@ Public Class ExcelImporter
         '    Next
         '    MsgBox(strs)
         'Next
-        'For Each al As ArrayList In sql_format_arraylist
+        'For Each al As ArrayList In data_type_arraylist
         '    Dim strs = ""
         '    For Each str As String In al
         '        strs += str + vbTab
@@ -303,20 +452,59 @@ Public Class ExcelImporter
                             For q As Integer = 0 To r.Cells.Count - 1
                                 Dim cellValue As Object = r.Cells(q).Value.ToString.Trim
                                 Dim headerText As String = dgvExcel.Columns(q).HeaderText.Trim
-                                If Not (cellValue.Equals(String.Empty)) Then
-                                    For y As Integer = 0 To excel_format_arraylist(i).Count - 1
-                                        Dim excel_temp = excel_format_arraylist(i)(y).ToString.Trim
-                                        'MsgBox(excel_temp + vbTab + headerText)
-                                        If excel_temp.Equals(headerText) Then
-                                            Dim sql_temp = sql_format_arraylist(i)(y).ToString.Trim
+                                'If Not (cellValue.Equals(String.Empty)) Then
+                                '    For y As Integer = 0 To excel_format_arraylist(i).Count - 1
+                                '        Dim excel_temp = excel_format_arraylist(i)(y).ToString.Trim
+                                '        'MsgBox(excel_temp + vbTab + headerText)
+                                '        If excel_temp.Equals(headerText) Then
+                                '            Dim sql_temp = sql_format_arraylist(i)(y).ToString.Trim
+                                '            If cellValue.ToString.Equals(String.Empty) Then
+                                '                MsgBox("Empty: " + headerText)
+                                '                command.Parameters.Add("@" + sql_format_arraylist(i)(y), SqlDbType.Char).Value = 0
+                                '            Else
+                                '                command.Parameters.Add("@" + sql_format_arraylist(i)(y), SqlDbType.Char).Value = cellValue
+                                '            End If
+                                '            'command.Parameters.Add("@" + sql_format_arraylist(i)(y), SqlDbType.Char).Value = cellValue
+                                '            MsgBox(excel_temp + vbTab + headerText)
+                                '            'MsgBox(headerText + vbTab + cellValue)
+                                '            'command.Parameters("@" + sql_temp).Value = cellValue
+                                '            queryable = True
+                                '        End If
+                                '    Next
+                                'Else
+
+                                'End If
+                                For y As Integer = 0 To excel_format_arraylist(i).Count - 1
+                                    Dim excel_temp = excel_format_arraylist(i)(y).ToString.Trim
+                                    'MsgBox(excel_temp + vbTab + headerText)
+                                    If excel_temp.Equals(headerText) Then
+                                        Dim sql_temp = sql_format_arraylist(i)(y).ToString.Trim
+                                        If Not (cellValue.Equals(String.Empty)) Then
                                             command.Parameters.Add("@" + sql_format_arraylist(i)(y), SqlDbType.Char).Value = cellValue
-                                            MsgBox(excel_temp + vbTab + headerText)
-                                            'MsgBox(headerText + vbTab + cellValue)
-                                            'command.Parameters("@" + sql_temp).Value = cellValue
-                                            queryable = True
+                                        Else
+                                            'MsgBox(excel_temp + vbTab + "(" + headerText + ")" + vbNewLine + "Data Type: " + data_type_arraylist(i)(y))
+                                            'MsgBox()
+                                            If data_type_arraylist(i)(y).ToString.Contains("char") Or data_type_arraylist(i)(y).ToString.Contains("text") Then
+                                                command.Parameters.Add("@" + sql_format_arraylist(i)(y), SqlDbType.Char).Value = " "
+                                                MsgBox("CHAR->" + excel_temp)
+                                            ElseIf data_type_arraylist(i)(y).ToString.Contains("date") Or data_type_arraylist(i)(y).ToString.Contains("time") Then
+                                                command.Parameters.Add("@" + sql_format_arraylist(i)(y), SqlDbType.Char).Value = New DateTime
+                                                MsgBox("DATETIME->" + excel_temp)
+                                            Else
+                                                command.Parameters.Add("@" + sql_format_arraylist(i)(y), SqlDbType.Char).Value = 0
+                                                MsgBox("NUMBER->" + excel_temp)
+                                            End If
+
+                                            'command.Parameters.Add("@" + sql_format_arraylist(i)(y), data_type_arraylist(i)(y)).Value = 0
+                                            'command.Parameters.Add("@" + sql_format_arraylist(i)(y), SqlDbType.Char).Value = 0
                                         End If
-                                    Next
-                                End If
+                                        'command.Parameters.Add("@" + sql_format_arraylist(i)(y), SqlDbType.Char).Value = cellValue
+                                        'MsgBox(excel_temp + vbTab + headerText)
+                                        'MsgBox(headerText + vbTab + cellValue)
+                                        'command.Parameters("@" + sql_temp).Value = cellValue
+                                        queryable = True
+                                    End If
+                                Next
                             Next
                             'MsgBox(strtemp)
                             If queryable Then
@@ -399,7 +587,7 @@ Public Class ExcelImporter
         'Next
     End Sub
     Private Sub test()
-        dgvExcel.Columns(1).DefaultCellStyle.Format = "d"
+        'dgvExcel.Columns(1).DefaultCellStyle.Format = "d"
         'init()
         'myConn = New SqlConnection("Data Source=" + serverName + ";" & "Initial Catalog=test_database;" + pwd_query)
         'Dim command As New SqlCommand("INSERT INTO table_1(name,lastupdate,price) VALUES (@name,@lastupdate,@price)", myConn)
@@ -414,4 +602,51 @@ Public Class ExcelImporter
         'End If
         'myConn.Close()
     End Sub
+
+    'Private Sub btnSync_Click(sender As Object, e As EventArgs) Handles btnSync.Click
+    '    init()
+    '    myConn = New SqlConnection("Data Source=" + serverName + ";" & "Initial Catalog=" + database + ";" + pwd_query)
+    '    Dim command As SqlCommand
+    '    command = myConn.CreateCommand
+    '    If txtType.Text.Equals("Quotation") Then
+    '        command.CommandText = "SELECT DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'squote'"
+    '    End If
+    '    myConn.Open()
+    '    Dim myReader As SqlDataReader
+    '    Dim al_dataType As New ArrayList
+    '    myReader = command.ExecuteReader()
+    '    Do While myReader.Read()
+    '        al_dataType.Add(myReader.GetString(0))
+    '    Loop
+    '    myConn.Close()
+    '    Using workbook As New XLWorkbook
+    '        Dim worksheet As IXLWorksheet = workbook.Worksheets.Add("Quotation")
+    '        'Dim worksheetLR As Integer = 1
+    '        Dim tableExcelSetting As DataTableCollection
+    '        Try
+    '            Using stream = File.Open(getMaintainSetting, FileMode.Open, FileAccess.Read)
+    '                Using reader As IExcelDataReader = ExcelReaderFactory.CreateReader(stream)
+    '                    Dim result As DataSet = reader.AsDataSet(New ExcelDataSetConfiguration() With {
+    '                                                                 .ConfigureDataTable = Function(__) New ExcelDataTableConfiguration() With {
+    '                                                                 .UseHeaderRow = True}})
+    '                    tableExcelSetting = result.Tables
+    '                    Dim excelUnique As New ArrayList
+    '                    arrayExtendFromExcelSheet(tableExcelSetting, "Quotation", excelUnique, worksheet)
+    '                    arrayExtendFromExcelSheet(tableExcelSetting, "Quotation Desc", excelUnique, worksheet)
+
+    '                End Using
+    '            End Using
+    '        Catch ex As Exception
+    '            MsgBox(ex.Message, MsgBoxStyle.Critical)
+    '        End Try
+    '        Using sfd As SaveFileDialog = New SaveFileDialog() With {.Filter = "Excel Workbook|*.xlsx|Excel 97-2003 Workbook|*.xls"}
+    '            If sfd.ShowDialog() = DialogResult.OK Then
+    '                worksheet.Columns.Width = 25
+    '                workbook.SaveAs(sfd.FileName)
+    '                MsgBox("File saved in " + sfd.FileName)
+    '            End If
+    '        End Using
+    '    End Using
+
+    'End Sub
 End Class
