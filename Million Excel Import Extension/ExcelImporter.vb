@@ -282,14 +282,15 @@ Public Class ExcelImporter
                 values += "," + sql_format_arraylist(m)(n)
             Next
             query += values.Substring(1, values.Length - 1) + ") VALUES ("
-            values = ""
-            For b As Integer = 0 To sql_format_arraylist(m).Count - 1
-                values += ",@" + sql_format_arraylist(m)(b)
-            Next
-            query += values.Substring(1, values.Length - 1) + ")"
+            'values = ""
+            'For b As Integer = 0 To sql_format_arraylist(m).Count - 1
+            '    values += ",@" + sql_format_arraylist(m)(b)
+            'Next
+            'query += values.Substring(1, values.Length - 1) + ")"
             'MsgBox(query)
             queryTable(m).add(query)
         Next
+        'MsgBox(queryTable(0)(2))
         For Each al As ArrayList In queryTable
             Dim strs = ""
             For Each str As String In al
@@ -300,7 +301,7 @@ Public Class ExcelImporter
         For i As Integer = 0 To queryTable.Count - 1
             init()
             Using myConn = New SqlConnection("Data Source=" + serverName + ";" & "Initial Catalog=" + database + ";" + pwd_query)
-                Using command As New SqlCommand(queryTable(i)(2), myConn)
+                Using command As New SqlCommand("", myConn)
                     'command.CommandType = Text
                     ' Create and add the parameters, just one time here with dummy values or'
                     ' use the full syntax to create each single the parameter'
@@ -312,6 +313,9 @@ Public Class ExcelImporter
                     Next
                     For u As Integer = 0 To sql_format_arraylist.Count - 1
                         Dim sql_temp = sql_format_arraylist(i)(u).ToString.Trim
+                        'Dim cmd As New SqlCommand("INSERT INTO " + queryTable(i)(1) + " (" + sql_temp + ")VALUES('" + +"')", myConn)
+                        'Dim cmd As New SqlCommand
+                        'Dim cmdText As String = "INSERT INTO " + queryTable(i)(1) + " (" + sql_temp + ")VALUES('"
                         For row As Integer = 0 To dgvExcel.RowCount - 2
                             Using r As DataGridViewRow = dgvExcel.Rows(row)
                                 Dim queryable As Boolean
@@ -326,39 +330,68 @@ Public Class ExcelImporter
                                         'MsgBox(excel_temp + vbTab + headerText)
                                         If excel_temp.Equals(headerText) Then
                                             If Not (cellValue.Equals(String.Empty)) Then
-                                                command.Parameters.Add("@" + sql_temp, SqlDbType.Char).Value = cellValue
+                                                queryTable(i)(2) += "'" + cellValue + "',"
+                                                'cmdText += cellValue
+                                                'cmd.CommandText = "INSERT INTO " + queryTable(i)(1) + " (" + sql_temp + ")VALUES('" + +"')"
+                                                'command.Parameters.Add("@" + sql_temp, SqlDbType.Char).Value = cellValue
                                             Else
                                                 If data_type_arraylist(i)(y).ToString.Contains("char") Or data_type_arraylist(i)(y).ToString.Contains("text") Then
-                                                    command.Parameters.Add("@" + sql_temp, SqlDbType.Char).Value = " "
+                                                    'command.Parameters.Add("@" + sql_temp, SqlDbType.Char).Value = " "
+                                                    queryTable(i)(2) += "' ',"
+                                                    'cmdText += " "
                                                     'MsgBox("CHAR->" + excel_temp)
                                                 ElseIf data_type_arraylist(i)(y).ToString.Contains("date") Or data_type_arraylist(i)(y).ToString.Contains("time") Then
-                                                    command.Parameters.Add("@" + sql_temp, SqlDbType.Char).Value = New DateTime
+                                                    'command.Parameters.Add("@" + sql_temp, SqlDbType.Char).Value = New DateTime
+                                                    queryTable(i)(2) += "'" + (New DateTime).ToString + "',"
+                                                    'cmdText += (New DateTime).ToString
                                                     'MsgBox("DATETIME->" + excel_temp)
                                                 Else
-                                                    command.Parameters.Add("@" + sql_temp, SqlDbType.Char).Value = 0
+                                                    'command.Parameters.Add("@" + sql_temp, SqlDbType.Char).Value = 0
+                                                    queryTable(i)(2) += "'0',"
+                                                    'cmdText += "0"
                                                     'MsgBox("NUMBER->" + excel_temp)
                                                 End If
                                             End If
+                                            'MsgBox(cmdText)
+                                            'cmdText += +"')"
+                                            'Dim cmd As New SqlCommand(cmdText, myConn)
+                                            ''cmd.CommandText = cmdText
+                                            ''cmd.CommandType = myConn
+                                            'myConn.Open()
+                                            'cmd.ExecuteNonQuery()
+                                            'myConn.Close()
                                             queryable = True
                                         Else
                                             If data_type_arraylist(i)(y).ToString.Contains("char") Or data_type_arraylist(i)(y).ToString.Contains("text") Then
-                                                command.Parameters.Add("@" + sql_temp, SqlDbType.Char).Value = " "
+                                                'command.Parameters.Add("@" + sql_temp, SqlDbType.Char).Value = " "
+                                                queryTable(i)(2) += "' ',"
                                                 'MsgBox("CHAR->" + excel_temp)
                                             ElseIf data_type_arraylist(i)(y).ToString.Contains("date") Or data_type_arraylist(i)(y).ToString.Contains("time") Then
-                                                command.Parameters.Add("@" + sql_temp, SqlDbType.Char).Value = New DateTime
+                                                'command.Parameters.Add("@" + sql_temp, SqlDbType.Char).Value = New DateTime
+                                                queryTable(i)(2) += "'" + (New DateTime).ToString + "',"
                                                 'MsgBox("DATETIME->" + excel_temp)
                                             Else
-                                                command.Parameters.Add("@" + sql_temp, SqlDbType.Char).Value = 0
+                                                'command.Parameters.Add("@" + sql_temp, SqlDbType.Char).Value = 0
+                                                queryTable(i)(2) += "'0',"
                                                 'MsgBox("NUMBER->" + excel_temp)
                                             End If
+                                            'cmdText += +"')"
+                                            'Dim cmd As New SqlCommand(cmdText, myConn)
+                                            ''cmd.CommandText = cmdText
+                                            ''cmd.CommandType = myConn
+                                            'myConn.Open()
+                                            'cmd.ExecuteNonQuery()
+                                            'myConn.Close()
                                         End If
                                     Next
                                 Next
                                 If queryable Then
-                                    MsgBox(command.CommandText)
-                                    myConn.Open()
-                                    command.ExecuteNonQuery()
-                                    myConn.Close()
+                                    queryTable(i)(2) += ")"
+                                    MsgBox(queryTable(i)(2))
+                                    'MsgBox(command.CommandText)
+                                    'myConn.Open()
+                                    'command.ExecuteNonQuery()
+                                    'myConn.Close()
                                 End If
                             End Using
                         Next
@@ -649,4 +682,99 @@ Public Class ExcelImporter
     '    End Using
 
     'End Sub
+    Private Sub runQueryTest()
+        Dim str = "INSERT INTO [dbo].[squote]
+           ([doc_type]
+           ,[doc_no]
+           ,[doc_date]
+           ,[doc_desp]
+           ,[doc_desp2]
+           ,[doc_status]
+           ,[doc_set]
+           ,[refno]
+           ,[refno2]
+           ,[custcode]
+           ,[name]
+           ,[addr]
+           ,[addrkey]
+           ,[attn2]
+           ,[terms]
+           ,[accmgr_id]
+           ,[curr_code]
+           ,[fx_rate]
+           ,[discount1]
+           ,[discount2]
+           ,[discount]
+           ,[dispec1]
+           ,[dispec2]
+           ,[taxcode]
+           ,[taxpec1]
+           ,[taxpec2]
+           ,[taxable]
+           ,[tax1]
+           ,[tax2]
+           ,[taxadj]
+           ,[tax]
+           ,[rndoff]
+           ,[subtotal]
+           ,[nett]
+           ,[total]
+           ,[local_gross]
+           ,[local_discount]
+           ,[local_nett]
+           ,[local_tax1]
+           ,[local_tax2]
+           ,[local_tax]
+           ,[local_rndoff]
+           ,[local_total]
+           ,[local_totalrp]
+           ,[deposit]
+           ,[sign]
+           ,[signqty]
+           ,[batchno]
+           ,[projcode]
+           ,[deptcode]
+           ,[shipmethod]
+           ,[hremark1]
+           ,[hremark2]
+           ,[hremark3]
+           ,[hremark4]
+           ,[hremark5]
+           ,[hremark6]
+           ,[hremark7]
+           ,[hremark8]
+           ,[hremark9]
+           ,[hremark10]
+           ,[hremark11]
+           ,[hremark12]
+           ,[hremark13]
+           ,[hremark14]
+           ,[hremark15]
+           ,[remark1]
+           ,[counter_no]
+           ,[cashier_id]
+           ,[buyer_id]
+           ,[buyer_name]
+           ,[cpdoc_type]
+           ,[cpdoc_no]
+           ,[cpdoc_date]
+           ,[printcnt]
+           ,[approvedby]
+           ,[approveddate]
+           ,[tsdate]
+           ,[createdby]
+           ,[updatedby]
+           ,[createdate]
+           ,[lastupdate])
+     VALUES
+           ('SQ','SQ000004','4-2-2022 12:00:00 AM','Quotation','   ','2','1','   ','   ','3000/B01','Best Beauty Sdn Bhd','4, Jln. Kuning 2, Tmn. Pelangi, 80400 JB, Johor','0','   ','0','   ','MYR','1','0','0','0','0','0','   ','0','0','2117','0','0','0','211.7','0','2117','2117','2328.7','2117','0','2117','0','0','211.7','0','2328.7','2117','0','1','-1','220410','   ','   ','   ','   ','   ','   ','   ','   ','   ','   ','   ','   ','   ','   ','   ','   ','   ','   ','   ','   ','   ','   ','   ','   ','   ','1-1-1900 12:00:00 AM','0','   ','1-1-1900 12:00:00 AM','1-1-1900 12:00:00 AM','admin','admin','3-1-2022 3:47:50 PM','3-1-2022 3:47:50 PM')"
+        Using myConn = New SqlConnection("Data Source=" + serverName + ";" & "Initial Catalog=" + database + ";" + pwd_query)
+            Using command As New SqlCommand(str, myConn)
+                myConn.Open()
+                command.ExecuteNonQuery()
+                myConn.Close()
+            End Using
+        End Using
+    End Sub
 End Class
+
