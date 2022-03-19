@@ -291,13 +291,14 @@ Public Class ExcelImporter
             queryTable(m).add(query)
         Next
         'MsgBox(queryTable(0)(2))
-        For Each al As ArrayList In queryTable
-            Dim strs = ""
-            For Each str As String In al
-                strs += str + vbNewLine
-            Next
-            'MsgBox(strs)
-        Next
+        'For Each al As ArrayList In queryTable
+        '    Dim strs = ""
+        '    For Each str As String In al
+        '        strs += str + vbNewLine
+        '    Next
+        '    MsgBox(strs)
+        'Next
+        'Return
         For i As Integer = 0 To queryTable.Count - 1
             init()
             Using myConn = New SqlConnection("Data Source=" + serverName + ";" & "Initial Catalog=" + database + ";" + pwd_query)
@@ -311,94 +312,183 @@ Public Class ExcelImporter
                     For j As Integer = 0 To sql_format_arraylist(i).count - 1
                         'command.Parameters.AddWithValue("@" + sql_format_arraylist(i)(j), "")
                     Next
-                    For u As Integer = 0 To sql_format_arraylist.Count - 1
-                        Dim sql_temp = sql_format_arraylist(i)(u).ToString.Trim
-                        'Dim cmd As New SqlCommand("INSERT INTO " + queryTable(i)(1) + " (" + sql_temp + ")VALUES('" + +"')", myConn)
-                        'Dim cmd As New SqlCommand
-                        'Dim cmdText As String = "INSERT INTO " + queryTable(i)(1) + " (" + sql_temp + ")VALUES('"
-                        For row As Integer = 0 To dgvExcel.RowCount - 2
-                            Using r As DataGridViewRow = dgvExcel.Rows(row)
-                                Dim queryable As Boolean
-                                queryable = False
-                                'Dim strtemp As String = ""
+                    For row As Integer = 0 To dgvExcel.RowCount - 2
+                        Using r As DataGridViewRow = dgvExcel.Rows(row)
+                            Dim query = ""
+                            Dim queryable = False
+                            For u As Integer = 0 To sql_format_arraylist(i).Count - 1
+                                Dim sql_temp = sql_format_arraylist(i)(u).ToString.Trim
+                                Dim data_type_temp = data_type_arraylist(i)(u).ToString.Trim
+                                Dim value = ""
                                 For q As Integer = 0 To r.Cells.Count - 1
                                     Dim cellValue As Object = r.Cells(q).Value.ToString.Trim
                                     Dim headerText As String = dgvExcel.Columns(q).HeaderText.Trim
-                                    Dim matched_with_header = False
                                     For y As Integer = 0 To excel_format_arraylist(i).Count - 1
                                         Dim excel_temp = excel_format_arraylist(i)(y).ToString.Trim
-                                        'MsgBox(excel_temp + vbTab + headerText)
                                         If excel_temp.Equals(headerText) Then
-                                            If Not (cellValue.Equals(String.Empty)) Then
-                                                queryTable(i)(2) += "'" + cellValue + "',"
-                                                'cmdText += cellValue
-                                                'cmd.CommandText = "INSERT INTO " + queryTable(i)(1) + " (" + sql_temp + ")VALUES('" + +"')"
-                                                'command.Parameters.Add("@" + sql_temp, SqlDbType.Char).Value = cellValue
-                                            Else
-                                                If data_type_arraylist(i)(y).ToString.Contains("char") Or data_type_arraylist(i)(y).ToString.Contains("text") Then
-                                                    'command.Parameters.Add("@" + sql_temp, SqlDbType.Char).Value = " "
-                                                    queryTable(i)(2) += "' ',"
-                                                    'cmdText += " "
-                                                    'MsgBox("CHAR->" + excel_temp)
-                                                ElseIf data_type_arraylist(i)(y).ToString.Contains("date") Or data_type_arraylist(i)(y).ToString.Contains("time") Then
-                                                    'command.Parameters.Add("@" + sql_temp, SqlDbType.Char).Value = New DateTime
-                                                    queryTable(i)(2) += "'" + (New DateTime).ToString + "',"
-                                                    'cmdText += (New DateTime).ToString
-                                                    'MsgBox("DATETIME->" + excel_temp)
-                                                Else
-                                                    'command.Parameters.Add("@" + sql_temp, SqlDbType.Char).Value = 0
-                                                    queryTable(i)(2) += "'0',"
-                                                    'cmdText += "0"
-                                                    'MsgBox("NUMBER->" + excel_temp)
-                                                End If
+                                            If value.Equals(String.Empty) Then
+                                                value = cellValue
+                                                queryable = True
                                             End If
-                                            'MsgBox(cmdText)
-                                            'cmdText += +"')"
-                                            'Dim cmd As New SqlCommand(cmdText, myConn)
-                                            ''cmd.CommandText = cmdText
-                                            ''cmd.CommandType = myConn
-                                            'myConn.Open()
-                                            'cmd.ExecuteNonQuery()
-                                            'myConn.Close()
-                                            queryable = True
-                                        Else
-                                            If data_type_arraylist(i)(y).ToString.Contains("char") Or data_type_arraylist(i)(y).ToString.Contains("text") Then
-                                                'command.Parameters.Add("@" + sql_temp, SqlDbType.Char).Value = " "
-                                                queryTable(i)(2) += "' ',"
-                                                'MsgBox("CHAR->" + excel_temp)
-                                            ElseIf data_type_arraylist(i)(y).ToString.Contains("date") Or data_type_arraylist(i)(y).ToString.Contains("time") Then
-                                                'command.Parameters.Add("@" + sql_temp, SqlDbType.Char).Value = New DateTime
-                                                queryTable(i)(2) += "'" + (New DateTime).ToString + "',"
-                                                'MsgBox("DATETIME->" + excel_temp)
-                                            Else
-                                                'command.Parameters.Add("@" + sql_temp, SqlDbType.Char).Value = 0
-                                                queryTable(i)(2) += "'0',"
-                                                'MsgBox("NUMBER->" + excel_temp)
-                                            End If
-                                            'cmdText += +"')"
-                                            'Dim cmd As New SqlCommand(cmdText, myConn)
-                                            ''cmd.CommandText = cmdText
-                                            ''cmd.CommandType = myConn
-                                            'myConn.Open()
-                                            'cmd.ExecuteNonQuery()
-                                            'myConn.Close()
                                         End If
                                     Next
+                                    If value.Equals(String.Empty) Then
+                                        If data_type_temp.ToString.Contains("char") Or data_type_temp.ToString.Contains("text") Then
+                                            value = "   "
+                                        ElseIf data_type_temp.ToString.Contains("date") Or data_type_temp.ToString.Contains("time") Then
+                                            value = (New DateTime).ToString
+                                        Else
+                                            value = "0"
+                                        End If
+                                    End If
                                 Next
-                                If queryable Then
-                                    queryTable(i)(2) += ")"
-                                    MsgBox(queryTable(i)(2))
-                                    'MsgBox(command.CommandText)
-                                    'myConn.Open()
-                                    'command.ExecuteNonQuery()
-                                    'myConn.Close()
-                                End If
-                            End Using
-                        Next
+                                query += "'" + value + "',"
+                            Next
+                            MsgBox(queryTable(i)(2) + query)
+                        End Using
                     Next
+                    Return
+
+                    For row As Integer = 0 To dgvExcel.RowCount - 2
+                        Using r As DataGridViewRow = dgvExcel.Rows(row)
+                            Dim queryable As Boolean
+                            queryable = False
+                            For u As Integer = 0 To sql_format_arraylist.Count - 1
+                                Dim sql_temp = sql_format_arraylist(i)(u).ToString.Trim
+                                Dim value = ""
+                                For q As Integer = 0 To r.Cells.Count - 1
+                                    Dim cellValue As Object = r.Cells(q).Value.ToString.Trim
+                                    Dim headerText As String = dgvExcel.Columns(q).HeaderText.Trim
+                                    'Dim matched_with_header = False
+                                    For y As Integer = 0 To excel_format_arraylist(i).Count - 1
+                                        Dim excel_temp = excel_format_arraylist(i)(y).ToString.Trim
+                                        If excel_temp.Equals(headerText) Then
+                                            If Not (cellValue.Equals(String.Empty)) Then
+                                                value += "'" + cellValue + "',"
+                                            Else
+                                                If data_type_arraylist(i)(y).ToString.Contains("char") Or data_type_arraylist(i)(y).ToString.Contains("text") Then
+                                                    value += "' ',"
+                                                ElseIf data_type_arraylist(i)(y).ToString.Contains("date") Or data_type_arraylist(i)(y).ToString.Contains("time") Then
+                                                    value += "'" + (New DateTime).ToString + "',"
+                                                Else
+                                                    value += "'0',"
+                                                End If
+                                            End If
+                                            queryable = True
+                                        Else
+                                            'If data_type_arraylist(i)(y).ToString.Contains("char") Or data_type_arraylist(i)(y).ToString.Contains("text") Then
+                                            '    value += "' ',"
+                                            'ElseIf data_type_arraylist(i)(y).ToString.Contains("date") Or data_type_arraylist(i)(y).ToString.Contains("time") Then
+                                            '    value += "'" + (New DateTime).ToString + "',"
+                                            'Else
+                                            '    value += "'0',"
+                                            'End If
+                                        End If
+                                        MsgBox("excel:" + excel_temp + vbNewLine + "sql:" + sql_temp + vbNewLine + "value:" + value)
+                                    Next
+                                Next
+                                MsgBox(vbNewLine + sql_temp + "--------->" + value)
+                                queryTable(i)(2) += value
+                            Next
+                            If queryable Then
+                                queryTable(i)(2) += ")"
+                                MsgBox("LMAO" + queryTable(i)(2))
+                                'MsgBox(command.CommandText)
+                                'myConn.Open()
+                                'command.ExecuteNonQuery()
+                                'myConn.Close()
+                            End If
+                        End Using
+                    Next
+                    Return
+                    For u As Integer = 0 To sql_format_arraylist.Count - 1
+                                Dim sql_temp = sql_format_arraylist(i)(u).ToString.Trim
+                                'Dim cmd As New SqlCommand("INSERT INTO " + queryTable(i)(1) + " (" + sql_temp + ")VALUES('" + +"')", myConn)
+                                'Dim cmd As New SqlCommand
+                                'Dim cmdText As String = "INSERT INTO " + queryTable(i)(1) + " (" + sql_temp + ")VALUES('"
+                                For row As Integer = 0 To dgvExcel.RowCount - 2
+                                    Using r As DataGridViewRow = dgvExcel.Rows(row)
+                                        Dim queryable As Boolean
+                                        queryable = False
+                                        'Dim strtemp As String = ""
+                                        For q As Integer = 0 To r.Cells.Count - 1
+                                            Dim cellValue As Object = r.Cells(q).Value.ToString.Trim
+                                            Dim headerText As String = dgvExcel.Columns(q).HeaderText.Trim
+                                            Dim matched_with_header = False
+                                            For y As Integer = 0 To excel_format_arraylist(i).Count - 1
+                                                Dim excel_temp = excel_format_arraylist(i)(y).ToString.Trim
+                                                'MsgBox(excel_temp + vbTab + headerText)
+                                                If excel_temp.Equals(headerText) Then
+                                                    If Not (cellValue.Equals(String.Empty)) Then
+                                                        queryTable(i)(2) += "'" + cellValue + "',"
+                                                        'cmdText += cellValue
+                                                        'cmd.CommandText = "INSERT INTO " + queryTable(i)(1) + " (" + sql_temp + ")VALUES('" + +"')"
+                                                        'command.Parameters.Add("@" + sql_temp, SqlDbType.Char).Value = cellValue
+                                                    Else
+                                                        If data_type_arraylist(i)(y).ToString.Contains("char") Or data_type_arraylist(i)(y).ToString.Contains("text") Then
+                                                            'command.Parameters.Add("@" + sql_temp, SqlDbType.Char).Value = " "
+                                                            queryTable(i)(2) += "' ',"
+                                                            'cmdText += " "
+                                                            'MsgBox("CHAR->" + excel_temp)
+                                                        ElseIf data_type_arraylist(i)(y).ToString.Contains("date") Or data_type_arraylist(i)(y).ToString.Contains("time") Then
+                                                            'command.Parameters.Add("@" + sql_temp, SqlDbType.Char).Value = New DateTime
+                                                            queryTable(i)(2) += "'" + (New DateTime).ToString + "',"
+                                                            'cmdText += (New DateTime).ToString
+                                                            'MsgBox("DATETIME->" + excel_temp)
+                                                        Else
+                                                            'command.Parameters.Add("@" + sql_temp, SqlDbType.Char).Value = 0
+                                                            queryTable(i)(2) += "'0',"
+                                                            'cmdText += "0"
+                                                            'MsgBox("NUMBER->" + excel_temp)
+                                                        End If
+                                                    End If
+                                                    'MsgBox(cmdText)
+                                                    'cmdText += +"')"
+                                                    'Dim cmd As New SqlCommand(cmdText, myConn)
+                                                    ''cmd.CommandText = cmdText
+                                                    ''cmd.CommandType = myConn
+                                                    'myConn.Open()
+                                                    'cmd.ExecuteNonQuery()
+                                                    'myConn.Close()
+                                                    queryable = True
+                                                Else
+                                                    If data_type_arraylist(i)(y).ToString.Contains("char") Or data_type_arraylist(i)(y).ToString.Contains("text") Then
+                                                        'command.Parameters.Add("@" + sql_temp, SqlDbType.Char).Value = " "
+                                                        queryTable(i)(2) += "' ',"
+                                                        'MsgBox("CHAR->" + excel_temp)
+                                                    ElseIf data_type_arraylist(i)(y).ToString.Contains("date") Or data_type_arraylist(i)(y).ToString.Contains("time") Then
+                                                        'command.Parameters.Add("@" + sql_temp, SqlDbType.Char).Value = New DateTime
+                                                        queryTable(i)(2) += "'" + (New DateTime).ToString + "',"
+                                                        'MsgBox("DATETIME->" + excel_temp)
+                                                    Else
+                                                        'command.Parameters.Add("@" + sql_temp, SqlDbType.Char).Value = 0
+                                                        queryTable(i)(2) += "'0',"
+                                                        'MsgBox("NUMBER->" + excel_temp)
+                                                    End If
+                                                    'cmdText += +"')"
+                                                    'Dim cmd As New SqlCommand(cmdText, myConn)
+                                                    ''cmd.CommandText = cmdText
+                                                    ''cmd.CommandType = myConn
+                                                    'myConn.Open()
+                                                    'cmd.ExecuteNonQuery()
+                                                    'myConn.Close()
+                                                End If
+                                            Next
+                                        Next
+                                        If queryable Then
+                                            queryTable(i)(2) += ")"
+                                            MsgBox(queryTable(i)(2))
+                                            'MsgBox(command.CommandText)
+                                            'myConn.Open()
+                                            'command.ExecuteNonQuery()
+                                            'myConn.Close()
+                                        End If
+                                    End Using
+                                Next
+                            Next
 
 
-                End Using
+                        End Using
             End Using
         Next
     End Sub
