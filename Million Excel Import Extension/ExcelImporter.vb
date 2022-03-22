@@ -147,29 +147,206 @@ Public Class ExcelImporter
     Private Sub btnImport_Click(sender As Object, e As EventArgs) Handles btnImport.Click
         Dim importType = "Quotation"
         Dim tableExcelSetting As DataTableCollection
-        'Try
-        Using stream = File.Open(getMaintainSetting, FileMode.Open, FileAccess.Read)
-            Using reader As IExcelDataReader = ExcelReaderFactory.CreateReader(stream)
-                Dim result As DataSet = reader.AsDataSet(New ExcelDataSetConfiguration() With {
-                                                                 .ConfigureDataTable = Function(__) New ExcelDataTableConfiguration() With {
-                                                                 .UseHeaderRow = True}})
-                tableExcelSetting = result.Tables
-                Dim queryTable As New ArrayList
-                If txtType.Text.Equals("Quotation") Then
-                    queryTable.Add(New ArrayList)
-                    queryTable.Add(New ArrayList)
-                    queryTable(0).add("Quotation") '0
-                    queryTable(0).add("squote") '1
-                    queryTable(1).add("Quotation Desc")
-                    queryTable(1).add("squotedet")
-                ElseIf txtType.Text.Equals("SalesOrder") Then
+        Try
+            Using stream = File.Open(getMaintainSetting, FileMode.Open, FileAccess.Read)
+                Using reader As IExcelDataReader = ExcelReaderFactory.CreateReader(stream)
+                    Dim result As DataSet = reader.AsDataSet(New ExcelDataSetConfiguration() With {
+                                                                     .ConfigureDataTable = Function(__) New ExcelDataTableConfiguration() With {
+                                                                     .UseHeaderRow = True}})
+                    tableExcelSetting = result.Tables
+                    Dim queryTable As New ArrayList
+                    If txtType.Text.Equals("Quotation") Then
+                        queryTable.Add(New ArrayList)
+                        queryTable.Add(New ArrayList)
+                        queryTable(0).add("Quotation") '0
+                        queryTable(0).add("squote") '1
+                        queryTable(1).add("Quotation Desc")
+                        queryTable(1).add("squotedet")
+                    ElseIf txtType.Text.Equals("SalesOrder") Then
 
-                End If
-                quotationWriteIntoSQL(tableExcelSetting, queryTable)
+                    End If
+                    quotationWriteIntoSQL(tableExcelSetting, queryTable)
+                End Using
             End Using
-        End Using
+        Catch ex As Exception
+            MsgBox(ex.Message, MsgBoxStyle.Critical)
+        End Try
     End Sub
     Private Sub quotationWriteIntoSQL(tableExcelSetting As DataTableCollection, queryTable As ArrayList)
+        Try
+            Dim sql_format_arraylist = New ArrayList
+            Dim excel_format_arraylist = New ArrayList
+            Dim data_type_arraylist = New ArrayList
+            Dim default_arraylist = New ArrayList
+            Dim format_arraylist = New ArrayList
+            Dim value_arraylist = New ArrayList
+            For j As Integer = 0 To queryTable.Count - 1
+                sql_format_arraylist.Add(New ArrayList)
+                excel_format_arraylist.Add(New ArrayList)
+                data_type_arraylist.Add(New ArrayList)
+                default_arraylist.Add(New ArrayList)
+                value_arraylist.Add(New ArrayList)
+                format_arraylist.Add(New ArrayList)
+                Dim dtTemp As DataTable = tableExcelSetting(queryTable(j)(0))
+                For Each row As DataRow In dtTemp.Rows
+                    Dim sql_value = row(0).ToString
+                    Dim excel_value = row(1).ToString
+                    Dim data_type = row(4).ToString
+                    Dim default_value = row(2).ToString
+                    Dim format_value = row(3).ToString
+                    sql_format_arraylist(j).add(sql_value)
+                    data_type_arraylist(j).add(data_type)
+                    excel_format_arraylist(j).add(excel_value)
+                    default_arraylist(j).add(default_value)
+                    format_arraylist(j).add(format_value)
+                Next
+            Next
+            'For i As Integer = 0 To sql_format_arraylist.Count - 1
+            '    Dim v = 0
+            '    Dim strs = ""
+            '    For Each str As String In sql_format_arraylist(i)
+            '        strs += str + vbTab
+            '        v += 1
+            '    Next
+            '    MsgBox(v.ToString + " (sql Count) : " + strs)
+            'Next
+            'For i As Integer = 0 To default_arraylist.Count - 1
+            '    Dim v = 0
+            '    Dim strs = ""
+            '    For Each str As String In default_arraylist(i)
+            '        strs += str + vbTab
+            '        v += 1
+            '    Next
+            '    MsgBox(v.ToString + " (default_arraylist Count) : " + strs)
+            'Next
+            For m As Integer = 0 To queryTable.Count - 1
+                Dim query As String = "INSERT INTO " + queryTable(m)(1) + " ("
+                Dim values As String = ""
+                For n As Integer = 0 To sql_format_arraylist(m).Count - 1
+                    If Not (default_arraylist(m)(n).Equals("PK_int")) Then
+                        values += "," + sql_format_arraylist(m)(n)
+                    End If
+                Next
+                query += values.Substring(1, values.Length - 1) + ") VALUES ("
+                queryTable(m).add(query)
+            Next
+            For i As Integer = 0 To queryTable.Count - 1
+                init()
+                Using myConn = New SqlConnection("Data Source=" + serverName + ";" & "Initial Catalog=" + database + ";" + pwd_query)
+                    Using command As New SqlCommand("", myConn)
+                        For row As Integer = 0 To dgvExcel.RowCount - 2
+                            Using r As DataGridViewRow = dgvExcel.Rows(row)
+                                value_arraylist(i).Add(New ArrayList)
+                                Dim query = ""
+                                Dim queryable = False
+                                For u As Integer = 0 To sql_format_arraylist(i).Count - 1
+                                    Dim sql_temp = sql_format_arraylist(i)(u).ToString.Trim
+                                    Dim data_type_temp = data_type_arraylist(i)(u).ToString.Trim
+                                    Dim default_temp = default_arraylist(i)(u).ToString.Trim
+                                    Dim add_value As Boolean = False
+                                    Dim value = ""
+                                    For q As Integer = 0 To r.Cells.Count - 1
+                                        Dim cellValue As Object = r.Cells(q).Value.ToString.Trim
+                                        Dim headerText As String = dgvExcel.Columns(q).HeaderText.Trim
+                                        Dim excel_temp = excel_format_arraylist(i)(u).ToString.Trim
+                                        If headerText.Equals(excel_temp) Then
+                                            If Not (cellValue.Equals(String.Empty)) Then
+                                                q = r.Cells.Count
+                                                value_arraylist(i)(row).add(cellValue)
+                                                add_value = True
+                                                value = cellValue
+                                                If data_type_temp.Contains("PK") Then
+                                                    queryable = True
+                                                End If
+                                            End If
+                                        End If
+                                    Next
+                                    If add_value = False Then
+                                        If default_temp.Equals(String.Empty) Then
+                                            If data_type_temp.ToString.Contains("char") Or data_type_temp.ToString.Contains("text") Then
+                                                value = "   "
+                                                value_arraylist(i)(row).add("   ")
+                                            ElseIf data_type_temp.ToString.Contains("date") Or data_type_temp.ToString.Contains("time") Then
+                                                value = (New DateTime).ToString
+                                                value_arraylist(i)(row).add((New DateTime).ToString)
+                                            Else
+                                                value = "0"
+                                                value_arraylist(i)(row).add("0")
+                                            End If
+                                        Else
+                                            value = "{DEFAULT_VALUE}"
+                                            value_arraylist(i)(row).add("{DEFAULT_VALUE}")
+                                        End If
+                                    End If
+                                Next
+                                For jk = 0 To 2
+                                    For g As Integer = 0 To value_arraylist(i)(row).count - 1
+                                        Dim value_temp As String = value_arraylist(i)(row)(g).ToString.Trim
+                                        If value_temp.Equals("{DEFAULT_VALUE}") Then
+                                            Dim default_temp = default_arraylist(i)(g).ToString.Trim
+                                            If default_temp.Contains("getstringonly_") Then
+                                                Dim default_index As Integer = Convert.ToInt32(default_temp.Substring(14))
+                                                Dim stringonly_char As Char() = value_arraylist(i)(row)(default_index).ToString.ToCharArray()
+                                                Dim stringonly_str = ""
+                                                For Each ch As Char In stringonly_char
+                                                    If Not Char.IsDigit(ch) Then
+                                                        stringonly_str += ch
+                                                    End If
+                                                Next
+                                                value_arraylist(i)(row)(g) = stringonly_str
+                                            ElseIf default_temp.Contains("FK") Then
+                                                If row > 0 Then
+                                                    Dim fk_value_temp = ""
+                                                    For h = row To 0 Step -1
+                                                        fk_value_temp = value_arraylist(i)(h)(g).ToString.Trim
+                                                        If fk_value_temp.ToCharArray.Count > 0 And Not (fk_value_temp.Equals("{DEFAULT_VALUE}")) Then
+                                                            h = 0
+                                                        End If
+                                                    Next
+                                                    value_arraylist(i)(row)(g) = fk_value_temp
+                                                Else
+                                                    Dim data_type_temp = data_type_arraylist(i)(g).ToString.Trim
+                                                    If data_type_temp.ToString.Contains("char") Or data_type_temp.ToString.Contains("text") Then
+                                                        value_arraylist(i)(row)(g) = "   "
+                                                    ElseIf data_type_temp.ToString.Contains("date") Or data_type_temp.ToString.Contains("time") Then
+                                                        value_arraylist(i)(row)(g) = (New DateTime).ToString
+                                                    Else
+                                                        value_arraylist(i)(row)(g) = "0"
+                                                    End If
+                                                End If
+                                            ElseIf default_temp.Contains("PK_int") Then
+                                                value_arraylist(i)(row)(g) = "{._!@#$%^&*()}"
+                                            Else
+                                                value_arraylist(i)(row)(g) = default_temp
+                                            End If
+                                        End If
+                                    Next
+                                Next
+                                For g As Integer = 0 To value_arraylist(i)(row).count - 1
+                                    Dim value_temp As String = value_arraylist(i)(row)(g).ToString
+                                    If Not (value_temp.Equals("{._!@#$%^&*()}")) Then
+                                        query += "'" + value_temp + "',"
+                                    End If
+                                Next
+                                If queryable Then
+                                    Dim command_text As String = queryTable(i)(2) + query
+                                    command_text = command_text.Substring(0, command_text.Length - 1) + ")"
+                                    MsgBox(command_text)
+                                    command.CommandText = command_text
+                                    'myConn.Open()
+                                    'command.ExecuteNonQuery()
+                                    'myConn.Close()
+                                End If
+                            End Using
+                        Next
+                    End Using
+                End Using
+            Next
+        Catch ex As Exception
+            MsgBox(ex.Message, MsgBoxStyle.Critical)
+        End Try
+    End Sub
+    Private Sub quotationWriteIntoSQLQuotation(tableExcelSetting As DataTableCollection, queryTable As ArrayList)
         Dim sql_format_arraylist = New ArrayList
         Dim excel_format_arraylist = New ArrayList
         Dim data_type_arraylist = New ArrayList
@@ -195,59 +372,19 @@ Public Class ExcelImporter
                 excel_format_arraylist(j).add(excel_value)
                 default_arraylist(j).add(default_value)
                 format_arraylist(j).add(format_value)
-                'For i As Integer = 0 To dgvExcel.ColumnCount - 1
-                '    Dim dgvHeader = dgvExcel.Columns(i).HeaderText
-                '    If excel_value.Equals(dgvHeader) Then
-                '        'queryTable(j).Add(sql_value)
-                '        'sql_format_arraylist(j).add(sql_value)
-                '        'excel_format_arraylist(j).add(excel_value)
-                '        'quotationTable.Add(sql_value)
-                '    End If
-                'Next
             Next
         Next
-        'For i As Integer = 0 To sql_format_arraylist.Count - 1
-        '    Dim v = 0
-        '    Dim strs = ""
-        '    For Each str As String In sql_format_arraylist(i)
-        '        strs += str + vbTab
-        '        v += 1
-        '    Next
-        '    MsgBox(v.ToString + " (sql Count) : " + strs)
-        'Next
-        'For i As Integer = 0 To default_arraylist.Count - 1
-        '    Dim v = 0
-        '    Dim strs = ""
-        '    For Each str As String In default_arraylist(i)
-        '        strs += str + vbTab
-        '        v += 1
-        '    Next
-        '    MsgBox(v.ToString + " (default_arraylist Count) : " + strs)
-        'Next
         For m As Integer = 0 To queryTable.Count - 1
             Dim query As String = "INSERT INTO " + queryTable(m)(1) + " ("
             Dim values As String = ""
             For n As Integer = 0 To sql_format_arraylist(m).Count - 1
-                values += "," + sql_format_arraylist(m)(n)
+                If Not (default_arraylist(m)(n).Equals("PK_int")) Then
+                    values += "," + sql_format_arraylist(m)(n)
+                End If
             Next
             query += values.Substring(1, values.Length - 1) + ") VALUES ("
-            'values = ""
-            'For b As Integer = 0 To sql_format_arraylist(m).Count - 1
-            '    values += ",@" + sql_format_arraylist(m)(b)
-            'Next
-            'query += values.Substring(1, values.Length - 1) + ")"
-            'MsgBox(query)
             queryTable(m).add(query)
         Next
-        'MsgBox(queryTable(0)(2))
-        'For Each al As ArrayList In queryTable
-        '    Dim strs = ""
-        '    For Each str As String In al
-        '        strs += str + vbNewLine
-        '    Next
-        '    MsgBox(strs)
-        'Next
-        'Return
         For i As Integer = 0 To queryTable.Count - 1
             init()
             Using myConn = New SqlConnection("Data Source=" + serverName + ";" & "Initial Catalog=" + database + ";" + pwd_query)
@@ -261,7 +398,6 @@ Public Class ExcelImporter
                                 Dim sql_temp = sql_format_arraylist(i)(u).ToString.Trim
                                 Dim data_type_temp = data_type_arraylist(i)(u).ToString.Trim
                                 Dim default_temp = default_arraylist(i)(u).ToString.Trim
-                                'Dim value_temp = value_arraylist(i)(u).ToString.Trim
                                 Dim add_value As Boolean = False
                                 Dim value = ""
                                 For q As Integer = 0 To r.Cells.Count - 1
@@ -269,10 +405,6 @@ Public Class ExcelImporter
                                     Dim headerText As String = dgvExcel.Columns(q).HeaderText.Trim
                                     Dim excel_temp = excel_format_arraylist(i)(u).ToString.Trim
                                     If headerText.Equals(excel_temp) Then
-                                        'q = r.Cells.Count
-                                        'value_arraylist(i)(row).add(cellValue)
-                                        'add_value = True
-                                        'value = cellValue
                                         If Not (cellValue.Equals(String.Empty)) Then
                                             q = r.Cells.Count
                                             value_arraylist(i)(row).add(cellValue)
@@ -297,92 +429,69 @@ Public Class ExcelImporter
                                             value_arraylist(i)(row).add("0")
                                         End If
                                     Else
-                                        'If default_temp.Contains("getstringonly_") Then
-                                        '    Dim default_index As Integer = Convert.ToInt32(default_temp.Substring(14))
-                                        '    MsgBox(default_index.ToString)
-                                        '    MsgBox(value_arraylist(i).count.ToString)
-                                        '    'MsgBox("getonly" + vbTab + value_arraylist(i)(default_index).ToString)
-                                        '    'value = value_arraylist(i)(default_index)
-                                        '    'value_arraylist(i).add("DEFAULT_VALUE")
-                                        'End If
                                         value = "{DEFAULT_VALUE}"
                                         value_arraylist(i)(row).add("{DEFAULT_VALUE}")
                                     End If
                                 End If
-                                'MsgBox("sql_temp:" + vbTab + sql_temp + vbTab + "value:" + vbTab + value_arraylist(i).count.ToString + vbTab + "count:" + vbTab + u.ToString)
-                                'query += "'" + value + "',"
                             Next
-                            'MsgBox("sql: " + vbTab + (sql_format_arraylist(i).count).ToString + " default: " + default_arraylist(i).count.ToString)
-                            For g As Integer = 0 To value_arraylist(i)(row).count - 1
-                                Dim value_temp As String = value_arraylist(i)(row)(g).ToString.Trim
-                                If value_temp.Equals("{DEFAULT_VALUE}") Then
-                                    'MsgBox("i=" + i.ToString + vbTab + "g=" + g.ToString)
-                                    Dim default_temp = default_arraylist(i)(g).ToString.Trim
-                                    'Dim default_temp = default_arraylist(i)(g).ToString.Trim
-                                    If default_temp.Contains("getstringonly_") Then
-                                        Dim default_index As Integer = Convert.ToInt32(default_temp.Substring(14))
-                                        Dim stringonly_char As Char() = value_arraylist(i)(row)(default_index).ToString.ToCharArray()
-                                        Dim stringonly_str = ""
-                                        For Each ch As Char In stringonly_char
-                                            If Not Char.IsDigit(ch) Then
-                                                stringonly_str += ch
-                                            End If
-                                        Next
-                                        'MsgBox("COUNT: " + i.ToString + vbTab + value_arraylist(i)(default_index))
-                                        'value = value_arraylist(i)(default_index)
-                                        value_arraylist(i)(row)(g) = stringonly_str
-                                    ElseIf default_temp.Contains("FK") Then
-                                        If row > 0 Then
-                                            Dim fk_value_temp = ""
-                                            For h = row - 1 To 0
-                                                If fk_value_temp.Equals(String.Empty) Then
-                                                    fk_value_temp = value_arraylist(i)(h)(g).ToString.Trim
-                                                    h = 0
+                            For jk = 0 To 2
+                                For g As Integer = 0 To value_arraylist(i)(row).count - 1
+                                    Dim value_temp As String = value_arraylist(i)(row)(g).ToString.Trim
+                                    If value_temp.Equals("{DEFAULT_VALUE}") Then
+                                        Dim default_temp = default_arraylist(i)(g).ToString.Trim
+                                        If default_temp.Contains("getstringonly_") Then
+                                            Dim default_index As Integer = Convert.ToInt32(default_temp.Substring(14))
+                                            Dim stringonly_char As Char() = value_arraylist(i)(row)(default_index).ToString.ToCharArray()
+                                            Dim stringonly_str = ""
+                                            For Each ch As Char In stringonly_char
+                                                If Not Char.IsDigit(ch) Then
+                                                    stringonly_str += ch
                                                 End If
                                             Next
-                                            MsgBox("Value in table " + i.ToString + " with row " + row.ToString + " in value " + g.ToString + " => " + fk_value_temp)
-                                            value_arraylist(i)(row)(g) = fk_value_temp + "LMAO"
-                                        Else
-                                            Dim data_type_temp = data_type_arraylist(i)(g).ToString.Trim
-                                            If data_type_temp.ToString.Contains("char") Or data_type_temp.ToString.Contains("text") Then
-                                                value_arraylist(i)(row)(g) = "   "
-                                            ElseIf data_type_temp.ToString.Contains("date") Or data_type_temp.ToString.Contains("time") Then
-                                                value_arraylist(i)(row)(g) = (New DateTime).ToString
+                                            value_arraylist(i)(row)(g) = stringonly_str
+                                        ElseIf default_temp.Contains("FK") Then
+                                            If row > 0 Then
+                                                Dim fk_value_temp = ""
+                                                For h = row To 0 Step -1
+                                                    fk_value_temp = value_arraylist(i)(h)(g).ToString.Trim
+                                                    If fk_value_temp.ToCharArray.Count > 0 And Not (fk_value_temp.Equals("{DEFAULT_VALUE}")) Then
+                                                        h = 0
+                                                    End If
+                                                Next
+                                                value_arraylist(i)(row)(g) = fk_value_temp
                                             Else
-                                                value_arraylist(i)(row)(g) = "0"
+                                                Dim data_type_temp = data_type_arraylist(i)(g).ToString.Trim
+                                                If data_type_temp.ToString.Contains("char") Or data_type_temp.ToString.Contains("text") Then
+                                                    value_arraylist(i)(row)(g) = "   "
+                                                ElseIf data_type_temp.ToString.Contains("date") Or data_type_temp.ToString.Contains("time") Then
+                                                    value_arraylist(i)(row)(g) = (New DateTime).ToString
+                                                Else
+                                                    value_arraylist(i)(row)(g) = "0"
+                                                End If
                                             End If
+                                        ElseIf default_temp.Contains("PK_int") Then
+                                            value_arraylist(i)(row)(g) = "{._!@#$%^&*()}"
+                                        Else
+                                            value_arraylist(i)(row)(g) = default_temp
                                         End If
-                                    Else
-                                        value_arraylist(i)(row)(g) = default_temp
                                     End If
-                                End If
-                                query += "'" + value_arraylist(i)(row)(g) + "',"
+                                Next
                             Next
-                            'MsgBox(queryTable(i)(2) + query)
-                            'MsgBox("complete")
+                            For g As Integer = 0 To value_arraylist(i)(row).count - 1
+                                Dim value_temp As String = value_arraylist(i)(row)(g).ToString
+                                If Not (value_temp.Equals("{._!@#$%^&*()}")) Then
+                                    query += "'" + value_temp + "',"
+                                End If
+                            Next
                             If queryable Then
-                                'For b = 0 To default_arraylist(i).Count - 1
-                                '    Dim default_value_temp = default_arraylist(i)(b)
-                                '    If Not (default_value_temp.Equals(String.Empty)) Then
-
-                                '    End If
-                                'Next
                                 Dim command_text As String = queryTable(i)(2) + query
                                 command_text = command_text.Substring(0, command_text.Length - 1) + ")"
                                 MsgBox(command_text)
-                                'queryTable(i)(2) += ")"
-                                'MsgBox(queryTable(i)(2) + query)
-                                'MsgBox(command.CommandText)
                                 command.CommandText = command_text
                                 'myConn.Open()
                                 'command.ExecuteNonQuery()
                                 'myConn.Close()
-                            Else
-                                'Dim command_text As String = queryTable(i)(2) + query
-                                'command_text = command_text.Substring(0, command_text.Length - 1) + ")"
-                                'MsgBox(command_text)
                             End If
-                            'MsgBox("Queryable: " + queryable.ToString + vbNewLine + queryTable(i)(2) + query)
                         End Using
                     Next
                 End Using

@@ -160,6 +160,12 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="Quotation Form.Designer.vb">
+      <DependentUpon>Quotation Form.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Quotation Form.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="SQLConnectionForm.Designer.vb">
       <DependentUpon>SQLConnectionForm.vb</DependentUpon>
     </Compile>
@@ -182,6 +188,9 @@
       <LastGenOutput>Resources.Designer.vb</LastGenOutput>
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Quotation Form.resx">
+      <DependentUpon>Quotation Form.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="SQLConnectionForm.resx">
       <DependentUpon>SQLConnectionForm.vb</DependentUpon>

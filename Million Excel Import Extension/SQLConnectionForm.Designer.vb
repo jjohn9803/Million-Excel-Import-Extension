@@ -283,7 +283,7 @@ Partial Class SQL_Connection_Form
         Me.ClientSize = New System.Drawing.Size(396, 284)
         Me.Controls.Add(Me.Panel1)
         Me.Controls.Add(Me.TabControl1)
-        Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle
+        Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow
         Me.Name = "SQL_Connection_Form"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "SQL Connection Form"
