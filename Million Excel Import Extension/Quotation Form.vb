@@ -79,8 +79,8 @@ Public Class Quotation_Form
     Private Sub btnImport_Click(sender As Object, e As EventArgs) Handles btnImport.Click
         Dim importType = "Quotation"
         Dim tableExcelSetting As DataTableCollection
-        Try
-            Using stream = File.Open(getMaintainSetting, FileMode.Open, FileAccess.Read)
+        'Try
+        Using stream = File.Open(getMaintainSetting, FileMode.Open, FileAccess.Read)
                 Using reader As IExcelDataReader = ExcelReaderFactory.CreateReader(stream)
                     Dim result As DataSet = reader.AsDataSet(New ExcelDataSetConfiguration() With {
                                                                      .ConfigureDataTable = Function(__) New ExcelDataTableConfiguration() With {
@@ -96,9 +96,9 @@ Public Class Quotation_Form
                     quotationWriteIntoSQLQuotation2(tableExcelSetting, queryTable)
                 End Using
             End Using
-        Catch ex As Exception
-            MsgBox(ex.Message, MsgBoxStyle.Critical)
-        End Try
+        'Catch ex As Exception
+        '    MsgBox(ex.Message + vbNewLine + ex.StackTrace, MsgBoxStyle.Critical)
+        'End Try
     End Sub
     'Private Sub quotationWriteIntoSQLQuotation(tableExcelSetting As DataTableCollection, queryTable As ArrayList)
     '    Dim value_arraylist = New ArrayList
@@ -157,7 +157,7 @@ Public Class Quotation_Form
             queryTable(m).add(query)
         Next
         For i As Integer = 0 To queryTable.Count - 1
-            For row As Integer = 0 To dgvExcel.RowCount - 2
+            For row As Integer = 0 To dgvExcel.RowCount - 1
                 Using r As DataGridViewRow = dgvExcel.Rows(row)
                     Dim Queryable = False
                     value_arraylist(i).Add(New ArrayList)
@@ -212,122 +212,376 @@ Public Class Quotation_Form
                 End Using
             Next
         Next
-        For Each str As String In value_arraylist(i)(Row)
+        'For i As Integer = 0 To queryTable.Count - 1
+        '    For row As Integer = 0 To dgvExcel.RowCount - 1
+        '        Dim strs = ""
+        '        For Each str As String In value_arraylist(i)(row)
+        '            strs += str + vbTab
+        '        Next
+        '        MsgBox("Row " + row.ToString + vbNewLine + strs)
+        '    Next
+        'Next
 
-        Next
-        For i As Integer = 0 To queryTable.Count - 1
-            For row As Integer = 0 To dgvExcel.RowCount - 2
-                Using r As DataGridViewRow = dgvExcel.Rows(row)
-                    Dim queryable = False
-                    For default_value_checker As Integer = 0 To 10
-                        For g As Integer = 0 To value_arraylist(i)(row).count - 1
-                            Dim value_temp As String = value_arraylist(i)(row)(g).ToString.Trim
-                            If value_temp.Equals("{DEFAULT_VALUE}") Then
-                                Dim default_temp = default_arraylist(i)(g).ToString.Trim
-                                If default_temp.Contains("getstringonly_") Then
-                                    Dim default_index As Integer = Convert.ToInt32(default_temp.Substring(14))
-                                    Dim stringonly_char As Char() = value_arraylist(i)(row)(default_index).ToString.ToCharArray()
-                                    Dim stringonly_str = ""
-                                    For Each ch As Char In stringonly_char
-                                        If Not Char.IsDigit(ch) Then
-                                            stringonly_str += ch
-                                        End If
-                                    Next
-                                    value_arraylist(i)(row)(g) = stringonly_str
-                                ElseIf default_temp.Contains("FK") Then
-                                    If row > 0 Then
-                                        Dim fk_value_temp = ""
-                                        For h = row To 0 Step -1
-                                            fk_value_temp = value_arraylist(i)(h)(g).ToString.Trim
-                                            If fk_value_temp.ToCharArray.Count > 0 And Not (fk_value_temp.Equals("{DEFAULT_VALUE}")) Then
-                                                h = 0
+        For default_value_checker As Integer = 0 To 10
+            For i As Integer = 0 To queryTable.Count - 1
+                For row As Integer = 0 To dgvExcel.RowCount - 1
+                    Using r As DataGridViewRow = dgvExcel.Rows(row)
+                        If Not value_arraylist(i)(row)(0).Equals("{INVALID ARRAY}") Then
+                            For g As Integer = 0 To value_arraylist(i)(row).count - 1
+                                Dim value_temp As String = value_arraylist(i)(row)(g).ToString.Trim
+                                If value_temp.Equals("{DEFAULT_VALUE}") Then
+                                    Dim default_temp = default_arraylist(i)(g).ToString.Trim
+                                    If default_temp.Contains("getstringonly_") Then
+                                        Dim default_index As Integer = Convert.ToInt32(default_temp.Substring(14))
+                                        Dim stringonly_char As Char() = value_arraylist(i)(row)(default_index).ToString.ToCharArray()
+                                        Dim stringonly_str = ""
+                                        For Each ch As Char In stringonly_char
+                                            If Not Char.IsDigit(ch) Then
+                                                stringonly_str += ch
                                             End If
                                         Next
-                                        value_arraylist(i)(row)(g) = fk_value_temp
-                                    Else
-                                        Dim data_type_temp = data_type_arraylist(i)(g).ToString.Trim
-                                        If data_type_temp.ToString.Contains("char") Or data_type_temp.ToString.Contains("text") Then
-                                            value_arraylist(i)(row)(g) = "   "
-                                        ElseIf data_type_temp.ToString.Contains("date") Or data_type_temp.ToString.Contains("time") Then
-                                            value_arraylist(i)(row)(g) = (New DateTime).ToString
+                                        value_arraylist(i)(row)(g) = stringonly_str
+                                    ElseIf default_temp.Contains("FK") Then
+                                        If row > 0 Then
+                                            Dim fk_value_temp = ""
+                                            For h = row To 0 Step -1
+                                                fk_value_temp = value_arraylist(i)(h)(g).ToString.Trim
+                                                If fk_value_temp.ToCharArray.Count > 0 And Not (fk_value_temp.Equals("{DEFAULT_VALUE}")) Then
+                                                    h = 0
+                                                End If
+                                            Next
+                                            value_arraylist(i)(row)(g) = fk_value_temp
                                         Else
-                                            value_arraylist(i)(row)(g) = "0"
+                                            Dim data_type_temp = data_type_arraylist(i)(g).ToString.Trim
+                                            If data_type_temp.ToString.Contains("char") Or data_type_temp.ToString.Contains("text") Then
+                                                value_arraylist(i)(row)(g) = "   "
+                                            ElseIf data_type_temp.ToString.Contains("date") Or data_type_temp.ToString.Contains("time") Then
+                                                value_arraylist(i)(row)(g) = (New DateTime).ToString
+                                            Else
+                                                value_arraylist(i)(row)(g) = "0"
+                                            End If
                                         End If
+                                    ElseIf default_temp.Contains("PK_int") Then
+                                        value_arraylist(i)(row)(g) = "{._!@#$%^&*()}"
+                                    Else
+                                        value_arraylist(i)(row)(g) = default_temp
                                     End If
-                                ElseIf default_temp.Contains("PK_int") Then
-                                    value_arraylist(i)(row)(g) = "{._!@#$%^&*()}"
-                                Else
-                                    value_arraylist(i)(row)(g) = default_temp
                                 End If
-                            End If
-                        Next
-                    Next
-                    For format_value_check As Integer = 0 To 2
-                        For g As Integer = 0 To value_arraylist(i)(row).count - 1
-                            Dim value_temp As String = value_arraylist(i)(row)(g).ToString.Trim
+                            Next
+                        End If
+                    End Using
+                Next
+            Next
+        Next
+
+        'Quotation only
+        Dim rangeQuotation As New List(Of String)
+        For row As Integer = 0 To dgvExcel.RowCount - 1
+            Dim range_checker_temp As String = value_arraylist(0)(row)(0)
+            If Not range_checker_temp.Equals("{INVALID ARRAY}") And row > 0 Then
+                If rangeQuotation.Count = 0 Then
+                    rangeQuotation.Add("0." + (row - 1).ToString)
+                Else
+                    rangeQuotation.Add(rangeQuotation(rangeQuotation.Count - 1).Split(".")(1) + "." + (row - 1).ToString)
+                End If
+            End If
+        Next
+        rangeQuotation.Add((rangeQuotation(rangeQuotation.Count - 1).Split(".")(1).ToString) + "." + (dgvExcel.RowCount - 1).ToString)
+        Dim strs = ""
+        For Each stra As String In rangeQuotation
+            strs += stra + vbNewLine
+        Next
+        MsgBox(strs)
+        Return
+        'For row As Integer = 0 To dgvExcel.RowCount - 1
+        '    For g As Integer = 0 To value_arraylist(i)(row).count - 1
+        '        Dim value_temp As String = value_arraylist(i)(row)(g).ToString.Trim
+        '        If value_temp.Equals("{FORMULA_VALUE}") Then
+        '            Dim formula_temp = formula_arraylist(i)(g).ToString.Trim
+        '            Dim finalized_temp = New List(Of String)(formula_temp.Split("?"c))
+        '            Dim cal_result = 0
+        '            For Each local_formula As String In finalized_temp
+        '                If local_formula.Contains("+") Or local_formula.Contains("*") Then
+        '                    Dim expression = New List(Of String)(local_formula.Split(New [Char]() {"+"c, "*"c}))
+        '                    Dim calculation = local_formula
+        '                    Dim calculate_valid = True
+        '                    For Each str As String In expression
+        '                        str = (str.Replace("(", "")).Replace(")", "").Trim
+        '                        Dim value_index = -1
+        '                        Dim table_index = -1
+        '                        If str.Contains(".") Then
+        '                            Dim table_name = str.Split(".")(0).Trim
+        '                            For yu = 0 To queryTable.Count - 1
+        '                                Dim search_table_name = queryTable(yu)(1)
+        '                                If table_name.Contains(search_table_name) Then
+        '                                    table_index = yu
+        '                                End If
+        '                            Next
+        '                            value_index = sql_format_arraylist(table_index).IndexOf(str.Split(".")(1).Trim)
+        '                        Else
+        '                            table_index = i
+        '                            value_index = sql_format_arraylist(i).IndexOf(str.Trim)
+        '                        End If
+        '                        If value_index = -1 Then
+        '                            calculate_valid = False
+        '                            Exit For
+        '                        End If
+        '                        If calculate_valid Then
+        '                            'MsgBox("str: " + str + vbNewLine + "Local formula: " + local_formula + vbNewLine + "Table index: " + table_index.ToString + vbNewLine + "Row: " + row.ToString + vbNewLine + "Value Index: " + value_index.ToString)
+        '                            For uu = row To 0 Step -1
+        '                                If Not value_arraylist(table_index)(uu)(0).Equals("{INVALID ARRAY}") Then
+        '                                    'Dim 
+        '                                    'Try
+
+        '                                    'Catch ex As Exception
+
+        '                                    'End Try
+        '                                    'Dim expression_value_temp = CDbl(Val(value_arraylist(table_index)(row)(value_index)))
+        '                                    Dim expression_value_temp = value_arraylist(table_index)(row)(value_index)
+        '                                    calculation = calculation.Replace(str, expression_value_temp.ToString)
+        '                                    Exit For
+        '                                End If
+        '                            Next
+        '                        End If
+        '                    Next
+        '                    'MsgBox("Before:" + vbTab + local_formula + vbNewLine + "After:" + vbTab + calculation)
+        '                    If calculate_valid Then
+        '                        If Not calculation.Contains("{FORMULA_VALUE}") Then
+        '                            calculation = New DataTable().Compute(calculation, Nothing)
+        '                            cal_result = calculation
+        '                        End If
+        '                    End If
+        '                    'cal_result = calculation
+        '                End If
+        '                'If local_formula.Contains("+") Then
+        '                '    Dim expression = New List(Of String)(local_formula.Split("+"c))
+        '                '    Dim calculation = local_formula
+        '                '    Dim calculate_valid = True
+        '                '    For Each str As String In expression
+        '                '        Dim value_index = -1
+        '                '        Dim table_index = -1
+        '                '        If str.Contains(".") Then
+        '                '            Dim table_name = str.Split(".")(0).Trim
+        '                '            For yu = 0 To queryTable.Count - 1
+        '                '                Dim search_table_name = queryTable(yu)(1)
+        '                '                If table_name.Contains(search_table_name) Then
+        '                '                    table_index = yu
+        '                '                End If
+        '                '            Next
+        '                '            value_index = sql_format_arraylist(table_index).IndexOf(str.Split(".")(1).Trim)
+        '                '        Else
+        '                '            table_index = i
+        '                '            value_index = sql_format_arraylist(i).IndexOf(str.Trim)
+        '                '        End If
+        '                '        If value_index = -1 Then
+        '                '            calculate_valid = False
+        '                '            Exit For
+        '                '        End If
+        '                '        If calculate_valid Then
+        '                '            Dim expression_value_temp = CDbl(Val(value_arraylist(table_index)(row)(value_index)))
+        '                '            calculation = calculation.Replace(str, expression_value_temp.ToString)
+        '                '        End If
+        '                '    Next
+        '                '    MsgBox(calculation)
+        '                '    If calculate_valid Then
+        '                '        calculation = New DataTable().Compute(calculation, Nothing)
+        '                '    End If
+        '                '    cal_result = calculation
+        '                'ElseIf local_formula.Contains("*") Then
+        '                '    Dim expression = New List(Of String)(local_formula.Split("*"c))
+        '                '    Dim calculation = local_formula
+        '                '    Dim calculate_valid = True
+        '                '    For Each str As String In expression
+        '                '        Dim value_index = -1
+        '                '        Dim table_index = -1
+        '                '        If str.Contains(".") Then
+        '                '            Dim table_name = str.Split(".")(0).Trim
+        '                '            For yu = 0 To queryTable.Count - 1
+        '                '                Dim search_table_name = queryTable(yu)(1).trim
+        '                '                If table_name.Equals(search_table_name) Then
+        '                '                    table_index = yu
+        '                '                End If
+        '                '            Next
+        '                '            value_index = sql_format_arraylist(table_index).IndexOf(str.Split(".")(1).Trim)
+        '                '        Else
+        '                '            table_index = i
+        '                '            value_index = sql_format_arraylist(i).IndexOf(str.Trim)
+        '                '        End If
+        '                '        If value_index = -1 Then
+        '                '            calculate_valid = False
+        '                '            Exit For
+        '                '        End If
+        '                '        If calculate_valid Then
+        '                '            Dim expression_value_temp = CDbl(Val(value_arraylist(table_index)(row)(value_index)))
+        '                '            calculation = calculation.Replace(str, expression_value_temp.ToString)
+        '                '        End If
+        '                '    Next
+        '                '    'MsgBox(calculation)
+        '                '    If calculate_valid Then
+        '                '        calculation = New DataTable().Compute(calculation, Nothing)
+        '                '    End If
+        '                '    cal_result = calculation
+        '                'End If
+        '            Next
+        '            'MsgBox("Formula: " + formula_temp + vbNewLine + "before change=> " + value_arraylist(i)(row)(g) + vbNewLine + "after change=> " + cal_result.ToString)
+        '            If cal_result > 0 Or format_value_check = 10 Then
+        '                MsgBox("i wrote it because of format check = " + format_value_check.ToString + " Or result = " + cal_result.ToString + vbNewLine + formula_arraylist(i)(g).ToString.Trim)
+        '                value_arraylist(i)(row)(g) = cal_result
+        '            End If
+        '        End If
+        '    Next
+        'Next
+        Return
+        For formula_checker As Integer = 0 To 10
+            For row As Integer = 0 To dgvExcel.RowCount - 1
+                Using r As DataGridViewRow = dgvExcel.Rows(row)
+                    Dim value_temp As String = formula_arraylist(0)()
+                End Using
+            Next
+        Next
+        'Quotation only end
+        For format_value_check As Integer = 0 To 10
+            For i As Integer = 0 To queryTable.Count - 1
+                For row As Integer = 0 To dgvExcel.RowCount - 1
+                    Using r As DataGridViewRow = dgvExcel.Rows(row)
+                        For g As Integer = 0 To value_arraylist(i)(Row).count - 1
+                            Dim value_temp As String = value_arraylist(i)(Row)(g).ToString.Trim
                             If value_temp.Equals("{FORMULA_VALUE}") Then
                                 Dim formula_temp = formula_arraylist(i)(g).ToString.Trim
                                 Dim finalized_temp = New List(Of String)(formula_temp.Split("?"c))
-                                Dim writable = False
                                 Dim cal_result = 0
                                 For Each local_formula As String In finalized_temp
-                                    If writable = False Then
-                                        If local_formula.Contains("+") Then
-                                            Dim expression = New List(Of String)(local_formula.Split("+"c))
-                                            Dim calculation = 0
-                                            Dim calculate_valid = True
-                                            For Each str As String In expression
-                                                Dim value_index = sql_format_arraylist(i).IndexOf(str.Trim)
-                                                If value_index = -1 Then
-                                                    calculate_valid = False
-                                                End If
-                                                If calculate_valid Then
-                                                    Dim expression_value_temp = CDbl(Val(value_arraylist(i)(row)(value_index)))
-                                                    calculation += expression_value_temp
-                                                End If
-                                            Next
-                                            If calculation > 0 Then
-                                                writable = True
-                                            End If
-                                            cal_result = calculation
-                                        ElseIf local_formula.Contains("*") Then
-                                            Dim expression = New List(Of String)(local_formula.Split("*"c))
-                                            Dim calculation = ""
-                                            Dim calculate_valid = True
-                                            For Each str As String In expression
-                                                Dim value_index = sql_format_arraylist(i).IndexOf(str.Trim)
-                                                If value_index = -1 Then
-                                                    calculate_valid = False
-                                                    Exit For
-                                                End If
-                                                If calculate_valid Then
-                                                    Dim expression_value_temp = CDbl(Val(value_arraylist(i)(row)(value_index)))
-                                                    calculation += expression_value_temp.ToString + "*"
-                                                End If
-                                            Next
-                                            If calculate_valid Then
-                                                calculation = calculation.Substring(0, calculation.Count - 1)
-                                                MsgBox("Row " + row.ToString + " Formula: " + local_formula + vbNewLine + "*Calculation : -> " + calculation)
+                                    If local_formula.Contains("+") Or local_formula.Contains("*") Then
+                                        Dim expression = New List(Of String)(local_formula.Split(New [Char]() {"+"c, "*"c}))
+                                        Dim calculation = local_formula
+                                        Dim calculate_valid = True
+                                        For Each str As String In expression
+                                            str = (str.Replace("(", "")).Replace(")", "").Trim
+                                            Dim value_index = -1
+                                            Dim table_index = -1
+                                            If str.Contains(".") Then
+                                                Dim table_name = str.Split(".")(0).Trim
+                                                For yu = 0 To queryTable.Count - 1
+                                                    Dim search_table_name = queryTable(yu)(1)
+                                                    If table_name.Contains(search_table_name) Then
+                                                        table_index = yu
+                                                    End If
+                                                Next
+                                                value_index = sql_format_arraylist(table_index).IndexOf(str.Split(".")(1).Trim)
                                             Else
-                                                MsgBox("Invalid calculation found!" + vbNewLine + local_formula + " in " + g.ToString)
+                                                table_index = i
+                                                value_index = sql_format_arraylist(i).IndexOf(str.Trim)
                                             End If
+                                            If value_index = -1 Then
+                                                calculate_valid = False
+                                                Exit For
+                                            End If
+                                            If calculate_valid Then
+                                                'MsgBox("str: " + str + vbNewLine + "Local formula: " + local_formula + vbNewLine + "Table index: " + table_index.ToString + vbNewLine + "Row: " + row.ToString + vbNewLine + "Value Index: " + value_index.ToString)
+                                                For uu = row To 0 Step -1
+                                                    If Not value_arraylist(table_index)(uu)(0).Equals("{INVALID ARRAY}") Then
+                                                        'Dim 
+                                                        'Try
 
-                                            'If calculation > 0 Then
-                                            '    writable = True
-                                            'End If
-                                            'cal_result = calculation
+                                                        'Catch ex As Exception
+
+                                                        'End Try
+                                                        'Dim expression_value_temp = CDbl(Val(value_arraylist(table_index)(row)(value_index)))
+                                                        Dim expression_value_temp = value_arraylist(table_index)(row)(value_index)
+                                                        calculation = calculation.Replace(str, expression_value_temp.ToString)
+                                                        Exit For
+                                                    End If
+                                                Next
+                                            End If
+                                        Next
+                                        'MsgBox("Before:" + vbTab + local_formula + vbNewLine + "After:" + vbTab + calculation)
+                                        If calculate_valid Then
+                                            If Not calculation.Contains("{FORMULA_VALUE}") Then
+                                                calculation = New DataTable().Compute(calculation, Nothing)
+                                                cal_result = calculation
+                                            End If
                                         End If
+                                        'cal_result = calculation
                                     End If
+                                    'If local_formula.Contains("+") Then
+                                    '    Dim expression = New List(Of String)(local_formula.Split("+"c))
+                                    '    Dim calculation = local_formula
+                                    '    Dim calculate_valid = True
+                                    '    For Each str As String In expression
+                                    '        Dim value_index = -1
+                                    '        Dim table_index = -1
+                                    '        If str.Contains(".") Then
+                                    '            Dim table_name = str.Split(".")(0).Trim
+                                    '            For yu = 0 To queryTable.Count - 1
+                                    '                Dim search_table_name = queryTable(yu)(1)
+                                    '                If table_name.Contains(search_table_name) Then
+                                    '                    table_index = yu
+                                    '                End If
+                                    '            Next
+                                    '            value_index = sql_format_arraylist(table_index).IndexOf(str.Split(".")(1).Trim)
+                                    '        Else
+                                    '            table_index = i
+                                    '            value_index = sql_format_arraylist(i).IndexOf(str.Trim)
+                                    '        End If
+                                    '        If value_index = -1 Then
+                                    '            calculate_valid = False
+                                    '            Exit For
+                                    '        End If
+                                    '        If calculate_valid Then
+                                    '            Dim expression_value_temp = CDbl(Val(value_arraylist(table_index)(row)(value_index)))
+                                    '            calculation = calculation.Replace(str, expression_value_temp.ToString)
+                                    '        End If
+                                    '    Next
+                                    '    MsgBox(calculation)
+                                    '    If calculate_valid Then
+                                    '        calculation = New DataTable().Compute(calculation, Nothing)
+                                    '    End If
+                                    '    cal_result = calculation
+                                    'ElseIf local_formula.Contains("*") Then
+                                    '    Dim expression = New List(Of String)(local_formula.Split("*"c))
+                                    '    Dim calculation = local_formula
+                                    '    Dim calculate_valid = True
+                                    '    For Each str As String In expression
+                                    '        Dim value_index = -1
+                                    '        Dim table_index = -1
+                                    '        If str.Contains(".") Then
+                                    '            Dim table_name = str.Split(".")(0).Trim
+                                    '            For yu = 0 To queryTable.Count - 1
+                                    '                Dim search_table_name = queryTable(yu)(1).trim
+                                    '                If table_name.Equals(search_table_name) Then
+                                    '                    table_index = yu
+                                    '                End If
+                                    '            Next
+                                    '            value_index = sql_format_arraylist(table_index).IndexOf(str.Split(".")(1).Trim)
+                                    '        Else
+                                    '            table_index = i
+                                    '            value_index = sql_format_arraylist(i).IndexOf(str.Trim)
+                                    '        End If
+                                    '        If value_index = -1 Then
+                                    '            calculate_valid = False
+                                    '            Exit For
+                                    '        End If
+                                    '        If calculate_valid Then
+                                    '            Dim expression_value_temp = CDbl(Val(value_arraylist(table_index)(row)(value_index)))
+                                    '            calculation = calculation.Replace(str, expression_value_temp.ToString)
+                                    '        End If
+                                    '    Next
+                                    '    'MsgBox(calculation)
+                                    '    If calculate_valid Then
+                                    '        calculation = New DataTable().Compute(calculation, Nothing)
+                                    '    End If
+                                    '    cal_result = calculation
+                                    'End If
                                 Next
                                 'MsgBox("Formula: " + formula_temp + vbNewLine + "before change=> " + value_arraylist(i)(row)(g) + vbNewLine + "after change=> " + cal_result.ToString)
-                                value_arraylist(i)(row)(g) = cal_result
+                                If cal_result > 0 Or format_value_check = 10 Then
+                                    MsgBox("i wrote it because of format check = " + format_value_check.ToString + " Or result = " + cal_result.ToString + vbNewLine + formula_arraylist(i)(g).ToString.Trim)
+                                    value_arraylist(i)(row)(g) = cal_result
+                                End If
                             End If
                         Next
-                    Next
-                    If queryable = False Then
-
-                    End If
-                End Using
+                    End Using
+                Next
             Next
         Next
         For i As Integer = 0 To queryTable.Count - 1
@@ -336,20 +590,23 @@ Public Class Quotation_Form
                 Using command As New SqlCommand("", myConn)
                     For row As Integer = 0 To dgvExcel.RowCount - 2
                         Using r As DataGridViewRow = dgvExcel.Rows(row)
-                            Dim query = ""
-                            For g As Integer = 0 To value_arraylist(i)(row).count - 1
-                                Dim value_temp As String = value_arraylist(i)(row)(g).ToString
-                                If Not (value_temp.Equals("{._!@#$%^&*()}")) Then
-                                    query += "'" + value_temp + "',"
-                                End If
-                            Next
-                            Dim command_text As String = queryTable(i)(2) + query
-                            command_text = command_text.Substring(0, command_text.Length - 1) + ")"
-                            MsgBox(command_text)
-                            command.CommandText = command_text
-                            'myConn.Open()
-                            'command.ExecuteNonQuery()
-                            'myConn.Close()
+                            If Not value_arraylist(i)(row)(0).Equals("{INVALID ARRAY}") Then
+                                Dim query = ""
+                                For g As Integer = 0 To value_arraylist(i)(row).count - 1
+                                    Dim value_temp As String = value_arraylist(i)(row)(g).ToString
+                                    If Not (value_temp.Equals("{._!@#$%^&*()}")) Then
+                                        query += "'" + value_temp + "',"
+                                    End If
+                                Next
+                                Dim command_text As String = queryTable(i)(2) + query
+                                command_text = command_text.Substring(0, command_text.Length - 1) + ")"
+                                MsgBox(command_text)
+                                command.CommandText = command_text
+                                'myConn.Open()
+                                'command.ExecuteNonQuery()
+                                'myConn.Close()
+                            End If
+
                         End Using
                     Next
                 End Using
@@ -357,4 +614,3 @@ Public Class Quotation_Form
         Next
     End Sub
 End Class
-'https://www.youtube.com/watch?v=S-Ya9QzbHKo&ab_channel=V%E3%81%BE%E3%81%A8%E3%82%81
