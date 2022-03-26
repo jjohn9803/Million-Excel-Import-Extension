@@ -300,91 +300,99 @@ Public Class Quotation_Form
                         Dim finalized_temp = New List(Of String)(formula_temp.Split("?"c))
                         Dim cal_result = ""
                         For Each local_formula As String In finalized_temp
-                            If local_formula.Contains("+") Or local_formula.Contains("-") Or local_formula.Contains("*") Then
-                                Dim expression = New List(Of String)(local_formula.Split(New [Char]() {"+"c, "*"c, "-"c}))
-                                Dim calculation = local_formula
-                                For Each express As String In expression
-                                    Dim table_name_index = -1
-                                    Dim table_value_index = -1
-                                    Dim express_temp = (express.Replace("(", "")).Replace(")", "").Trim
-                                    Dim cal_value_temp = ""
-                                    If express_temp.Contains("~") Then
-                                        Dim table_name = express_temp.Split("~")(0).Trim
-                                        Dim table_value_name = express_temp.Split("~")(1).Trim
-                                        For yu = 0 To queryTable.Count - 1
-                                            Dim search_table_name = queryTable(yu)(1)
-                                            If table_name.Equals(search_table_name) Then
-                                                table_name_index = yu
-                                            End If
-                                        Next
-                                        'table_name_index=找到quo还是quo_desc OUTPUT:0或者1 同辈：query.i value(这里)()()
-                                        'getDescSource=找到这个desc是属于哪一个quo的(row) 例如：quo1拥有product1,2 quo2拥有product3,4,5 OUTPUT:0或者2 同辈：row value()(这里)()
-                                        'table_value_index=从sql的0或1找到符合formula express value名字在valuearraylist的位置 value()()(这里)
-                                        'value_arraylist=(type)(row)(value)
+                            Dim expression = New List(Of String)(local_formula.Split(New [Char]() {"+"c, "*"c, "-"c}))
+                            Dim calculation = local_formula
+                            For Each express As String In expression
+                                Dim table_name_index = -1
+                                Dim table_value_index = -1
+                                Dim express_temp = (express.Replace("(", "")).Replace(")", "").Trim
+                                Dim cal_value_temp = ""
+                                If express_temp.Contains("~") Then
+                                    Dim table_name = express_temp.Split("~")(0).Trim
+                                    Dim table_value_name = express_temp.Split("~")(1).Trim
+                                    For yu = 0 To queryTable.Count - 1
+                                        Dim search_table_name = queryTable(yu)(1)
+                                        If table_name.Equals(search_table_name) Then
+                                            table_name_index = yu
+                                        End If
+                                    Next
+                                    'table_name_index=找到quo还是quo_desc OUTPUT:0或者1 同辈：query.i value(这里)()()
+                                    'getDescSource=找到这个desc是属于哪一个quo的(row) 例如：quo1拥有product1,2 quo2拥有product3,4,5 OUTPUT:0或者2 同辈：row value()(这里)()
+                                    'table_value_index=从sql的0或1找到符合formula express value名字在valuearraylist的位置 value()()(这里)
+                                    'value_arraylist=(type)(row)(value)
 
-                                        Dim getDescSource = CInt(rangeQuo(row).ToString.Split(".")(0))
-                                        table_value_index = sql_format_arraylist(table_name_index).IndexOf(table_value_name)
-                                        cal_value_temp = value_arraylist(table_name_index)(getDescSource)(table_value_index).ToString.Trim
+                                    Dim getDescSource = CInt(rangeQuo(row).ToString.Split(".")(0))
+                                    table_value_index = sql_format_arraylist(table_name_index).IndexOf(table_value_name)
+                                    cal_value_temp = value_arraylist(table_name_index)(getDescSource)(table_value_index).ToString.Trim
+                                    If cal_value_temp.Equals("{FORMULA_VALUE}") Then
+                                        cal_value_temp = 0
+                                    End If
+
+                                    'Dim getDescSource = rangeQuo(table_name_index)
+                                    'table_value_index = sql_format_arraylist(table_name_index).IndexOf(table_value_name)
+                                    'cal_value_temp = value_arraylist(0)(table_name_index)(table_value_index).ToString.Trim
+                                    'If cal_value_temp.Equals("{FORMULA_VALUE}") Then
+                                    '    cal_value_temp = 0
+                                    'End If
+                                Else
+                                    'valuearraylist(querytable,i)(table_name,0,1 % row)(table_index,values_index)
+                                    'Dim getDescSource = CInt(rangeQuo(row).ToString.Split(".")(0))
+                                    'table_name_index = 1
+                                    table_name_index = i
+                                    Dim table_value_name = express_temp.Trim
+                                    table_value_index = sql_format_arraylist(table_name_index).IndexOf(table_value_name)
+                                    If table_value_index <> -1 Then
+                                        cal_value_temp = value_arraylist(table_name_index)(row)(table_value_index).ToString.Trim
                                         If cal_value_temp.Equals("{FORMULA_VALUE}") Then
+                                            MsgBox("WHY ARE YOU A FORMULA")
                                             cal_value_temp = 0
                                         End If
-
-                                        'Dim getDescSource = rangeQuo(table_name_index)
-                                        'table_value_index = sql_format_arraylist(table_name_index).IndexOf(table_value_name)
-                                        'cal_value_temp = value_arraylist(0)(table_name_index)(table_value_index).ToString.Trim
-                                        'If cal_value_temp.Equals("{FORMULA_VALUE}") Then
-                                        '    cal_value_temp = 0
-                                        'End If
                                     Else
-                                        'valuearraylist(querytable,i)(table_name,0,1 % row)(table_index,values_index)
-                                        'Dim getDescSource = CInt(rangeQuo(row).ToString.Split(".")(0))
-                                        'table_name_index = 1
-                                        table_name_index = i
-                                        Dim table_value_name = express_temp.Trim
-                                        table_value_index = sql_format_arraylist(table_name_index).IndexOf(table_value_name)
-                                        If table_value_index <> -1 Then
-                                            cal_value_temp = value_arraylist(table_name_index)(row)(table_value_index).ToString.Trim
-                                            If cal_value_temp.Equals("{FORMULA_VALUE}") Then
-                                                MsgBox("WHY ARE YOU A FORMULA")
-                                                cal_value_temp = 0
-                                            End If
-                                        Else
-                                            'MsgBox("404 not found" + vbNewLine + table_name_index.ToString + vbNewLine + row.ToString + vbNewLine + table_value_index.ToString + vbNewLine + table_value_name)
-                                        End If
-
-                                        ''valuearraylist(querytable,i)(table_name,0,1 % row)(table_index,values_index)
-                                        'Dim getDescSource = CInt(rangeQuo(row).ToString.Split(".")(0))
-                                        ''table_name_index = 1
-                                        'table_name_index = getDescSource
-                                        'Dim table_value_name = express_temp.Trim
-                                        'table_value_index = sql_format_arraylist(i).IndexOf(table_value_name)
-                                        'If table_value_index <> -1 Then
-                                        '    Try
-                                        '        cal_value_temp = value_arraylist(i)(table_name_index)(table_value_index).ToString.Trim
-                                        '    Catch ex As Exception
-                                        '        MsgBox("Problem: " + table_value_index.ToString)
-                                        '    End Try
-
-                                        '    If cal_value_temp.Equals("{FORMULA_VALUE}") Then
-                                        '        cal_value_temp = 0
-                                        '    End If
-                                        'End If
-                                        'If getDescSource = 2 Then
-                                        '    MsgBox("BAKA")
-                                        'End If
-
+                                        'MsgBox("404 not found" + vbNewLine + table_name_index.ToString + vbNewLine + row.ToString + vbNewLine + table_value_index.ToString + vbNewLine + table_value_name)
                                     End If
-                                    'MsgBox("From " + express_temp.ToString + " TO " + cal_value_temp.ToString)
-                                    If Not express_temp.Contains(".") Then
-                                        calculation = calculation.Replace(express_temp, cal_value_temp)
-                                    End If
-                                Next
-                                cal_result = New DataTable().Compute(calculation, Nothing)
-                                'MsgBox("Calculation:" + vbTab + calculation + vbNewLine + local_formula)
-                            End If
+
+                                    ''valuearraylist(querytable,i)(table_name,0,1 % row)(table_index,values_index)
+                                    'Dim getDescSource = CInt(rangeQuo(row).ToString.Split(".")(0))
+                                    ''table_name_index = 1
+                                    'table_name_index = getDescSource
+                                    'Dim table_value_name = express_temp.Trim
+                                    'table_value_index = sql_format_arraylist(i).IndexOf(table_value_name)
+                                    'If table_value_index <> -1 Then
+                                    '    Try
+                                    '        cal_value_temp = value_arraylist(i)(table_name_index)(table_value_index).ToString.Trim
+                                    '    Catch ex As Exception
+                                    '        MsgBox("Problem: " + table_value_index.ToString)
+                                    '    End Try
+
+                                    '    If cal_value_temp.Equals("{FORMULA_VALUE}") Then
+                                    '        cal_value_temp = 0
+                                    '    End If
+                                    'End If
+                                    'If getDescSource = 2 Then
+                                    '    MsgBox("BAKA")
+                                    'End If
+
+                                End If
+                                'MsgBox("From " + express_temp.ToString + " TO " + cal_value_temp.ToString)
+                                If Not express_temp.Contains(".") Then
+                                    calculation = calculation.Replace(express_temp, cal_value_temp)
+                                End If
+                            Next
+                            cal_result = New DataTable().Compute(calculation, Nothing)
+                            'MsgBox("Calculation:" + vbTab + calculation + vbNewLine + local_formula)
 
                         Next
-                        value_arraylist(i)(row)(g) = cal_result
+                        If CDec(cal_result) <> 0 Then
+                            value_arraylist(i)(row)(g) = Format(CDec(cal_result), "0.00").ToString
+                        Else
+                            value_arraylist(i)(row)(g) = cal_result.ToString
+                        End If
+                        'Try
+                        '    value_arraylist(i)(row)(g) = Format(CDec(cal_result), "0.00").ToString
+                        'Catch ex As Exception
+                        '    MsgBox("Check it out : " + cal_result + vbNewLine + formula_temp)
+                        'End Try
+
                     End If
                 Next
             Next
@@ -413,10 +421,12 @@ Public Class Quotation_Form
                         Dim formula_temp = formula_arraylist(i)(g).ToString.Trim
                         Dim finalized_temp = New List(Of String)(formula_temp.Split("?"c))
                         Dim cal_result = ""
+                        Dim cal_type = ""
                         For Each local_formula As String In finalized_temp
                             If local_formula.Contains("+") Or local_formula.Contains("-") Or local_formula.Contains("*") Then
                                 Dim expression = New List(Of String)(local_formula.Split(New [Char]() {"+"c, "*"c, "-"c}))
                                 Dim calculation = local_formula
+                                'MsgBox(local_formula)
                                 For Each express As String In expression
                                     Dim table_name_index = -1
                                     Dim table_value_index = -1
@@ -435,29 +445,39 @@ Public Class Quotation_Form
                                         'getDescSource=找到这个desc是属于哪一个quo的(row) 例如：quo1拥有product1,2 quo2拥有product3,4,5 OUTPUT:0或者2 同辈：row value()(这里)()
                                         'table_value_index=从sql的0或1找到符合formula express value名字在valuearraylist的位置 value()()(这里)
                                         'value_arraylist=(type)(row)(value)
+                                        table_value_index = sql_format_arraylist(table_name_index).IndexOf(table_value_name)
 
                                         Dim myTargets As New List(Of String)
                                         For Each target As String In rangeQuo
                                             Dim rangeStart = target.Split(".")(0)
                                             If rangeStart.Equals(row.ToString) Then
                                                 myTargets.Add(target.Split(".")(1))
-                                                MsgBox(row.ToString + " is adding " + target.Split(".")(1) + " as its target")
+                                                'MsgBox(row.ToString + " is adding " + target.Split(".")(1) + " as its target")
                                             End If
                                         Next
+                                        For Each target As String In myTargets
+                                            Dim getValueOfTarget = value_arraylist(table_name_index)(CInt(target))(table_value_index).ToString.Trim
+                                            cal_value_temp += getValueOfTarget + "+"
+                                        Next
+                                        cal_value_temp = "(" + cal_value_temp.Substring(0, cal_value_temp.Length - 1) + ")"
+                                        'MsgBox("Expresses: " + expresses.Substring(0, expresses.Length - 1) + vbNewLine + local_formula)
+                                        'Dim getDescSource = CInt(rangeQuo(row).ToString.Split(".")(0))
 
-                                        Dim getDescSource = CInt(rangeQuo(row).ToString.Split(".")(0))
-                                        table_value_index = sql_format_arraylist(table_name_index).IndexOf(table_value_name)
-                                        cal_value_temp = value_arraylist(table_name_index)(getDescSource)(table_value_index).ToString.Trim
-                                        If cal_value_temp.Equals("{FORMULA_VALUE}") Then
+                                        'cal_value_temp = value_arraylist(table_name_index)(getDescSource)(table_value_index).ToString.Trim
+                                        If cal_value_temp.Contains("{FORMULA_VALUE}") Then
+                                            MsgBox("No way formula_value gonna exists here!")
                                             cal_value_temp = 0
                                         End If
-
+                                        'If Not express_temp.Contains(".") Then
+                                        '    calculation = calculation.Replace(express_temp, cal_value_temp)
+                                        'End If
                                         'Dim getDescSource = rangeQuo(table_name_index)
                                         'table_value_index = sql_format_arraylist(table_name_index).IndexOf(table_value_name)
                                         'cal_value_temp = value_arraylist(0)(table_name_index)(table_value_index).ToString.Trim
                                         'If cal_value_temp.Equals("{FORMULA_VALUE}") Then
                                         '    cal_value_temp = 0
                                         'End If
+                                        cal_type = "1"
                                     Else
                                         'valuearraylist(querytable,i)(table_name,0,1 % row)(table_index,values_index)
                                         'Dim getDescSource = CInt(rangeQuo(row).ToString.Split(".")(0))
@@ -495,268 +515,131 @@ Public Class Quotation_Form
                                         'If getDescSource = 2 Then
                                         '    MsgBox("BAKA")
                                         'End If
-
+                                        cal_type = "2"
                                     End If
                                     'MsgBox("From " + express_temp.ToString + " TO " + cal_value_temp.ToString)
                                     If Not express_temp.Contains(".") Then
                                         calculation = calculation.Replace(express_temp, cal_value_temp)
                                     End If
                                 Next
-                                cal_result = New DataTable().Compute(calculation, Nothing)
+                                Try
+                                    cal_result = New DataTable().Compute(calculation, Nothing)
+                                    'MsgBox("After calculation and the result: " + cal_result)
+                                Catch ex As Exception
+                                    MsgBox("This calculation has problem -> " + calculation + vbNewLine + local_formula, MsgBoxStyle.Exclamation)
+                                    MsgBox(value_arraylist(0)(row)(33))
+                                    'Dim str = ""
+                                    'For Each temp As String In value_arraylist(0)(row)
+                                    '    str += temp + vbTab
+                                    'Next
+                                    'MsgBox(str)
+                                End Try
+
                                 'MsgBox("Calculation:" + vbTab + calculation + vbNewLine + local_formula)
-                            End If
-
-                        Next
-                        value_arraylist(i)(row)(g) = cal_result
-                    End If
-                Next
-            Next
-        Next
-
-        Return
-            For i As Integer = 1 To 1
-            For row As Integer = 0 To dgvExcel.RowCount - 1
-                For g As Integer = 0 To value_arraylist(i)(row).count - 1
-                    Dim value_temp As String = value_arraylist(i)(row)(g).ToString.Trim
-                    If value_temp.Equals("{FORMULA_VALUE}") Then
-                        Dim formula_temp = formula_arraylist(i)(g).ToString.Trim
-                        Dim finalized_temp = New List(Of String)(formula_temp.Split("?"c))
-                        Dim cal_result = ""
-                        For Each local_formula As String In finalized_temp
-                            If local_formula.Contains("+") Or local_formula.Contains("-") Or local_formula.Contains("*") Then
-                                Dim expression = New List(Of String)(local_formula.Split(New [Char]() {"+"c, "*"c, "-"c}))
+                            Else
+                                '没有加减乘除的单个value
+                                Dim table_name_index = -1
+                                Dim table_value_index = -1
+                                Dim cal_value_temp = ""
                                 Dim calculation = local_formula
-                                For Each express As String In expression
-                                    Dim table_name_index = -1
-                                    Dim table_value_index = -1
-                                    Dim express_temp = (express.Replace("(", "")).Replace(")", "").Trim
-                                    Dim cal_value_temp = ""
-                                    If express_temp.Contains("~") Then
-                                        Dim table_name = express_temp.Split("~")(0).Trim
-                                        Dim table_value_name = express_temp.Split("~")(1).Trim
-                                        For yu = 0 To queryTable.Count - 1
-                                            Dim search_table_name = queryTable(yu)(1)
-                                            If table_name.Equals(search_table_name) Then
-                                                table_name_index = yu
-                                            End If
-                                        Next
-                                        'value_arraylist=(type)(row)(value)
-                                        Dim getDescSource = rangeQuo(table_name_index)
-                                        table_value_index = sql_format_arraylist(table_name_index).IndexOf(table_value_name)
-                                        cal_value_temp = value_arraylist(0)(table_name_index)(table_value_index).ToString.Trim
+                                If calculation.Contains("~") Then
+                                    Dim table_name = calculation.Split("~")(0).Trim
+                                    Dim table_value_name = calculation.Split("~")(1).Trim
+                                    For yu = 0 To queryTable.Count - 1
+                                        Dim search_table_name = queryTable(yu)(1)
+                                        If table_name.Equals(search_table_name) Then
+                                            table_name_index = yu
+                                        End If
+                                    Next
+                                    'table_name_index=找到quo还是quo_desc OUTPUT:0或者1 同辈：query.i value(这里)()()
+                                    'getDescSource=找到这个desc是属于哪一个quo的(row) 例如：quo1拥有product1,2 quo2拥有product3,4,5 OUTPUT:0或者2 同辈：row value()(这里)()
+                                    'table_value_index=从sql的0或1找到符合formula express value名字在valuearraylist的位置 value()()(这里)
+                                    'value_arraylist=(type)(row)(value)
+                                    table_value_index = sql_format_arraylist(table_name_index).IndexOf(table_value_name)
+
+                                    Dim myTargets As New List(Of String)
+                                    For Each target As String In rangeQuo
+                                        Dim rangeStart = target.Split(".")(0)
+                                        If rangeStart.Equals(row.ToString) Then
+                                            myTargets.Add(target.Split(".")(1))
+                                            'MsgBox(row.ToString + " is adding " + target.Split(".")(1) + " as its target")
+                                        End If
+                                    Next
+                                    For Each target As String In myTargets
+                                        Dim getValueOfTarget = value_arraylist(table_name_index)(CInt(target))(table_value_index).ToString.Trim
+                                        cal_value_temp += getValueOfTarget + "+"
+                                    Next
+                                    cal_value_temp = "(" + cal_value_temp.Substring(0, cal_value_temp.Length - 1) + ")"
+                                    'MsgBox("Expresses: " + expresses.Substring(0, expresses.Length - 1) + vbNewLine + local_formula)
+                                    'Dim getDescSource = CInt(rangeQuo(row).ToString.Split(".")(0))
+
+                                    'cal_value_temp = value_arraylist(table_name_index)(getDescSource)(table_value_index).ToString.Trim
+                                    If cal_value_temp.Contains("{FORMULA_VALUE}") Then
+                                        MsgBox("No way formula_value gonna exists here!")
+                                        cal_value_temp = 0
+                                    End If
+                                    cal_type = "B1"
+                                Else
+                                    'table_name_index=找到quo还是quo_desc OUTPUT:0或者1 同辈：query.i value(这里)()()
+                                    'getDescSource=找到这个desc是属于哪一个quo的(row) 例如：quo1拥有product1,2 quo2拥有product3,4,5 OUTPUT:0或者2 同辈：row value()(这里)()
+                                    'table_value_index=从sql的0或1找到符合formula express value名字在valuearraylist的位置 value()()(这里)
+                                    'value_arraylist=(type)(row)(value)
+                                    table_name_index = i
+                                    Dim table_value_name = local_formula.Trim
+                                    table_value_index = sql_format_arraylist(table_name_index).IndexOf(table_value_name)
+                                    If table_value_index <> -1 Then
+                                        cal_value_temp = value_arraylist(table_name_index)(row)(table_value_index).ToString.Trim
                                         If cal_value_temp.Equals("{FORMULA_VALUE}") Then
+                                            MsgBox("WHY ARE YOU A FORMULA")
                                             cal_value_temp = 0
                                         End If
                                     Else
-                                        table_name_index = 1
-                                        Dim table_value_name = express_temp.Trim
-                                        table_value_index = sql_format_arraylist(table_name_index).IndexOf(table_value_name)
-                                        If table_value_index <> -1 Then
-                                            cal_value_temp = value_arraylist(0)(table_name_index)(table_value_index).ToString.Trim
-                                            If cal_value_temp.Equals("{FORMULA_VALUE}") Then
-                                                cal_value_temp = 0
-                                            End If
-                                        End If
-
+                                        MsgBox("单品 404 not found" + vbNewLine + table_name_index.ToString + vbNewLine + row.ToString + vbNewLine + table_value_index.ToString + vbNewLine + table_value_name)
                                     End If
-                                    calculation.Replace(express_temp, cal_value_temp)
-                                Next
-                                MsgBox("Calculation:" + vbTab + calculation)
+                                    cal_type = "B2"
+                                End If
+                                If Not calculation.Contains(".") Then
+                                    calculation = cal_value_temp
+                                End If
+                                Try
+                                    cal_result = New DataTable().Compute(calculation, Nothing)
+                                    'MsgBox("After calculation and the result: " + cal_result)
+                                Catch ex As Exception
+                                    MsgBox("This calculation has problem -> " + calculation + vbNewLine + local_formula, MsgBoxStyle.Exclamation)
+                                    MsgBox(value_arraylist(0)(row)(33))
+                                    'Dim str = ""
+                                    'For Each temp As String In value_arraylist(0)(row)
+                                    '    str += temp + vbTab
+                                    'Next
+                                    'MsgBox(str)
+                                End Try
                             End If
+
                         Next
+                        If cal_type = "" Then
+                            MsgBox("Empty -> " + formula_temp + vbNewLine + finalized_temp(0).ToString)
+                        End If
+                        'MsgBox("Upgrade value: " + value_arraylist(i)(row)(g) + vbNewLine + "This calculation -> " + cal_result + vbNewLine + formula_temp + vbNewLine + "Cal Type: " + cal_type, MsgBoxStyle.Exclamation)
+                        'value_arraylist(i)(row)(g) = Format(CDec(cal_result), "0.00").ToString
+                        If CDec(cal_result) <> 0 Then
+                            value_arraylist(i)(row)(g) = Format(CDec(cal_result), "0.00").ToString
+                        Else
+                            value_arraylist(i)(row)(g) = cal_result.ToString
+                        End If
                     End If
                 Next
             Next
         Next
-        Return
-        'For i As Integer = (queryTable.Count - 1) To 0 Step -1
+        'For i As Integer = 0 To queryTable.Count - 1
         '    For row As Integer = 0 To dgvExcel.RowCount - 1
-        '        For g As Integer = 0 To value_arraylist(i)(row).count - 1
-        '            Dim value_temp As String = value_arraylist(i)(row)(g).ToString.Trim
-        '            If value_temp.Equals("{FORMULA_VALUE}") Then
-        '                Dim formula_temp = formula_arraylist(i)(g).ToString.Trim
-        '                Dim finalized_temp = New List(Of String)(formula_temp.Split("?"c))
-        '                Dim cal_result = ""
-        '                For Each local_formula As String In finalized_temp
-        '                    If local_formula.Contains("+") Or local_formula.Contains("-") Or local_formula.Contains("*") Then
-        '                        Dim expression = New List(Of String)(local_formula.Split(New [Char]() {"+"c, "*"c, "-"c}))
-        '                        Dim calculation = local_formula
-        '                        Dim table_name_index = -1
-        '                        Dim table_value_index = -1
-        '                        For Each express As String In expression
-        '                            Dim express_temp = (express.Replace("(", "")).Replace(")", "").Trim
-        '                            If express_temp.Contains(".") Then
-        '                                Dim table_name = express_temp.Split(".")(0).Trim
-        '                                Dim table_value_name = express_temp.Split(".")(1).Trim
-
-        '                                For yu = 0 To queryTable.Count - 1
-        '                                    Dim search_table_name = queryTable(yu)(1)
-        '                                    If table_name.Equals(search_table_name) Then
-        '                                        table_name_index = yu
-        '                                    End If
-        '                                Next
-
-        '                                For yu = 0 To value_arraylist(i).count - 1
-        '                                    Dim search_table_value = value_arraylist(i)(1)
-        '                                    If table_name.Equals(search_table_value) Then
-        '                                        table_name_index = yu
-        '                                    End If
-        '                                Next
-
-        '                            End If
-        '                        Next
-        '                    End If
-        '                Next
-        '            End If
+        '        Dim strs = ""
+        '        For Each str As String In value_arraylist(i)(row)
+        '            strs += str + vbTab
         '        Next
+        '        MsgBox("Row " + row.ToString + vbNewLine + strs)
         '    Next
         'Next
         'Quotation only end
-        Return
-        For format_value_check As Integer = 0 To 10
-            For i As Integer = 0 To queryTable.Count - 1
-                For row As Integer = 0 To dgvExcel.RowCount - 1
-                    Using r As DataGridViewRow = dgvExcel.Rows(row)
-                        For g As Integer = 0 To value_arraylist(i)(Row).count - 1
-                            Dim value_temp As String = value_arraylist(i)(Row)(g).ToString.Trim
-                            If value_temp.Equals("{FORMULA_VALUE}") Then
-                                Dim formula_temp = formula_arraylist(i)(g).ToString.Trim
-                                Dim finalized_temp = New List(Of String)(formula_temp.Split("?"c))
-                                Dim cal_result = 0
-                                For Each local_formula As String In finalized_temp
-                                    If local_formula.Contains("+") Or local_formula.Contains("*") Then
-                                        Dim expression = New List(Of String)(local_formula.Split(New [Char]() {"+"c, "*"c}))
-                                        Dim calculation = local_formula
-                                        Dim calculate_valid = True
-                                        For Each str As String In expression
-                                            str = (str.Replace("(", "")).Replace(")", "").Trim
-                                            Dim value_index = -1
-                                            Dim table_index = -1
-                                            If str.Contains(".") Then
-                                                Dim table_name = str.Split(".")(0).Trim
-                                                For yu = 0 To queryTable.Count - 1
-                                                    Dim search_table_name = queryTable(yu)(1)
-                                                    If table_name.Contains(search_table_name) Then
-                                                        table_index = yu
-                                                    End If
-                                                Next
-                                                value_index = sql_format_arraylist(table_index).IndexOf(str.Split(".")(1).Trim)
-                                            Else
-                                                table_index = i
-                                                value_index = sql_format_arraylist(i).IndexOf(str.Trim)
-                                            End If
-                                            If value_index = -1 Then
-                                                calculate_valid = False
-                                                Exit For
-                                            End If
-                                            If calculate_valid Then
-                                                'MsgBox("str: " + str + vbNewLine + "Local formula: " + local_formula + vbNewLine + "Table index: " + table_index.ToString + vbNewLine + "Row: " + row.ToString + vbNewLine + "Value Index: " + value_index.ToString)
-                                                For uu = row To 0 Step -1
-                                                    If Not value_arraylist(table_index)(uu)(0).Equals("{INVALID ARRAY}") Then
-                                                        'Dim 
-                                                        'Try
-
-                                                        'Catch ex As Exception
-
-                                                        'End Try
-                                                        'Dim expression_value_temp = CDbl(Val(value_arraylist(table_index)(row)(value_index)))
-                                                        Dim expression_value_temp = value_arraylist(table_index)(row)(value_index)
-                                                        calculation = calculation.Replace(str, expression_value_temp.ToString)
-                                                        Exit For
-                                                    End If
-                                                Next
-                                            End If
-                                        Next
-                                        'MsgBox("Before:" + vbTab + local_formula + vbNewLine + "After:" + vbTab + calculation)
-                                        If calculate_valid Then
-                                            If Not calculation.Contains("{FORMULA_VALUE}") Then
-                                                calculation = New DataTable().Compute(calculation, Nothing)
-                                                cal_result = calculation
-                                            End If
-                                        End If
-                                        'cal_result = calculation
-                                    End If
-                                    'If local_formula.Contains("+") Then
-                                    '    Dim expression = New List(Of String)(local_formula.Split("+"c))
-                                    '    Dim calculation = local_formula
-                                    '    Dim calculate_valid = True
-                                    '    For Each str As String In expression
-                                    '        Dim value_index = -1
-                                    '        Dim table_index = -1
-                                    '        If str.Contains(".") Then
-                                    '            Dim table_name = str.Split(".")(0).Trim
-                                    '            For yu = 0 To queryTable.Count - 1
-                                    '                Dim search_table_name = queryTable(yu)(1)
-                                    '                If table_name.Contains(search_table_name) Then
-                                    '                    table_index = yu
-                                    '                End If
-                                    '            Next
-                                    '            value_index = sql_format_arraylist(table_index).IndexOf(str.Split(".")(1).Trim)
-                                    '        Else
-                                    '            table_index = i
-                                    '            value_index = sql_format_arraylist(i).IndexOf(str.Trim)
-                                    '        End If
-                                    '        If value_index = -1 Then
-                                    '            calculate_valid = False
-                                    '            Exit For
-                                    '        End If
-                                    '        If calculate_valid Then
-                                    '            Dim expression_value_temp = CDbl(Val(value_arraylist(table_index)(row)(value_index)))
-                                    '            calculation = calculation.Replace(str, expression_value_temp.ToString)
-                                    '        End If
-                                    '    Next
-                                    '    MsgBox(calculation)
-                                    '    If calculate_valid Then
-                                    '        calculation = New DataTable().Compute(calculation, Nothing)
-                                    '    End If
-                                    '    cal_result = calculation
-                                    'ElseIf local_formula.Contains("*") Then
-                                    '    Dim expression = New List(Of String)(local_formula.Split("*"c))
-                                    '    Dim calculation = local_formula
-                                    '    Dim calculate_valid = True
-                                    '    For Each str As String In expression
-                                    '        Dim value_index = -1
-                                    '        Dim table_index = -1
-                                    '        If str.Contains(".") Then
-                                    '            Dim table_name = str.Split(".")(0).Trim
-                                    '            For yu = 0 To queryTable.Count - 1
-                                    '                Dim search_table_name = queryTable(yu)(1).trim
-                                    '                If table_name.Equals(search_table_name) Then
-                                    '                    table_index = yu
-                                    '                End If
-                                    '            Next
-                                    '            value_index = sql_format_arraylist(table_index).IndexOf(str.Split(".")(1).Trim)
-                                    '        Else
-                                    '            table_index = i
-                                    '            value_index = sql_format_arraylist(i).IndexOf(str.Trim)
-                                    '        End If
-                                    '        If value_index = -1 Then
-                                    '            calculate_valid = False
-                                    '            Exit For
-                                    '        End If
-                                    '        If calculate_valid Then
-                                    '            Dim expression_value_temp = CDbl(Val(value_arraylist(table_index)(row)(value_index)))
-                                    '            calculation = calculation.Replace(str, expression_value_temp.ToString)
-                                    '        End If
-                                    '    Next
-                                    '    'MsgBox(calculation)
-                                    '    If calculate_valid Then
-                                    '        calculation = New DataTable().Compute(calculation, Nothing)
-                                    '    End If
-                                    '    cal_result = calculation
-                                    'End If
-                                Next
-                                'MsgBox("Formula: " + formula_temp + vbNewLine + "before change=> " + value_arraylist(i)(row)(g) + vbNewLine + "after change=> " + cal_result.ToString)
-                                If cal_result > 0 Or format_value_check = 10 Then
-                                    MsgBox("i wrote it because of format check = " + format_value_check.ToString + " Or result = " + cal_result.ToString + vbNewLine + formula_arraylist(i)(g).ToString.Trim)
-                                    value_arraylist(i)(row)(g) = cal_result
-                                End If
-                            End If
-                        Next
-                    End Using
-                Next
-            Next
-        Next
         For i As Integer = 0 To queryTable.Count - 1
             init()
             Using myConn = New SqlConnection("Data Source=" + serverName + ";" & "Initial Catalog=" + database + ";" + pwd_query)
@@ -775,9 +658,9 @@ Public Class Quotation_Form
                                 command_text = command_text.Substring(0, command_text.Length - 1) + ")"
                                 MsgBox(command_text)
                                 command.CommandText = command_text
-                                'myConn.Open()
-                                'command.ExecuteNonQuery()
-                                'myConn.Close()
+                                myConn.Open()
+                                command.ExecuteNonQuery()
+                                myConn.Close()
                             End If
 
                         End Using

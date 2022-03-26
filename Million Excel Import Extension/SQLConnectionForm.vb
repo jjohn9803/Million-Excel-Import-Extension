@@ -262,7 +262,8 @@ Public Class SQL_Connection_Form
             form2.WindowState = FormWindowState.Maximized
         ElseIf TabControl1.SelectedTab.TabIndex = 2 Then
             form3.Visible = True
-            Me.WindowState = FormWindowState.Maximized
+            Me.Size = form3.Size
+            Me.WindowState = FormWindowState.Normal
             form3.WindowState = FormWindowState.Maximized
             form3.readMaintainSetting()
         Else

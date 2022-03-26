@@ -72,10 +72,15 @@ Public Class Maintainance_Form
         'For Each row As DataRow In dt.Rows
         '    'MsgBox(row.Item(0))
         'Next row
+        DataGridViewManage.Rows.Clear()
+
         For Each row As DataRow In dt.Rows
             Dim newRow As DataGridViewRow = DataGridViewManage.Rows(DataGridViewManage.Rows.Add())
             newRow.Cells(0).Value = row.Item("sql_format").ToString
-            newRow.Cells(1).Value = row.Item("excel_formt").ToString
+            newRow.Cells(1).Value = row.Item("excel_format").ToString
+            newRow.Cells(2).Value = row.Item("default_value").ToString
+            newRow.Cells(3).Value = row.Item("formula").ToString
+            newRow.Cells(4).Value = row.Item("data_type").ToString
         Next row
 
     End Sub
