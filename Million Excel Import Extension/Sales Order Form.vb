@@ -2,7 +2,7 @@
 Imports System.IO
 Imports ClosedXML.Excel
 Imports ExcelDataReader
-Public Class Quotation_Form
+Public Class Sales_Order_Form
     Dim tables As DataTableCollection
     Private serverName As String
     Private database As String
@@ -10,7 +10,7 @@ Public Class Quotation_Form
     Private statusConnection As Boolean
     Private pwd_query As String
     Private import_type As String
-    Private Sub Quotation_Form_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+    Private Sub Sales_Order_Form_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         init()
     End Sub
     Private Sub init()
@@ -77,22 +77,22 @@ Public Class Quotation_Form
         Return SQL_Connection_Form.returnUpperFolder(Application.StartupPath(), 2) + "maintain.xls"
     End Function
     Private Sub btnImport_Click(sender As Object, e As EventArgs) Handles btnImport.Click
-        Dim importType = "Quotation"
+        Dim importType = "Sales Order"
         Dim tableExcelSetting As DataTableCollection
         'Try
         Using stream = File.Open(getMaintainSetting, FileMode.Open, FileAccess.Read)
             Using reader As IExcelDataReader = ExcelReaderFactory.CreateReader(stream)
                 Dim result As DataSet = reader.AsDataSet(New ExcelDataSetConfiguration() With {
-                                                                     .ConfigureDataTable = Function(__) New ExcelDataTableConfiguration() With {
-                                                                     .UseHeaderRow = True}})
+                                                                 .ConfigureDataTable = Function(__) New ExcelDataTableConfiguration() With {
+                                                                 .UseHeaderRow = True}})
                 tableExcelSetting = result.Tables
                 Dim queryTable As New ArrayList
                 queryTable.Add(New ArrayList)
                 queryTable.Add(New ArrayList)
-                queryTable(0).add("Quotation") '0
-                queryTable(0).add("squote") '1
-                queryTable(1).add("Quotation Desc")
-                queryTable(1).add("squotedet")
+                queryTable(0).add("Sales Order") '0
+                queryTable(0).add("sorder") '1
+                queryTable(1).add("Sales Order Desc")
+                queryTable(1).add("sorderdet")
                 quotationWriteIntoSQL(tableExcelSetting, queryTable)
             End Using
         End Using
