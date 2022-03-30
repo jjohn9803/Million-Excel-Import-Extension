@@ -2,6 +2,7 @@
 Imports System.IO
 Imports ClosedXML.Excel
 Imports ExcelDataReader
+
 Public Class Quotation_Form
     Dim tables As DataTableCollection
     Private serverName As String
@@ -179,8 +180,8 @@ Public Class Quotation_Form
                                     value = "   "
                                     value_arraylist(i)(row).add("   ")
                                 ElseIf data_type_temp.ToString.Contains("date") Or data_type_temp.ToString.Contains("time") Then
-                                    value = (New DateTime).ToString
-                                    value_arraylist(i)(row).add((New DateTime).ToString)
+                                    value = New Date.ToString
+                                    value_arraylist(i)(row).add(New Date.ToString)
                                 Else
                                     value = "0"
                                     value_arraylist(i)(row).add("0")
@@ -239,7 +240,7 @@ Public Class Quotation_Form
                                             If data_type_temp.ToString.Contains("char") Or data_type_temp.ToString.Contains("text") Then
                                                 value_arraylist(i)(row)(g) = "   "
                                             ElseIf data_type_temp.ToString.Contains("date") Or data_type_temp.ToString.Contains("time") Then
-                                                value_arraylist(i)(row)(g) = (New DateTime).ToString
+                                                value_arraylist(i)(row)(g) = New Date.ToString
                                             Else
                                                 value_arraylist(i)(row)(g) = "0"
                                             End If
@@ -699,7 +700,8 @@ Public Class Quotation_Form
                                 For g As Integer = 0 To value_arraylist(i)(row).count - 1
                                     Dim value_temp As String = value_arraylist(i)(row)(g).ToString
                                     If sql_format_arraylist(i)(g).ToString.Trim.Equals("createdate") Or sql_format_arraylist(i)(g).ToString.Trim.Equals("lastupdate") Then
-                                        query += "'" + DateTime.Now.ToString + "',"
+                                        query += "'" + Date.Now.ToString + "',"
+                                        value_arraylist(i)(row)(g) = Date.Now.ToString
                                     ElseIf Not (value_temp.Equals("{._!@#$%^&*()}")) Then
                                         query += "'" + value_temp + "',"
                                     End If
@@ -722,15 +724,39 @@ Public Class Quotation_Form
                 End Using
             End Using
         Next
-        For i As Integer = 0 To queryTable.Count - 1
-            For row As Integer = 0 To dgvExcel.RowCount - 1
-                Dim strs = ""
-                For j = 0 To value_arraylist(i)(row).count - 1
-                    strs += sql_format_arraylist(i)(j) + ":" + vbTab + value_arraylist(i)(row)(j) + vbNewLine
+        Using workbook As New XLWorkbook
+            Dim sheets As New ArrayList
+
+            For i As Integer = 0 To queryTable.Count - 1
+                Dim sheetName As String = queryTable(i)(0)
+                Dim worksheet As IXLWorksheet = workbook.Worksheets.Add(sheetName)
+                Dim writableRow = 1
+
+                For row As Integer = 0 To dgvExcel.RowCount - 1
+                    If Not (value_arraylist(i)(row)(0).Equals("{INVALID ARRAY}")) Then
+                        For j As Integer = 0 To value_arraylist(i)(row).count - 1
+                            worksheet.Cell(writableRow, (j + 1)).Value = sql_format_arraylist(i)(j)
+                            worksheet.Cell(writableRow, (j + 1)).Style.Font.Bold = True
+                        Next
+                        writableRow += 1
+                        For j As Integer = 0 To value_arraylist(i)(row).count - 1
+                            worksheet.Cell(writableRow, (j + 1)).Value = value_arraylist(i)(row)(j)
+                        Next
+                        writableRow += 2
+                    End If
                 Next
-                Clipboard.SetText(strs)
-                MsgBox("Row " + row.ToString + vbNewLine + strs)
+                worksheet.Columns.Width = 25
             Next
-        Next
+            'C:\Users\RBADM07\Desktop\Generated Result.xlsx
+            workbook.SaveAs("C:\Users\RBADM07\Desktop\Generated Result.xlsx")
+            'Using sfd As SaveFileDialog = New SaveFileDialog() With {.Filter = "Excel Workbook|*.xlsx|Excel 97-2003 Workbook|*.xls"}
+            '    sfd.FileName = "Generated Result"
+            '    If sfd.ShowDialog() = DialogResult.OK Then
+            '        workbook.SaveAs(sfd.FileName)
+            '    End If
+            'End Using
+        End Using
+
+
     End Sub
 End Class
