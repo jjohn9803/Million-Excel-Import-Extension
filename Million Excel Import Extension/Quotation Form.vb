@@ -348,8 +348,12 @@ Public Class Quotation_Form
                             Dim formula_temp = formula_arraylist(i)(g).ToString.Trim
                             Dim finalized_temp = New List(Of String)(formula_temp.Split("?"c))
                             Dim cal_result = ""
-                            Dim cal_valid = True
+                            Dim cal_valid = False
+                            Dim finalized_cal_boolean = False
                             For Each local_formula As String In finalized_temp
+                                If finalized_cal_boolean Then
+                                    Exit For
+                                End If
                                 Dim expression = New List(Of String)(local_formula.Split(New [Char]() {"+"c, "*"c, "-"c}))
                                 Dim calculation = local_formula
                                 For Each express As String In expression
@@ -374,12 +378,16 @@ Public Class Quotation_Form
                                         Dim getDescSource = CInt(rangeQuo(row).ToString.Split(".")(0))
                                         table_value_index = sql_format_arraylist(table_name_index).IndexOf(table_value_name)
                                         cal_value_temp = value_arraylist(table_name_index)(getDescSource)(table_value_index).ToString.Trim
-                                        If cal_value_temp.Equals("{FORMULA_VALUE}") Then
+                                        If cal_value_temp.Equals("{FORMULA_VALUE}") Or cal_value_temp.Equals(String.Empty) Then
                                             If formula_checker >= 5 Then
                                                 cal_value_temp = 0
+                                                cal_valid = True
                                             Else
                                                 cal_valid = False
+                                                Exit For
                                             End If
+                                        Else
+                                            cal_valid = True
                                         End If
                                     Else
                                         'valuearraylist(querytable,i)(table_name,0,1 % row)(table_index,values_index)
@@ -390,11 +398,13 @@ Public Class Quotation_Form
                                         table_value_index = sql_format_arraylist(table_name_index).IndexOf(table_value_name)
                                         If table_value_index <> -1 Then
                                             cal_value_temp = value_arraylist(table_name_index)(row)(table_value_index).ToString.Trim
-                                            If cal_value_temp.Equals("{FORMULA_VALUE}") Then
+                                            If cal_value_temp.Equals("{FORMULA_VALUE}") Or cal_value_temp.Equals(String.Empty) Then
                                                 If formula_checker >= 5 Then
                                                     cal_value_temp = 0
+                                                    cal_valid = True
                                                 Else
                                                     cal_valid = False
+                                                    Exit For
                                                 End If
                                                 'MsgBox("WHY ARE YOU A FORMULA" + vbNewLine + "i: " + table_name_index.ToString + vbNewLine + "row: " + row.ToString + vbNewLine + "index: " + table_value_index.ToString + vbNewLine + "Value: " + cal_value_temp + vbNewLine + "Sql: " + sql_format_arraylist(table_name_index)(table_value_index) + vbNewLine + "Name: " + table_value_name + vbNewLine + "Formula: " + local_formula + vbNewLine + "Formula temp: " + formula_temp + vbNewLine + "Express Temp: " + express_temp)
 
@@ -403,6 +413,8 @@ Public Class Quotation_Form
                                                 '    result += str + vbTab
                                                 'Next
                                                 'MsgBox(result)
+                                            Else
+                                                cal_valid = True
                                             End If
 
                                         Else
@@ -411,21 +423,18 @@ Public Class Quotation_Form
 
                                     End If
                                     'MsgBox("From " + express_temp.ToString + " TO " + cal_value_temp.ToString)
-                                    If Not express_temp.Contains(".") Then
-                                        If cal_value_temp.Equals(String.Empty) Then
-                                            cal_valid = False
-                                        End If
-                                        If cal_valid Then
-                                            calculation = calculation.Replace(express_temp, cal_value_temp)
-                                        End If
+                                    If Not express_temp.Contains(".") And cal_valid Then
+                                        calculation = calculation.Replace(express_temp, cal_value_temp)
                                     End If
                                 Next
-                                If (Not (calculation.Contains("{FORMULA_VALUE}")) Or formula_checker >= 5) And cal_valid Then
-                                    calculation = calculation.Replace("{FORMULA_VALUE}", "0")
+                                If cal_valid Then
                                     Try
                                         cal_result = New DataTable().Compute(calculation, Nothing)
+                                        If CDec(cal_result) > 0 Then
+                                            finalized_cal_boolean = True
+                                        End If
                                     Catch ex As Exception
-                                        MsgBox("Formula checker: " + formula_checker.ToString + vbNewLine + "Calculation: " + calculation + vbNewLine + "local formula: " + local_formula)
+                                        MsgBox("nett_amt:" + vbTab + value_arraylist(i)(row)(25).ToString + vbNewLine + sql_format_arraylist(i)(25))
                                     End Try
                                 End If
 
@@ -435,13 +444,27 @@ Public Class Quotation_Form
                                 'MsgBox("Calculation:" + vbTab + calculation + vbNewLine + local_formula)
 
                             Next
-                            If cal_valid Then
+                            If finalized_cal_boolean Then
+                                'If cal_valid Then
+                                '    If Not (cal_result.Equals(String.Empty)) Then
+                                '        If CDec(cal_result) <> 0 Then
+                                '            value_arraylist(i)(row)(g) = Format(CDec(cal_result), "0.00").ToString
+                                '        End If
+                                '    Else
+                                '        value_arraylist(i)(row)(g) = cal_result.ToString
+                                '    End If
+                                'End If
                                 If Not (cal_result.Equals(String.Empty)) Then
                                     If CDec(cal_result) <> 0 Then
                                         value_arraylist(i)(row)(g) = Format(CDec(cal_result), "0.00").ToString
                                     End If
                                 Else
                                     value_arraylist(i)(row)(g) = cal_result.ToString
+                                End If
+                            Else
+                                If formula_checker >= 5 Then
+                                    MsgBox("cal result: " + cal_result)
+                                    value_arraylist(i)(row)(g) = "0.00"
                                 End If
                             End If
 
