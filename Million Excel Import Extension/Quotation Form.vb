@@ -301,8 +301,8 @@ Public Class Quotation_Form
                                         Dim source_value = value_arraylist(i)(row)(source_sql_index)
                                         Dim result_value = ""
                                         'MsgBox("SELECT " + destination_sql_value + " FROM " + destination_table + " WHERE " + source_sql_value + "='" + source_value + "'")
-                                        MsgBox(source_value)
-                                        If source_value.Equals(String.Empty) Then
+                                        'MsgBox(source_value)
+                                        If source_value.ToString.Trim.Equals(String.Empty) Then
                                             MsgBox("het")
                                             value_arraylist(i)(row)(g) = 0
                                         Else
@@ -361,6 +361,15 @@ Public Class Quotation_Form
         'Return
         'Hardcode Formula
         For row As Integer = 0 To dgvExcel.RowCount - 1
+            If Not value_arraylist(0)(row)(0).Equals("{INVALID ARRAY}") Then
+                'batchno
+                If value_arraylist(0)(row)(47).length = 2 Then
+                    Dim date1 = value_arraylist(0)(row)(2)
+                    Dim batchno = value_arraylist(0)(row)(47)
+                    value_arraylist(0)(row)(47) = Year(date1).ToString.Substring(2) + Month(date1).ToString("00") + batchno
+                End If
+            End If
+
             'qtyrp
             If value_arraylist(1)(row)(10).Equals("{FORMULA_VALUE}") Then
                 Dim qty = value_arraylist(1)(row)(9)
@@ -372,7 +381,7 @@ Public Class Quotation_Form
                 Dim qty = CDbl(value_arraylist(1)(row)(9))
                 Dim price = CDbl(value_arraylist(1)(row)(11))
                 Dim gross_amt = qty * price
-                value_arraylist(1)(row)(24) = gross_amt
+                value_arraylist(1)(row)(24) = Math.Round(gross_amt, 2)
             End If
 
             'disamt1
@@ -380,7 +389,7 @@ Public Class Quotation_Form
                 Dim gross_amt = CDbl(value_arraylist(1)(row)(24))
                 Dim disp1 = CDbl(value_arraylist(1)(row)(16))
                 Dim disamt1 = gross_amt * (disp1 * 0.01)
-                value_arraylist(1)(row)(12) = disamt1
+                value_arraylist(1)(row)(12) = Math.Round(disamt1, 2)
             End If
 
             'disamt2
@@ -389,7 +398,7 @@ Public Class Quotation_Form
                 Dim disamt1 = CDbl(value_arraylist(1)(row)(12))
                 Dim disp2 = CDbl(value_arraylist(1)(row)(17))
                 Dim disamt2 = (gross_amt - disamt1) * (disp2 * 0.01)
-                value_arraylist(1)(row)(13) = disamt2
+                value_arraylist(1)(row)(13) = Math.Round(disamt2, 2)
             End If
 
             'disamt3
@@ -399,7 +408,7 @@ Public Class Quotation_Form
                 Dim disamt2 = CDbl(value_arraylist(1)(row)(13))
                 Dim disp3 = CDbl(value_arraylist(1)(row)(18))
                 Dim disamt3 = (gross_amt - disamt1 - disamt2) * (disp3 * 0.01)
-                value_arraylist(1)(row)(14) = disamt3
+                value_arraylist(1)(row)(14) = Math.Round(disamt3, 2)
             End If
 
             'disamt
@@ -408,7 +417,7 @@ Public Class Quotation_Form
                 Dim disamt2 = CDbl(value_arraylist(1)(row)(13))
                 Dim disamt3 = CDbl(value_arraylist(1)(row)(14))
                 Dim disamt = disamt1 + disamt2 + disamt3
-                value_arraylist(1)(row)(15) = disamt
+                value_arraylist(1)(row)(15) = Math.Round(disamt, 2)
             End If
 
             'nett_amt
@@ -416,15 +425,15 @@ Public Class Quotation_Form
                 Dim gross_amt = CDbl(value_arraylist(1)(row)(24))
                 Dim disamt = CDbl(value_arraylist(1)(row)(15))
                 Dim nett_amt = gross_amt - disamt
-                value_arraylist(1)(row)(25) = nett_amt
+                value_arraylist(1)(row)(25) = Math.Round(nett_amt, 2)
             End If
 
             'amt
             If value_arraylist(1)(row)(26).Equals("{FORMULA_VALUE}") Then
                 Dim gross_amt = CDbl(value_arraylist(1)(row)(24))
                 Dim disamt = CDbl(value_arraylist(1)(row)(17))
-                Dim nett_amt = gross_amt - disamt
-                value_arraylist(1)(row)(26) = nett_amt
+                Dim amt = gross_amt - disamt
+                value_arraylist(1)(row)(26) = Math.Round(amt, 2)
             End If
             'taxamt1
             If value_arraylist(1)(row)(19).Equals("{FORMULA_VALUE}") Then
@@ -434,14 +443,14 @@ Public Class Quotation_Form
                     taxp1 = CDbl(value_arraylist(1)(row)(23))
                 End If
                 Dim taxamt1 = nett_amt * (taxp1 * 0.01)
-                value_arraylist(1)(row)(19) = taxamt1
+                value_arraylist(1)(row)(19) = Math.Round(taxamt1, 2)
             End If
             'taxamt
             If value_arraylist(1)(row)(22).Equals("{FORMULA_VALUE}") Then
                 Dim taxamt1 = CDbl(value_arraylist(1)(row)(19))
                 Dim taxamt2 = CDbl(value_arraylist(1)(row)(20))
                 Dim taxamt = taxamt1 + taxamt2
-                value_arraylist(1)(row)(22) = taxamt
+                value_arraylist(1)(row)(22) = Math.Round(taxamt, 2)
             End If
 
             'local converter
@@ -465,14 +474,14 @@ Public Class Quotation_Form
             If value_arraylist(1)(row)(28).Equals("{FORMULA_VALUE}") Then
                 Dim gross_amt = CDbl(value_arraylist(1)(row)(24))
                 Dim local_gamt = gross_amt * fx_rate
-                value_arraylist(1)(row)(28) = local_gamt
+                value_arraylist(1)(row)(28) = Math.Round(local_gamt, 2)
             End If
 
             'local_disamt
             If value_arraylist(1)(row)(29).Equals("{FORMULA_VALUE}") Then
                 Dim disamt = CDbl(value_arraylist(1)(row)(15))
                 Dim local_disamt = disamt * fx_rate
-                value_arraylist(1)(row)(29) = local_disamt
+                value_arraylist(1)(row)(29) = Math.Round(local_disamt, 2)
             End If
 
             'local_namt
@@ -480,55 +489,55 @@ Public Class Quotation_Form
                 Dim local_gamt = CDbl(value_arraylist(1)(row)(28))
                 Dim local_disamt = CDbl(value_arraylist(1)(row)(29))
                 Dim local_namt = local_gamt - local_disamt
-                value_arraylist(1)(row)(30) = local_namt
+                value_arraylist(1)(row)(30) = Math.Round(local_namt, 2)
             End If
 
             'local_taxamt1
             If value_arraylist(1)(row)(31).Equals("{FORMULA_VALUE}") Then
                 Dim taxamt1 = CDbl(value_arraylist(1)(row)(19))
                 Dim local_taxamt1 = taxamt1 * fx_rate
-                value_arraylist(1)(row)(31) = local_taxamt1
+                value_arraylist(1)(row)(31) = Math.Round(local_taxamt1, 2)
             End If
 
             'local_taxamt2
             If value_arraylist(1)(row)(32).Equals("{FORMULA_VALUE}") Then
                 Dim taxamt2 = CDbl(value_arraylist(1)(row)(20))
                 Dim local_taxamt2 = taxamt2 * fx_rate
-                value_arraylist(1)(row)(32) = local_taxamt2
+                value_arraylist(1)(row)(32) = Math.Round(local_taxamt2, 2)
             End If
 
             'local_taxamtadj1
             If value_arraylist(1)(row)(33).Equals("{FORMULA_VALUE}") Then
                 Dim taxamtadj1 = CDbl(value_arraylist(1)(row)(21))
                 Dim local_taxamtadj1 = taxamtadj1 * fx_rate
-                value_arraylist(1)(row)(33) = local_taxamtadj1
+                value_arraylist(1)(row)(33) = Math.Round(local_taxamtadj1, 2)
             End If
 
             'local_taxamt
             If value_arraylist(1)(row)(34).Equals("{FORMULA_VALUE}") Then
                 Dim taxamt = CDbl(value_arraylist(1)(row)(22))
                 Dim local_taxamt = taxamt * fx_rate
-                value_arraylist(1)(row)(34) = local_taxamt
+                value_arraylist(1)(row)(34) = Math.Round(local_taxamt, 2)
             End If
 
             'local_amt
             If value_arraylist(1)(row)(35).Equals("{FORMULA_VALUE}") Then
                 Dim amt = CDbl(value_arraylist(1)(row)(26))
                 Dim local_amt = amt * fx_rate
-                value_arraylist(1)(row)(35) = local_amt
+                value_arraylist(1)(row)(35) = Math.Round(local_amt, 2)
             End If
 
             'local_amtrp
             If value_arraylist(1)(row)(36).Equals("{FORMULA_VALUE}") Then
                 Dim local_amt = value_arraylist(1)(row)(35)
-                value_arraylist(1)(row)(36) = local_amt
+                value_arraylist(1)(row)(36) = Math.Round(local_amt, 2)
             End If
 
             'local_mcamt1
             If value_arraylist(1)(row)(38).Equals("{FORMULA_VALUE}") Then
                 Dim mcamt1 = CDbl(value_arraylist(1)(row)(37))
                 Dim local_mcamt1 = mcamt1 * fx_rate
-                value_arraylist(1)(row)(38) = local_mcamt1
+                value_arraylist(1)(row)(38) = Math.Round(local_mcamt1, 2)
             End If
 
         Next
@@ -906,6 +915,59 @@ Public Class Quotation_Form
                 Next
             Next
         Next
+        For row As Integer = 0 To dgvExcel.RowCount - 1
+            If Not value_arraylist(0)(row)(0).Equals("{INVALID ARRAY}") Then
+                'taxable
+                If value_arraylist(0)(row)(26).ToString.Trim.Equals("0") Then
+                    'get query target
+                    Dim taxable As Double = 0
+                    Dim myTarget As New ArrayList
+                    For Each target In rangeQuo
+                        If target.ToString.Split(".")(0).Equals(row.ToString) Then
+                            Dim targetRow = CInt(target.ToString.Split(".")(1))
+                            'myTarget.Add(target.ToString.Split(".")(1))
+                            Dim nett_amt = value_arraylist(1)(targetRow)(25)
+                            Dim taxcode = value_arraylist(1)(targetRow)(52)
+                            If taxcode.ToString.Trim.ToCharArray.Count > 0 Then
+                                taxable += nett_amt
+                            End If
+                        End If
+                    Next
+                    value_arraylist(0)(row)(26) = Math.Round(taxable, 2)
+                End If
+            End If
+        Next
+
+        'hardcore exist checker
+        Dim execute_valid As Boolean = True
+        Dim exist_result As String = ""
+        init()
+        myConn = New SqlConnection("Data Source=" + serverName + ";" & "Initial Catalog=" + database + ";" + pwd_query)
+        myConn.Open()
+        For row As Integer = 0 To dgvExcel.RowCount - 1
+            'squote.doc_no / duplicate
+            If value_arraylist(0)(row)(0).Equals("{INVALID ARRAY}") Then
+                Dim doc_no = value_arraylist(0)(row)(1)
+                If existed_checker("squote", "doc_no", doc_no) Then
+                    execute_valid = False
+                    exist_result += "doc_no (" + doc_no + ") already existed in the database!" + vbNewLine
+                End If
+            End If
+
+            'squote.custcode / exist
+            If value_arraylist(0)(row)(0).Equals("{INVALID ARRAY}") Then
+                Dim custcode = value_arraylist(0)(row)(1)
+                If existed_checker("squote", "custcode", custcode) Then
+                    execute_valid = False
+                    exist_result += "custcode (" + custcode + ") is not found in the database!" + vbNewLine
+                End If
+            End If
+
+
+        Next
+        myConn.Close()
+        'endhardcore exist checker
+
         'For i As Integer = 0 To queryTable.Count - 1
         '    For row As Integer = 0 To dgvExcel.RowCount - 1
         '        Dim strs = ""
@@ -986,4 +1048,14 @@ Public Class Quotation_Form
 
 
     End Sub
+
+    Private Function existed_checker(table As String, sql_value As String, value As String)
+        Dim exist_value As Boolean = False
+        Dim command = New SqlCommand("SELECT * FROM " + table + " WHERE " + sql_value + " ='" + value + "'", myConn)
+        Dim reader As SqlDataReader = command.ExecuteReader
+        While reader.Read()
+            exist_value = True
+        End While
+        Return exist_value
+    End Function
 End Class
