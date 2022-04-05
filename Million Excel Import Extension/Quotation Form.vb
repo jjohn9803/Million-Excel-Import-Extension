@@ -945,22 +945,29 @@ Public Class Quotation_Form
         myConn = New SqlConnection("Data Source=" + serverName + ";" & "Initial Catalog=" + database + ";" + pwd_query)
         myConn.Open()
         For row As Integer = 0 To dgvExcel.RowCount - 1
-            'squote.doc_no / duplicate
             If value_arraylist(0)(row)(0).Equals("{INVALID ARRAY}") Then
+                'squote.doc_no / duplicate
                 Dim doc_no = value_arraylist(0)(row)(1)
                 If existed_checker("squote", "doc_no", doc_no) Then
                     execute_valid = False
                     exist_result += "doc_no (" + doc_no + ") already existed in the database!" + vbNewLine
                 End If
-            End If
 
-            'squote.custcode / exist
-            If value_arraylist(0)(row)(0).Equals("{INVALID ARRAY}") Then
-                Dim custcode = value_arraylist(0)(row)(1)
-                If existed_checker("squote", "custcode", custcode) Then
+                'squote.custcode / exist
+                Dim custcode = value_arraylist(0)(row)(9)
+                If Not existed_checker("squote", "custcode", custcode) Then
                     execute_valid = False
                     exist_result += "custcode (" + custcode + ") is not found in the database!" + vbNewLine
                 End If
+
+                'squote.accmgr_id / exist
+                Dim accmgr_id = value_arraylist(0)(row)(15)
+                If Not existed_checker("squote", "custcode", accmgr_id) Then
+                    execute_valid = False
+                    exist_result += "accmgr_id (" + accmgr_id + ") is not found in the database!" + vbNewLine
+                End If
+
+
             End If
 
 
