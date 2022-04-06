@@ -303,7 +303,6 @@ Public Class Quotation_Form
                                         'MsgBox("SELECT " + destination_sql_value + " FROM " + destination_table + " WHERE " + source_sql_value + "='" + source_value + "'")
                                         'MsgBox(source_value)
                                         If source_value.ToString.Trim.Equals(String.Empty) Then
-                                            MsgBox("het")
                                             value_arraylist(i)(row)(g) = 0
                                         Else
                                             init()
@@ -943,36 +942,163 @@ Public Class Quotation_Form
         Dim exist_result As String = ""
         init()
         myConn = New SqlConnection("Data Source=" + serverName + ";" & "Initial Catalog=" + database + ";" + pwd_query)
-        myConn.Open()
         For row As Integer = 0 To dgvExcel.RowCount - 1
-            If value_arraylist(0)(row)(0).Equals("{INVALID ARRAY}") Then
+            Dim table As String
+            Dim value_name As String
+            Dim value As String
+            'squote
+            If Not value_arraylist(0)(row)(0).Equals("{INVALID ARRAY}") Then
                 'squote.doc_no / duplicate
-                Dim doc_no = value_arraylist(0)(row)(1)
-                If existed_checker("squote", "doc_no", doc_no) Then
+                table = "squote"
+                value_name = "doc_no"
+                value = value_arraylist(0)(row)(1)
+                If existed_checker(table, value_name, value) Then
                     execute_valid = False
-                    exist_result += "doc_no (" + doc_no + ") already existed in the database!" + vbNewLine
+                    exist_result += value_name + " '" + value + "' already existed in the database (" + table + ")!" + vbNewLine
                 End If
 
-                'squote.custcode / exist
-                Dim custcode = value_arraylist(0)(row)(9)
-                If Not existed_checker("squote", "custcode", custcode) Then
-                    execute_valid = False
-                    exist_result += "custcode (" + custcode + ") is not found in the database!" + vbNewLine
+                'customer.custcode / exist
+                table = "customer"
+                value_name = "custcode"
+                value = value_arraylist(0)(row)(9)
+                If Not value.Trim.Equals(String.Empty) Then
+                    If Not existed_checker(table, value_name, value) Then
+                        execute_valid = False
+                        exist_result += value_name + " '" + value + "' is not found in the database (" + table + ")!" + vbNewLine
+                    End If
                 End If
 
-                'squote.accmgr_id / exist
-                Dim accmgr_id = value_arraylist(0)(row)(15)
-                If Not existed_checker("squote", "custcode", accmgr_id) Then
-                    execute_valid = False
-                    exist_result += "accmgr_id (" + accmgr_id + ") is not found in the database!" + vbNewLine
+                'accmgr.name / exist
+                table = "accmgr"
+                value_name = "accmgr_id"
+                value = value_arraylist(0)(row)(15)
+                If Not value.Trim.Equals(String.Empty) Then
+                    If Not existed_checker(table, value_name, value) Then
+                        execute_valid = False
+                        exist_result += value_name + " '" + value + "' is not found in the database (" + table + ")!" + vbNewLine
+                    End If
                 End If
 
+                'glbatch.batchno / exist
+                table = "glbatch"
+                value_name = "batchno"
+                value = value_arraylist(0)(row)(47)
+                If Not value.Trim.Equals(String.Empty) Then
+                    If Not existed_checker(table, value_name, value) Then
+                        execute_valid = False
+                        exist_result += value_name + " '" + value + "' is not found in the database (" + table + ")!" + vbNewLine
+                    End If
+                End If
+
+                'project.projcode / exist
+                table = "project"
+                value_name = "projcode"
+                value = value_arraylist(0)(row)(48)
+                If Not value.Trim.Equals(String.Empty) Then
+                    If Not existed_checker(table, value_name, value) Then
+                        execute_valid = False
+                        exist_result += value_name + " '" + value + "' is not found in the database (" + table + ")!" + vbNewLine
+                    End If
+                End If
+
+                'deptment.deptcode / exist
+                table = "deptment"
+                value_name = "deptcode"
+                value = value_arraylist(0)(row)(49)
+                If Not value.Trim.Equals(String.Empty) Then
+                    If Not existed_checker(table, value_name, value) Then
+                        execute_valid = False
+                        exist_result += value_name + " '" + value + "' is not found in the database (" + table + ")!" + vbNewLine
+                    End If
+                End If
+            End If
+
+            'squotedet
+            If Not value_arraylist(1)(row)(0).Equals(String.Empty) Then
+                'squotedet.doc_no / duplicate
+                table = "squotedet"
+                value_name = "doc_no"
+                value = value_arraylist(1)(row)(2)
+                If Not value.Trim.Equals(String.Empty) Then
+                    If existed_checker(table, value_name, value) Then
+                        execute_valid = False
+                        exist_result += value_name + " '" + value + "' already existed in the database (" + table + ")!" + vbNewLine
+                    End If
+                End If
+
+                'product.proddesp / exist
+                table = "product"
+                value_name = "proddesp"
+                value = value_arraylist(1)(row)(4)
+                If Not value.Trim.Equals(String.Empty) Then
+                    If Not existed_checker(table, value_name, value) Then
+                        execute_valid = False
+                        exist_result += value_name + " '" + value + "' is not found in the database (" + table + ")!" + vbNewLine
+                    End If
+                End If
+
+                'gltax.taxcode / exist
+                table = "gltax"
+                value_name = "taxcode"
+                value = value_arraylist(1)(row)(52)
+                If Not value.Trim.Equals(String.Empty) Then
+                    If Not existed_checker(table, value_name, value) Then
+                        execute_valid = False
+                        exist_result += value_name + " '" + value + "' is not found in the database (" + table + ")!" + vbNewLine
+                    End If
+                End If
+
+                'glbatch.batchno / exist
+                table = "glbatch"
+                value_name = "batchno"
+                value = value_arraylist(1)(row)(54)
+                If Not value.Trim.Equals(String.Empty) Then
+                    If Not existed_checker(table, value_name, value) Then
+                        execute_valid = False
+                        exist_result += value_name + " '" + value + "' is not found in the database (" + table + ")!" + vbNewLine
+                    End If
+                End If
+
+                'gldata.accno / exist
+                table = "gldata"
+                value_name = "accno"
+                value = value_arraylist(1)(row)(55)
+                If Not value.Trim.Equals(String.Empty) Then
+                    If Not existed_checker(table, value_name, value) Then
+                        execute_valid = False
+                        exist_result += value_name + " '" + value + "' is not found in the database (" + table + ")!" + vbNewLine
+                    End If
+                End If
+
+                'project.projcode / exist
+                table = "project"
+                value_name = "projcode"
+                value = value_arraylist(1)(row)(56)
+                If Not value.Trim.Equals(String.Empty) Then
+                    If Not existed_checker(table, value_name, value) Then
+                        execute_valid = False
+                        exist_result += value_name + " '" + value + "' is not found in the database (" + table + ")!" + vbNewLine
+                    End If
+                End If
+
+                'deptment.deptcode / exist
+                table = "deptment"
+                value_name = "deptcode"
+                value = value_arraylist(1)(row)(57)
+                If Not value.Trim.Equals(String.Empty) Then
+                    If Not existed_checker(table, value_name, value) Then
+                        execute_valid = False
+                        exist_result += value_name + " '" + value + "' is not found in the database (" + table + ")!" + vbNewLine
+                    End If
+                End If
 
             End If
 
-
         Next
-        myConn.Close()
+        If execute_valid = False Then
+            MsgBox(exist_result + vbNewLine + "The operation has been stopped!", MsgBoxStyle.Exclamation)
+            Return
+        End If
         'endhardcore exist checker
 
         'For i As Integer = 0 To queryTable.Count - 1
@@ -1008,9 +1134,9 @@ Public Class Quotation_Form
                                 command.CommandText = command_text
                                 myConn.Open()
                                 Try
-                                    'command.ExecuteNonQuery()
+                                    command.ExecuteNonQuery()
                                 Catch ex As Exception
-                                    MsgBox(ex.Message, MsgBoxStyle.Exclamation)
+                                    MsgBox(ex.Message + vbNewLine + command_text, MsgBoxStyle.Exclamation)
                                 End Try
                                 myConn.Close()
                             End If
@@ -1057,12 +1183,14 @@ Public Class Quotation_Form
     End Sub
 
     Private Function existed_checker(table As String, sql_value As String, value As String)
+        myConn.Open()
         Dim exist_value As Boolean = False
         Dim command = New SqlCommand("SELECT * FROM " + table + " WHERE " + sql_value + " ='" + value + "'", myConn)
         Dim reader As SqlDataReader = command.ExecuteReader
         While reader.Read()
             exist_value = True
         End While
+        myConn.Close()
         Return exist_value
     End Function
 End Class
