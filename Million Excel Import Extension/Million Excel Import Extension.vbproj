@@ -125,6 +125,12 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Delivery Order Form.Designer.vb">
+      <DependentUpon>Delivery Order Form.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Delivery Order Form.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="ExcelImporter.vb">
       <SubType>Form</SubType>
     </Compile>
@@ -180,6 +186,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Delivery Order Form.resx">
+      <DependentUpon>Delivery Order Form.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="ExcelImporter.resx">
       <DependentUpon>ExcelImporter.vb</DependentUpon>
     </EmbeddedResource>

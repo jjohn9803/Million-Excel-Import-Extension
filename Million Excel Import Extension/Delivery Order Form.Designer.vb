@@ -1,9 +1,9 @@
-﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class Sales_Order_Form
+﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
+Partial Class Delivery_Order_Form
     Inherits System.Windows.Forms.Form
 
     'Form overrides dispose to clean up the component list.
-    <System.Diagnostics.DebuggerNonUserCode()> _
+    <System.Diagnostics.DebuggerNonUserCode()>
     Protected Overrides Sub Dispose(ByVal disposing As Boolean)
         Try
             If disposing AndAlso components IsNot Nothing Then
@@ -20,7 +20,7 @@ Partial Class Sales_Order_Form
     'NOTE: The following procedure is required by the Windows Form Designer
     'It can be modified using the Windows Form Designer.  
     'Do not modify it using the code editor.
-    <System.Diagnostics.DebuggerStepThrough()> _
+    <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Dim DataGridViewCellStyle1 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Dim DataGridViewCellStyle2 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
@@ -54,7 +54,7 @@ Partial Class Sales_Order_Form
         Me.Panel1.Location = New System.Drawing.Point(0, 0)
         Me.Panel1.Name = "Panel1"
         Me.Panel1.Size = New System.Drawing.Size(884, 73)
-        Me.Panel1.TabIndex = 17
+        Me.Panel1.TabIndex = 14
         '
         'FlowLayoutPanel1
         '
@@ -115,7 +115,7 @@ Partial Class Sales_Order_Form
         Me.Panel2.Location = New System.Drawing.Point(0, 401)
         Me.Panel2.Name = "Panel2"
         Me.Panel2.Size = New System.Drawing.Size(884, 60)
-        Me.Panel2.TabIndex = 18
+        Me.Panel2.TabIndex = 15
         '
         'FlowLayoutPanel2
         '
@@ -187,7 +187,7 @@ Partial Class Sales_Order_Form
         Me.Panel3.Location = New System.Drawing.Point(0, 73)
         Me.Panel3.Name = "Panel3"
         Me.Panel3.Size = New System.Drawing.Size(884, 328)
-        Me.Panel3.TabIndex = 20
+        Me.Panel3.TabIndex = 17
         '
         'dgvExcel
         '
@@ -212,18 +212,18 @@ Partial Class Sales_Order_Form
         Me.dgvExcel.Name = "dgvExcel"
         Me.dgvExcel.ReadOnly = True
         Me.dgvExcel.Size = New System.Drawing.Size(884, 328)
-        Me.dgvExcel.TabIndex = 2
+        Me.dgvExcel.TabIndex = 1
         '
-        'Sales_Order_Form
+        'Delivery_Order_Form
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(884, 461)
         Me.Controls.Add(Me.Panel3)
-        Me.Controls.Add(Me.Panel1)
         Me.Controls.Add(Me.Panel2)
-        Me.Name = "Sales_Order_Form"
-        Me.Text = "Sales Order"
+        Me.Controls.Add(Me.Panel1)
+        Me.Name = "Delivery_Order_Form"
+        Me.Text = "Delivery Order"
         Me.Panel1.ResumeLayout(False)
         Me.FlowLayoutPanel1.ResumeLayout(False)
         Me.FlowLayoutPanel1.PerformLayout()

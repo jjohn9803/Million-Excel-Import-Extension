@@ -3,6 +3,10 @@
         Dim form
         If sender.text.Equals("Quotation") Then
             form = New Quotation_Form
+        ElseIf sender.text.Equals("Sales Order") Then
+            form = New Sales_Order_Form
+        ElseIf sender.text.Equals("Delivery Order") Then
+            form = New Delivery_Order_Form
         Else
 
         End If

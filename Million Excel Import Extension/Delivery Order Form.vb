@@ -3,7 +3,7 @@ Imports System.IO
 Imports ClosedXML.Excel
 Imports ExcelDataReader
 
-Public Class Sales_Order_Form
+Public Class Delivery_Order_Form
     Dim tables As DataTableCollection
     Private serverName As String
     Private database As String
@@ -11,7 +11,7 @@ Public Class Sales_Order_Form
     Private statusConnection As Boolean
     Private pwd_query As String
     Private import_type As String
-    Private Sub Sales_Order_Form_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+    Private Sub Delivery_Order_Form_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         init()
     End Sub
     Private Sub init()
@@ -59,10 +59,10 @@ Public Class Sales_Order_Form
         Return SQL_Connection_Form.returnUpperFolder(Application.StartupPath(), 2) + "maintain.xls"
     End Function
     Private Sub btnImport_Click(sender As Object, e As EventArgs) Handles btnImport.Click
-        Dim importType = "Sales Order"
+        Dim importType = "Delivery Order"
         Dim tableExcelSetting As DataTableCollection
-        'Try
-        Using stream = File.Open(getMaintainSetting, FileMode.Open, FileAccess.Read)
+        Try
+            Using stream = File.Open(getMaintainSetting, FileMode.Open, FileAccess.Read)
                 Using reader As IExcelDataReader = ExcelReaderFactory.CreateReader(stream)
                     Dim result As DataSet = reader.AsDataSet(New ExcelDataSetConfiguration() With {
                                                                          .ConfigureDataTable = Function(__) New ExcelDataTableConfiguration() With {
@@ -71,16 +71,16 @@ Public Class Sales_Order_Form
                     Dim queryTable As New ArrayList
                     queryTable.Add(New ArrayList)
                     queryTable.Add(New ArrayList)
-                    queryTable(0).add("Sales Order") '0
-                    queryTable(0).add("sorder") '1
-                    queryTable(1).add("Sales Order Desc")
-                    queryTable(1).add("sorderdet")
+                    queryTable(0).add("Delivery Order") '0
+                    queryTable(0).add("sdo") '1
+                    queryTable(1).add("Delivery Order Desc")
+                    queryTable(1).add("sdodet")
                     quotationWriteIntoSQL(tableExcelSetting, queryTable)
                 End Using
             End Using
-        'Catch ex As Exception
-        '    MsgBox(ex.Message + vbNewLine + ex.StackTrace, MsgBoxStyle.Critical)
-        'End Try
+        Catch ex As Exception
+            MsgBox(ex.Message + vbNewLine + ex.StackTrace, MsgBoxStyle.Critical)
+        End Try
     End Sub
     Private Sub quotationWriteIntoSQL(tableExcelSetting As DataTableCollection, queryTable As ArrayList)
         Dim value_arraylist = New ArrayList
@@ -238,6 +238,7 @@ Public Class Sales_Order_Form
                 Next
             Next
         Next
+
         For default_value_checker As Integer = 0 To 10
             For i As Integer = 0 To queryTable.Count - 1
                 For row As Integer = 0 To dgvExcel.RowCount - 1
@@ -316,10 +317,10 @@ Public Class Sales_Order_Form
         For row As Integer = 0 To dgvExcel.RowCount - 1
             If Not value_arraylist(0)(row)(0).Equals("{INVALID ARRAY}") Then
                 'batchno
-                If value_arraylist(0)(row)(48).length = 2 Then
+                If value_arraylist(0)(row)(47).length = 2 Then
                     Dim date1 = value_arraylist(0)(row)(2)
-                    Dim batchno = value_arraylist(0)(row)(48)
-                    value_arraylist(0)(row)(48) = Year(date1).ToString.Substring(2) + Month(date1).ToString("00") + batchno
+                    Dim batchno = value_arraylist(0)(row)(47)
+                    value_arraylist(0)(row)(47) = Year(date1).ToString.Substring(2) + Month(date1).ToString("00") + batchno
                 End If
             End If
 
@@ -330,82 +331,82 @@ Public Class Sales_Order_Form
             End If
 
             'gross_amt
-            If value_arraylist(1)(row)(26).Equals("{FORMULA_VALUE}") Then
+            If value_arraylist(1)(row)(25).Equals("{FORMULA_VALUE}") Then
                 Dim qty = CDbl(value_arraylist(1)(row)(9))
-                Dim price = CDbl(value_arraylist(1)(row)(13))
+                Dim price = CDbl(value_arraylist(1)(row)(12))
                 Dim gross_amt = qty * price
-                value_arraylist(1)(row)(26) = Math.Round(gross_amt, 2)
+                value_arraylist(1)(row)(25) = Math.Round(gross_amt, 2)
             End If
 
             'disamt1
-            If value_arraylist(1)(row)(14).Equals("{FORMULA_VALUE}") Then
-                Dim gross_amt = CDbl(value_arraylist(1)(row)(26))
-                Dim disp1 = CDbl(value_arraylist(1)(row)(18))
+            If value_arraylist(1)(row)(13).Equals("{FORMULA_VALUE}") Then
+                Dim gross_amt = CDbl(value_arraylist(1)(row)(25))
+                Dim disp1 = CDbl(value_arraylist(1)(row)(17))
                 Dim disamt1 = gross_amt * (disp1 * 0.01)
-                value_arraylist(1)(row)(14) = Math.Round(disamt1, 2)
+                value_arraylist(1)(row)(13) = Math.Round(disamt1, 2)
             End If
 
             'disamt2
-            If value_arraylist(1)(row)(15).Equals("{FORMULA_VALUE}") Then
-                Dim gross_amt = CDbl(value_arraylist(1)(row)(26))
-                Dim disamt1 = CDbl(value_arraylist(1)(row)(14))
-                Dim disp2 = CDbl(value_arraylist(1)(row)(19))
+            If value_arraylist(1)(row)(14).Equals("{FORMULA_VALUE}") Then
+                Dim gross_amt = CDbl(value_arraylist(1)(row)(25))
+                Dim disamt1 = CDbl(value_arraylist(1)(row)(13))
+                Dim disp2 = CDbl(value_arraylist(1)(row)(18))
                 Dim disamt2 = (gross_amt - disamt1) * (disp2 * 0.01)
-                value_arraylist(1)(row)(15) = Math.Round(disamt2, 2)
+                value_arraylist(1)(row)(14) = Math.Round(disamt2, 2)
             End If
 
             'disamt3
-            If value_arraylist(1)(row)(16).Equals("{FORMULA_VALUE}") Then
-                Dim gross_amt = CDbl(value_arraylist(1)(row)(26))
-                Dim disamt1 = CDbl(value_arraylist(1)(row)(14))
-                Dim disamt2 = CDbl(value_arraylist(1)(row)(15))
-                Dim disp3 = CDbl(value_arraylist(1)(row)(20))
+            If value_arraylist(1)(row)(15).Equals("{FORMULA_VALUE}") Then
+                Dim gross_amt = CDbl(value_arraylist(1)(row)(25))
+                Dim disamt1 = CDbl(value_arraylist(1)(row)(13))
+                Dim disamt2 = CDbl(value_arraylist(1)(row)(14))
+                Dim disp3 = CDbl(value_arraylist(1)(row)(19))
                 Dim disamt3 = (gross_amt - disamt1 - disamt2) * (disp3 * 0.01)
-                value_arraylist(1)(row)(16) = Math.Round(disamt3, 2)
+                value_arraylist(1)(row)(15) = Math.Round(disamt3, 2)
             End If
 
             'disamt
-            If value_arraylist(1)(row)(17).Equals("{FORMULA_VALUE}") Then
-                Dim disamt1 = CDbl(value_arraylist(1)(row)(14))
-                Dim disamt2 = CDbl(value_arraylist(1)(row)(15))
-                Dim disamt3 = CDbl(value_arraylist(1)(row)(16))
+            If value_arraylist(1)(row)(16).Equals("{FORMULA_VALUE}") Then
+                Dim disamt1 = CDbl(value_arraylist(1)(row)(13))
+                Dim disamt2 = CDbl(value_arraylist(1)(row)(14))
+                Dim disamt3 = CDbl(value_arraylist(1)(row)(15))
                 Dim disamt = disamt1 + disamt2 + disamt3
-                value_arraylist(1)(row)(17) = Math.Round(disamt, 2)
+                value_arraylist(1)(row)(16) = Math.Round(disamt, 2)
             End If
 
             'nett_amt
-            If value_arraylist(1)(row)(27).Equals("{FORMULA_VALUE}") Then
-                Dim gross_amt = CDbl(value_arraylist(1)(row)(26))
-                Dim disamt = CDbl(value_arraylist(1)(row)(17))
+            If value_arraylist(1)(row)(26).Equals("{FORMULA_VALUE}") Then
+                Dim gross_amt = CDbl(value_arraylist(1)(row)(25))
+                Dim disamt = CDbl(value_arraylist(1)(row)(16))
                 Dim nett_amt = gross_amt - disamt
-                value_arraylist(1)(row)(27) = Math.Round(nett_amt, 2)
+                value_arraylist(1)(row)(26) = Math.Round(nett_amt, 2)
             End If
 
             'amt
-            If value_arraylist(1)(row)(28).Equals("{FORMULA_VALUE}") Then
-                Dim gross_amt = CDbl(value_arraylist(1)(row)(26))
-                Dim disamt = CDbl(value_arraylist(1)(row)(17))
+            If value_arraylist(1)(row)(27).Equals("{FORMULA_VALUE}") Then
+                Dim gross_amt = CDbl(value_arraylist(1)(row)(25))
+                Dim disamt = CDbl(value_arraylist(1)(row)(16))
                 Dim amt = gross_amt - disamt
-                value_arraylist(1)(row)(28) = Math.Round(amt, 2)
+                value_arraylist(1)(row)(27) = Math.Round(amt, 2)
             End If
 
             'taxamt1
-            If value_arraylist(1)(row)(21).Equals("{FORMULA_VALUE}") Then
-                Dim nett_amt = CDbl(value_arraylist(1)(row)(27))
+            If value_arraylist(1)(row)(20).Equals("{FORMULA_VALUE}") Then
+                Dim nett_amt = CDbl(value_arraylist(1)(row)(26))
                 Dim taxp1 = 0
-                If Not value_arraylist(1)(row)(25).Equals(String.Empty) Then
-                    taxp1 = CDbl(value_arraylist(1)(row)(25))
+                If Not value_arraylist(1)(row)(24).Equals(String.Empty) Then
+                    taxp1 = CDbl(value_arraylist(1)(row)(24))
                 End If
                 Dim taxamt1 = nett_amt * (taxp1 * 0.01)
-                value_arraylist(1)(row)(21) = Math.Round(taxamt1, 2)
+                value_arraylist(1)(row)(20) = Math.Round(taxamt1, 2)
             End If
 
             'taxamt
-            If value_arraylist(1)(row)(24).Equals("{FORMULA_VALUE}") Then
-                Dim taxamt1 = CDbl(value_arraylist(1)(row)(21))
-                Dim taxamt2 = CDbl(value_arraylist(1)(row)(22))
+            If value_arraylist(1)(row)(23).Equals("{FORMULA_VALUE}") Then
+                Dim taxamt1 = CDbl(value_arraylist(1)(row)(20))
+                Dim taxamt2 = CDbl(value_arraylist(1)(row)(21))
                 Dim taxamt = taxamt1 + taxamt2
-                value_arraylist(1)(row)(24) = Math.Round(taxamt, 2)
+                value_arraylist(1)(row)(23) = Math.Round(taxamt, 2)
             End If
 
             'local converter
@@ -416,95 +417,88 @@ Public Class Sales_Order_Form
                     Exit For
                 End If
             Next
-            Dim fx_rate = CDbl(value_arraylist(0)(find_local)(18))
+            Dim fx_rate = CDbl(value_arraylist(0)(find_local)(17))
 
             'local_price
-            If value_arraylist(1)(row)(29).Equals("{FORMULA_VALUE}") Then
-                Dim price = CDbl(value_arraylist(1)(row)(13))
+            If value_arraylist(1)(row)(28).Equals("{FORMULA_VALUE}") Then
+                Dim price = CDbl(value_arraylist(1)(row)(12))
                 Dim local_price = price * fx_rate
-                value_arraylist(1)(row)(29) = local_price
+                value_arraylist(1)(row)(28) = local_price
             End If
 
             'local_gamt
-            If value_arraylist(1)(row)(30).Equals("{FORMULA_VALUE}") Then
-                Dim gross_amt = CDbl(value_arraylist(1)(row)(26))
+            If value_arraylist(1)(row)(29).Equals("{FORMULA_VALUE}") Then
+                Dim gross_amt = CDbl(value_arraylist(1)(row)(25))
                 Dim local_gamt = gross_amt * fx_rate
-                value_arraylist(1)(row)(30) = Math.Round(local_gamt, 2)
+                value_arraylist(1)(row)(29) = Math.Round(local_gamt, 2)
             End If
 
             'local_disamt
-            If value_arraylist(1)(row)(31).Equals("{FORMULA_VALUE}") Then
-                Dim disamt = CDbl(value_arraylist(1)(row)(17))
+            If value_arraylist(1)(row)(30).Equals("{FORMULA_VALUE}") Then
+                Dim disamt = CDbl(value_arraylist(1)(row)(16))
                 Dim local_disamt = disamt * fx_rate
-                value_arraylist(1)(row)(31) = Math.Round(local_disamt, 2)
+                value_arraylist(1)(row)(30) = Math.Round(local_disamt, 2)
             End If
 
             'local_namt
-            If value_arraylist(1)(row)(32).Equals("{FORMULA_VALUE}") Then
-                Dim local_gamt = CDbl(value_arraylist(1)(row)(30))
-                Dim local_disamt = CDbl(value_arraylist(1)(row)(31))
+            If value_arraylist(1)(row)(31).Equals("{FORMULA_VALUE}") Then
+                Dim local_gamt = CDbl(value_arraylist(1)(row)(29))
+                Dim local_disamt = CDbl(value_arraylist(1)(row)(30))
                 Dim local_namt = local_gamt - local_disamt
-                value_arraylist(1)(row)(32) = Math.Round(local_namt, 2)
+                value_arraylist(1)(row)(31) = Math.Round(local_namt, 2)
             End If
 
             'local_taxamt1
-            If value_arraylist(1)(row)(33).Equals("{FORMULA_VALUE}") Then
-                Dim taxamt1 = CDbl(value_arraylist(1)(row)(21))
+            If value_arraylist(1)(row)(32).Equals("{FORMULA_VALUE}") Then
+                Dim taxamt1 = CDbl(value_arraylist(1)(row)(20))
                 Dim local_taxamt1 = taxamt1 * fx_rate
-                value_arraylist(1)(row)(33) = Math.Round(local_taxamt1, 2)
+                value_arraylist(1)(row)(32) = Math.Round(local_taxamt1, 2)
             End If
 
             'local_taxamt2
-            If value_arraylist(1)(row)(34).Equals("{FORMULA_VALUE}") Then
-                Dim taxamt2 = CDbl(value_arraylist(1)(row)(22))
+            If value_arraylist(1)(row)(33).Equals("{FORMULA_VALUE}") Then
+                Dim taxamt2 = CDbl(value_arraylist(1)(row)(21))
                 Dim local_taxamt2 = taxamt2 * fx_rate
-                value_arraylist(1)(row)(34) = Math.Round(local_taxamt2, 2)
+                value_arraylist(1)(row)(33) = Math.Round(local_taxamt2, 2)
             End If
 
             'local_taxamtadj1
-            If value_arraylist(1)(row)(35).Equals("{FORMULA_VALUE}") Then
-                Dim taxamtadj1 = CDbl(value_arraylist(1)(row)(23))
+            If value_arraylist(1)(row)(34).Equals("{FORMULA_VALUE}") Then
+                Dim taxamtadj1 = CDbl(value_arraylist(1)(row)(22))
                 Dim local_taxamtadj1 = taxamtadj1 * fx_rate
-                value_arraylist(1)(row)(35) = Math.Round(local_taxamtadj1, 2)
+                value_arraylist(1)(row)(34) = Math.Round(local_taxamtadj1, 2)
             End If
 
             'local_taxamt
-            If value_arraylist(1)(row)(36).Equals("{FORMULA_VALUE}") Then
-                Dim taxamt = CDbl(value_arraylist(1)(row)(24))
+            If value_arraylist(1)(row)(35).Equals("{FORMULA_VALUE}") Then
+                Dim taxamt = CDbl(value_arraylist(1)(row)(23))
                 Dim local_taxamt = taxamt * fx_rate
-                value_arraylist(1)(row)(36) = Math.Round(local_taxamt, 2)
+                value_arraylist(1)(row)(35) = Math.Round(local_taxamt, 2)
             End If
 
             'local_amt
-            If value_arraylist(1)(row)(37).Equals("{FORMULA_VALUE}") Then
-                Dim amt = CDbl(value_arraylist(1)(row)(28))
+            If value_arraylist(1)(row)(36).Equals("{FORMULA_VALUE}") Then
+                Dim amt = CDbl(value_arraylist(1)(row)(27))
                 Dim local_amt = amt * fx_rate
-                value_arraylist(1)(row)(37) = Math.Round(local_amt, 2)
+                value_arraylist(1)(row)(36) = Math.Round(local_amt, 2)
             End If
 
             'local_amtrp
-            If value_arraylist(1)(row)(38).Equals("{FORMULA_VALUE}") Then
-                Dim local_amt = value_arraylist(1)(row)(37)
-                value_arraylist(1)(row)(38) = Math.Round(local_amt, 2)
+            If value_arraylist(1)(row)(37).Equals("{FORMULA_VALUE}") Then
+                Dim local_amt = value_arraylist(1)(row)(36)
+                value_arraylist(1)(row)(37) = Math.Round(local_amt, 2)
             End If
 
             'local_mcamt1
-            If value_arraylist(1)(row)(40).Equals("{FORMULA_VALUE}") Then
-                Dim mcamt1 = CDbl(value_arraylist(1)(row)(39))
+            If value_arraylist(1)(row)(39).Equals("{FORMULA_VALUE}") Then
+                Dim mcamt1 = CDbl(value_arraylist(1)(row)(38))
                 Dim local_mcamt1 = mcamt1 * fx_rate
-                value_arraylist(1)(row)(40) = Math.Round(local_mcamt1, 2)
+                value_arraylist(1)(row)(39) = Math.Round(local_mcamt1, 2)
             End If
 
         Next
 
         'End Hardcode Formula
-        'For i As Integer = 0 To 1
-        '    Dim str = ""
-        '    For g As Integer = 0 To sql_format_arraylist(i).count - 1
-        '        str += sql_format_arraylist(i)(g) + vbTab
-        '    Next
-        '    MsgBox(str)
-        'Next
 
         For i As Integer = 0 To 0
             For row As Integer = 0 To dgvExcel.RowCount - 1
@@ -538,11 +532,7 @@ Public Class Sales_Order_Form
                                         'getDescSource=找到这个desc是属于哪一个quo的(row) 例如：quo1拥有product1,2 quo2拥有product3,4,5 OUTPUT:0或者2 同辈：row value()(这里)()
                                         'table_value_index=从sql的0或1找到符合formula express value名字在valuearraylist的位置 value()()(这里)
                                         'value_arraylist=(type)(row)(value)
-                                        Try
-                                            table_value_index = sql_format_arraylist(table_name_index).IndexOf(table_value_name)
-                                        Catch ex As Exception
-                                            MsgBox("ROW: " + row.ToString + vbNewLine + "table_name_index: " + table_name_index.ToString + vbNewLine + "table_value_name: " + table_value_name)
-                                        End Try
+                                        table_value_index = sql_format_arraylist(table_name_index).IndexOf(table_value_name)
 
                                         Dim myTargets As New List(Of String)
                                         For Each target As String In rangeQuo
@@ -709,8 +699,8 @@ Public Class Sales_Order_Form
                         If target.ToString.Split(".")(0).Equals(row.ToString) Then
                             Dim targetRow = CInt(target.ToString.Split(".")(1))
                             'myTarget.Add(target.ToString.Split(".")(1))
-                            Dim nett_amt = value_arraylist(1)(targetRow)(25)
-                            Dim taxcode = value_arraylist(1)(targetRow)(52)
+                            Dim nett_amt = value_arraylist(1)(targetRow)(26)
+                            Dim taxcode = value_arraylist(1)(targetRow)(54)
                             If taxcode.ToString.Trim.ToCharArray.Count > 0 Then
                                 taxable += nett_amt
                             End If
@@ -731,10 +721,10 @@ Public Class Sales_Order_Form
             Dim table As String
             Dim value_name As String
             Dim value As String
-            'sorder
+            'sdo
             If Not value_arraylist(0)(row)(0).Equals("{INVALID ARRAY}") Then
-                'squote.doc_no / duplicate
-                table = "sorder"
+                'sdo.doc_no / duplicate
+                table = "sdo"
                 value_name = "doc_no"
                 value = value_arraylist(0)(row)(1)
                 If existed_checker(table, value_name, value) Then
@@ -756,7 +746,7 @@ Public Class Sales_Order_Form
                 'accmgr.accmgr_id / exist
                 table = "accmgr"
                 value_name = "accmgr_id"
-                value = value_arraylist(0)(row)(16)
+                value = value_arraylist(0)(row)(15)
                 If Not value.Trim.Equals(String.Empty) Then
                     If Not existed_checker(table, value_name, value) Then
                         execute_valid = False
@@ -767,7 +757,7 @@ Public Class Sales_Order_Form
                 'glbatch.batchno / exist
                 table = "glbatch"
                 value_name = "batchno"
-                value = value_arraylist(0)(row)(48)
+                value = value_arraylist(0)(row)(47)
                 If Not value.Trim.Equals(String.Empty) Then
                     If Not existed_checker(table, value_name, value) Then
                         execute_valid = False
@@ -778,7 +768,7 @@ Public Class Sales_Order_Form
                 'project.projcode / exist
                 table = "project"
                 value_name = "projcode"
-                value = value_arraylist(0)(row)(49)
+                value = value_arraylist(0)(row)(48)
                 If Not value.Trim.Equals(String.Empty) Then
                     If Not existed_checker(table, value_name, value) Then
                         execute_valid = False
@@ -789,7 +779,7 @@ Public Class Sales_Order_Form
                 'deptment.deptcode / exist
                 table = "deptment"
                 value_name = "deptcode"
-                value = value_arraylist(0)(row)(50)
+                value = value_arraylist(0)(row)(49)
                 If Not value.Trim.Equals(String.Empty) Then
                     If Not existed_checker(table, value_name, value) Then
                         execute_valid = False
@@ -798,10 +788,10 @@ Public Class Sales_Order_Form
                 End If
             End If
 
-            'sorderdet
+            'sdodet
             If Not value_arraylist(1)(row)(0).Equals(String.Empty) Then
-                'squotedet.doc_no / duplicate
-                table = "sorderdet"
+                'sdodet.doc_no / duplicate
+                table = "sdodet"
                 value_name = "doc_no"
                 value = value_arraylist(1)(row)(2)
                 If Not value.Trim.Equals(String.Empty) Then
@@ -871,6 +861,7 @@ Public Class Sales_Order_Form
         Next
         If execute_valid = False Then
             MsgBox(exist_result + vbNewLine + "The operation has been stopped!", MsgBoxStyle.Exclamation)
+            printExcelResult("C:\Users\RBADM07\Desktop\Generated Result DO.xlsx", queryTable, value_arraylist, sql_format_arraylist)
             Return
         End If
         'endhardcore exist checker
@@ -885,7 +876,6 @@ Public Class Sales_Order_Form
         '    Next
         'Next
         'Quotation only end
-        Dim rowInsertNum = 0
         For i As Integer = 0 To queryTable.Count - 1
             init()
             Using myConn = New SqlConnection("Data Source=" + serverName + ";" & "Initial Catalog=" + database + ";" + pwd_query)
@@ -909,7 +899,6 @@ Public Class Sales_Order_Form
                                 command.CommandText = command_text
                                 myConn.Open()
                                 Try
-                                    rowInsertNum += 1
                                     command.ExecuteNonQuery()
                                 Catch ex As Exception
                                     MsgBox(ex.Message + vbNewLine + command_text, MsgBoxStyle.Exclamation)
@@ -922,7 +911,10 @@ Public Class Sales_Order_Form
                 End Using
             End Using
         Next
-        MsgBox("Data Import Sucessfully!" + vbNewLine + "Row Inserted: " + rowInsertNum.ToString)
+
+    End Sub
+
+    Private Sub printExcelResult(filename As String, queryTable As ArrayList, value_arraylist As ArrayList, sql_format_arraylist As ArrayList)
         Using workbook As New XLWorkbook
             Dim sheets As New ArrayList
 
@@ -947,7 +939,7 @@ Public Class Sales_Order_Form
                 worksheet.Columns.Width = 25
             Next
             'C:\Users\RBADM07\Desktop\Generated Result.xlsx
-            workbook.SaveAs("C:\Users\RBADM07\Desktop\Generated Result SO.xlsx")
+            workbook.SaveAs(filename)
             'Using sfd As SaveFileDialog = New SaveFileDialog() With {.Filter = "Excel Workbook|*.xlsx|Excel 97-2003 Workbook|*.xls"}
             '    sfd.FileName = "Generated Result"
             '    If sfd.ShowDialog() = DialogResult.OK Then
@@ -955,8 +947,6 @@ Public Class Sales_Order_Form
             '    End If
             'End Using
         End Using
-
-
     End Sub
 
     Private Function existed_checker(table As String, sql_value As String, value As String)
