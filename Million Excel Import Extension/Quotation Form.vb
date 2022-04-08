@@ -872,6 +872,7 @@ Public Class Quotation_Form
         '    Next
         'Next
         'Quotation only end
+        Dim rowInsertNum = 0
         For i As Integer = 0 To queryTable.Count - 1
             init()
             Using myConn = New SqlConnection("Data Source=" + serverName + ";" & "Initial Catalog=" + database + ";" + pwd_query)
@@ -895,6 +896,7 @@ Public Class Quotation_Form
                                 command.CommandText = command_text
                                 myConn.Open()
                                 Try
+                                    rowInsertNum += 1
                                     command.ExecuteNonQuery()
                                 Catch ex As Exception
                                     MsgBox(ex.Message + vbNewLine + command_text, MsgBoxStyle.Exclamation)
@@ -907,40 +909,8 @@ Public Class Quotation_Form
                 End Using
             End Using
         Next
-        Using workbook As New XLWorkbook
-            Dim sheets As New ArrayList
-
-            For i As Integer = 0 To queryTable.Count - 1
-                Dim sheetName As String = queryTable(i)(0)
-                Dim worksheet As IXLWorksheet = workbook.Worksheets.Add(sheetName)
-                Dim writableRow = 1
-
-                For row As Integer = 0 To dgvExcel.RowCount - 1
-                    If Not (value_arraylist(i)(row)(0).Equals("{INVALID ARRAY}")) Then
-                        For j As Integer = 0 To value_arraylist(i)(row).count - 1
-                            worksheet.Cell(writableRow, (j + 1)).Value = sql_format_arraylist(i)(j)
-                            worksheet.Cell(writableRow, (j + 1)).Style.Font.Bold = True
-                        Next
-                        writableRow += 1
-                        For j As Integer = 0 To value_arraylist(i)(row).count - 1
-                            worksheet.Cell(writableRow, (j + 1)).Value = value_arraylist(i)(row)(j)
-                        Next
-                        writableRow += 2
-                    End If
-                Next
-                worksheet.Columns.Width = 25
-            Next
-            'C:\Users\RBADM07\Desktop\Generated Result.xlsx
-            workbook.SaveAs("C:\Users\RBADM07\Desktop\Generated Result.xlsx")
-            'Using sfd As SaveFileDialog = New SaveFileDialog() With {.Filter = "Excel Workbook|*.xlsx|Excel 97-2003 Workbook|*.xls"}
-            '    sfd.FileName = "Generated Result"
-            '    If sfd.ShowDialog() = DialogResult.OK Then
-            '        workbook.SaveAs(sfd.FileName)
-            '    End If
-            'End Using
-        End Using
-
-
+        MsgBox("Data Import Sucessfully!" + vbNewLine + "Row Inserted: " + rowInsertNum.ToString)
+        Function_Form.printExcelResult("C:\Users\RBADM07\Desktop\Generated Result.xlsx", queryTable, value_arraylist, sql_format_arraylist, dgvExcel)
     End Sub
 
     Private Function existed_checker(table As String, sql_value As String, value As String)

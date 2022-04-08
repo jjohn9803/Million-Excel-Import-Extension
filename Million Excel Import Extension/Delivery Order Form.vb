@@ -71,10 +71,13 @@ Public Class Delivery_Order_Form
                     Dim queryTable As New ArrayList
                     queryTable.Add(New ArrayList)
                     queryTable.Add(New ArrayList)
+                    queryTable.Add(New ArrayList)
                     queryTable(0).add("Delivery Order") '0
                     queryTable(0).add("sdo") '1
                     queryTable(1).add("Delivery Order Desc")
                     queryTable(1).add("sdodet")
+                    queryTable(2).add("Delivery Order Stock")
+                    queryTable(2).add("stock")
                     quotationWriteIntoSQL(tableExcelSetting, queryTable)
                 End Using
             End Using
@@ -496,6 +499,13 @@ Public Class Delivery_Order_Form
                 value_arraylist(1)(row)(39) = Math.Round(local_mcamt1, 2)
             End If
 
+            'stock.local_amount
+            If value_arraylist(2)(row)(15).Equals("{FORMULA_VALUE}") Then
+                Dim qty = CDbl(value_arraylist(2)(row)(12))
+                Dim cost = CDbl(value_arraylist(2)(row)(13))
+                Dim local_amount = qty * cost
+                value_arraylist(2)(row)(15) = Math.Round(local_amount, 2)
+            End If
         Next
 
         'End Hardcode Formula
@@ -721,7 +731,7 @@ Public Class Delivery_Order_Form
             Dim table As String
             Dim value_name As String
             Dim value As String
-            'sdo
+            'Delivery Order
             If Not value_arraylist(0)(row)(0).Equals("{INVALID ARRAY}") Then
                 'sdo.doc_no / duplicate
                 table = "sdo"
@@ -788,7 +798,7 @@ Public Class Delivery_Order_Form
                 End If
             End If
 
-            'sdodet
+            'Delivery Order Desc
             If Not value_arraylist(1)(row)(0).Equals(String.Empty) Then
                 'sdodet.doc_no / duplicate
                 table = "sdodet"
@@ -858,10 +868,47 @@ Public Class Delivery_Order_Form
 
             End If
 
+            'Delivery Order Stock
+            If Not value_arraylist(2)(row)(0).Equals(String.Empty) Then
+                'product.prodcode / exist
+                table = "product"
+                value_name = "prodcode"
+                value = value_arraylist(2)(row)(0)
+                If Not value.Trim.Equals(String.Empty) Then
+                    If Not existed_checker(table, value_name, value) Then
+                        execute_valid = False
+                        exist_result += value_name + " '" + value + "' is not found in the database (" + table + ")!" + vbNewLine
+                    End If
+                End If
+
+                'defdocno.doc_type / exist
+                table = "defdocno"
+                value_name = "doc_type"
+                value = value_arraylist(2)(row)(1)
+                If Not value.Trim.Equals(String.Empty) Then
+                    If Not existed_checker(table, value_name, value) Then
+                        execute_valid = False
+                        exist_result += value_name + " '" + value + "' is not found in the database (" + table + ")!" + vbNewLine
+                    End If
+                End If
+
+                'sdo.doc_no / exist
+                table = "sdo"
+                value_name = "doc_no"
+                value = value_arraylist(2)(row)(2)
+                If Not value.Trim.Equals(String.Empty) Then
+                    If Not existed_checker(table, value_name, value) Then
+                        execute_valid = False
+                        exist_result += value_name + " '" + value + "' is not found in the database (" + table + ")!" + vbNewLine
+                    End If
+                End If
+
+            End If
+
         Next
+        Function_Form.printExcelResult("C:\Users\RBADM07\Desktop\Generated Result DO.xlsx", queryTable, value_arraylist, sql_format_arraylist, dgvExcel)
         If execute_valid = False Then
             MsgBox(exist_result + vbNewLine + "The operation has been stopped!", MsgBoxStyle.Exclamation)
-            printExcelResult("C:\Users\RBADM07\Desktop\Generated Result DO.xlsx", queryTable, value_arraylist, sql_format_arraylist)
             Return
         End If
         'endhardcore exist checker
@@ -876,6 +923,7 @@ Public Class Delivery_Order_Form
         '    Next
         'Next
         'Quotation only end
+        Dim rowInsertNum = 0
         For i As Integer = 0 To queryTable.Count - 1
             init()
             Using myConn = New SqlConnection("Data Source=" + serverName + ";" & "Initial Catalog=" + database + ";" + pwd_query)
@@ -899,6 +947,7 @@ Public Class Delivery_Order_Form
                                 command.CommandText = command_text
                                 myConn.Open()
                                 Try
+                                    rowInsertNum += 1
                                     command.ExecuteNonQuery()
                                 Catch ex As Exception
                                     MsgBox(ex.Message + vbNewLine + command_text, MsgBoxStyle.Exclamation)
@@ -911,42 +960,7 @@ Public Class Delivery_Order_Form
                 End Using
             End Using
         Next
-
-    End Sub
-
-    Private Sub printExcelResult(filename As String, queryTable As ArrayList, value_arraylist As ArrayList, sql_format_arraylist As ArrayList)
-        Using workbook As New XLWorkbook
-            Dim sheets As New ArrayList
-
-            For i As Integer = 0 To queryTable.Count - 1
-                Dim sheetName As String = queryTable(i)(0)
-                Dim worksheet As IXLWorksheet = workbook.Worksheets.Add(sheetName)
-                Dim writableRow = 1
-
-                For row As Integer = 0 To dgvExcel.RowCount - 1
-                    If Not (value_arraylist(i)(row)(0).Equals("{INVALID ARRAY}")) Then
-                        For j As Integer = 0 To value_arraylist(i)(row).count - 1
-                            worksheet.Cell(writableRow, (j + 1)).Value = sql_format_arraylist(i)(j)
-                            worksheet.Cell(writableRow, (j + 1)).Style.Font.Bold = True
-                        Next
-                        writableRow += 1
-                        For j As Integer = 0 To value_arraylist(i)(row).count - 1
-                            worksheet.Cell(writableRow, (j + 1)).Value = value_arraylist(i)(row)(j)
-                        Next
-                        writableRow += 2
-                    End If
-                Next
-                worksheet.Columns.Width = 25
-            Next
-            'C:\Users\RBADM07\Desktop\Generated Result.xlsx
-            workbook.SaveAs(filename)
-            'Using sfd As SaveFileDialog = New SaveFileDialog() With {.Filter = "Excel Workbook|*.xlsx|Excel 97-2003 Workbook|*.xls"}
-            '    sfd.FileName = "Generated Result"
-            '    If sfd.ShowDialog() = DialogResult.OK Then
-            '        workbook.SaveAs(sfd.FileName)
-            '    End If
-            'End Using
-        End Using
+        MsgBox("Data Import Sucessfully!" + vbNewLine + "Row Inserted: " + rowInsertNum.ToString)
     End Sub
 
     Private Function existed_checker(table As String, sql_value As String, value As String)
