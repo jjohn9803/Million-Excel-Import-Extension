@@ -751,6 +751,17 @@ Public Class Quotation_Form
                     End If
                 End If
 
+                'currency.curr_code / exist
+                table = "currency"
+                value_name = "curr_code"
+                value = value_arraylist(0)(row)(16)
+                If Not value.Trim.Equals(String.Empty) Then
+                    If Not existed_checker(table, value_name, value) Then
+                        execute_valid = False
+                        exist_result += value_name + " '" + value + "' is not found in the database (" + table + ")!" + vbNewLine
+                    End If
+                End If
+
                 'glbatch.batchno / exist
                 table = "glbatch"
                 value_name = "batchno"
