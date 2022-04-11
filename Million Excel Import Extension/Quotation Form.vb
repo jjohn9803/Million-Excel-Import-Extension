@@ -920,8 +920,8 @@ Public Class Quotation_Form
                 End Using
             End Using
         Next
-        MsgBox("Data Import Sucessfully!" + vbNewLine + "Row Inserted: " + rowInsertNum.ToString)
-        Function_Form.printExcelResult("C:\Users\RBADM07\Desktop\Generated Result.xlsx", queryTable, value_arraylist, sql_format_arraylist, dgvExcel)
+        MsgBox("Data Import Sucessfully!" + vbNewLine + "Row Inserted: " + rowInsertNum.ToString, MsgBoxStyle.Information)
+        Function_Form.printExcelResult("C:\Users\RBADM07\Desktop\Generated Result Quotation.xlsx", queryTable, value_arraylist, sql_format_arraylist, dgvExcel)
     End Sub
 
     Private Function existed_checker(table As String, sql_value As String, value As String)

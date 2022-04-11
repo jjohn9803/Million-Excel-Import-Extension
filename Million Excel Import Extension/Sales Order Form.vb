@@ -753,9 +753,9 @@ Public Class Sales_Order_Form
                     End If
                 End If
 
-                'currency.curr_code / exist
-                table = "currency"
-                value_name = "curr_code"
+                'accmgr.accmgr_id / exist
+                table = "accmgr"
+                value_name = "accmgr_id"
                 value = value_arraylist(0)(row)(16)
                 If Not value.Trim.Equals(String.Empty) Then
                     If Not existed_checker(table, value_name, value) Then
@@ -764,10 +764,10 @@ Public Class Sales_Order_Form
                     End If
                 End If
 
-                'accmgr.accmgr_id / exist
-                table = "accmgr"
-                value_name = "accmgr_id"
-                value = value_arraylist(0)(row)(16)
+                'currency.curr_code / exist
+                table = "currency"
+                value_name = "curr_code"
+                value = value_arraylist(0)(row)(17)
                 If Not value.Trim.Equals(String.Empty) Then
                     If Not existed_checker(table, value_name, value) Then
                         execute_valid = False
@@ -933,8 +933,8 @@ Public Class Sales_Order_Form
                 End Using
             End Using
         Next
-        MsgBox("Data Import Sucessfully!" + vbNewLine + "Row Inserted: " + rowInsertNum.ToString)
-        Function_Form.printExcelResult("C:\Users\RBADM07\Desktop\Generated Result SO.xlsx", queryTable, value_arraylist, sql_format_arraylist, dgvExcel)
+        MsgBox("Data Import Sucessfully!" + vbNewLine + "Row Inserted: " + rowInsertNum.ToString, MsgBoxStyle.Information)
+        Function_Form.printExcelResult("C:\Users\RBADM07\Desktop\Generated Result Sales Order.xlsx", queryTable, value_arraylist, sql_format_arraylist, dgvExcel)
     End Sub
 
     Private Function existed_checker(table As String, sql_value As String, value As String)

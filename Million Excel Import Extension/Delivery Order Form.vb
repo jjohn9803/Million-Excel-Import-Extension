@@ -61,8 +61,8 @@ Public Class Delivery_Order_Form
     Private Sub btnImport_Click(sender As Object, e As EventArgs) Handles btnImport.Click
         Dim importType = "Delivery Order"
         Dim tableExcelSetting As DataTableCollection
-        Try
-            Using stream = File.Open(getMaintainSetting, FileMode.Open, FileAccess.Read)
+        'Try
+        Using stream = File.Open(getMaintainSetting, FileMode.Open, FileAccess.Read)
                 Using reader As IExcelDataReader = ExcelReaderFactory.CreateReader(stream)
                     Dim result As DataSet = reader.AsDataSet(New ExcelDataSetConfiguration() With {
                                                                          .ConfigureDataTable = Function(__) New ExcelDataTableConfiguration() With {
@@ -81,9 +81,9 @@ Public Class Delivery_Order_Form
                     quotationWriteIntoSQL(tableExcelSetting, queryTable)
                 End Using
             End Using
-        Catch ex As Exception
-            MsgBox(ex.Message + vbNewLine + ex.StackTrace, MsgBoxStyle.Critical)
-        End Try
+        'Catch ex As Exception
+        '    MsgBox(ex.Message + vbNewLine + ex.StackTrace, MsgBoxStyle.Critical)
+        'End Try
     End Sub
     Private Sub quotationWriteIntoSQL(tableExcelSetting As DataTableCollection, queryTable As ArrayList)
         Dim value_arraylist = New ArrayList
@@ -316,6 +316,7 @@ Public Class Delivery_Order_Form
             Next
         Next
 
+
         'Hardcode Formula
         For row As Integer = 0 To dgvExcel.RowCount - 1
             If Not value_arraylist(0)(row)(0).Equals("{INVALID ARRAY}") Then
@@ -499,6 +500,13 @@ Public Class Delivery_Order_Form
                 value_arraylist(1)(row)(39) = Math.Round(local_mcamt1, 2)
             End If
 
+            'stock.qty
+            If value_arraylist(2)(row)(12).Equals("{FORMULA_VALUE}") Then
+                Dim qty1 = CDbl(value_arraylist(1)(row)(9))
+                Dim qty = qty1 * -1
+                value_arraylist(2)(row)(12) = Math.Round(qty, 2)
+            End If
+
             'stock.local_amount
             If value_arraylist(2)(row)(15).Equals("{FORMULA_VALUE}") Then
                 Dim qty = CDbl(value_arraylist(2)(row)(12))
@@ -506,6 +514,7 @@ Public Class Delivery_Order_Form
                 Dim local_amount = qty * cost
                 value_arraylist(2)(row)(15) = Math.Round(local_amount, 2)
             End If
+
         Next
 
         'End Hardcode Formula
@@ -904,21 +913,9 @@ Public Class Delivery_Order_Form
                     End If
                 End If
 
-                'sdo.doc_no / exist
-                table = "sdo"
-                value_name = "doc_no"
-                value = value_arraylist(2)(row)(2)
-                If Not value.Trim.Equals(String.Empty) Then
-                    If Not existed_checker(table, value_name, value) Then
-                        execute_valid = False
-                        exist_result += value_name + " '" + value + "' is not found in the database (" + table + ")!" + vbNewLine
-                    End If
-                End If
-
             End If
 
         Next
-        Function_Form.printExcelResult("C:\Users\RBADM07\Desktop\Generated Result DO.xlsx", queryTable, value_arraylist, sql_format_arraylist, dgvExcel)
         If execute_valid = False Then
             MsgBox(exist_result + vbNewLine + "The operation has been stopped!", MsgBoxStyle.Exclamation)
             Return
@@ -949,6 +946,17 @@ Public Class Delivery_Order_Form
                                     If sql_format_arraylist(i)(g).ToString.Trim.Equals("createdate") Or sql_format_arraylist(i)(g).ToString.Trim.Equals("lastupdate") Then
                                         query += "'" + Date.Now.ToString + "',"
                                         value_arraylist(i)(row)(g) = Date.Now.ToString
+                                    ElseIf i = 2 And g = 3 Then
+                                        Dim dkeyFromDO As String = ""
+                                        Dim command_temp = New SqlCommand("SELECT TOP 1 dkey FROM sdodet WHERE doc_no ='" + value_arraylist(2)(row)(2) + "' AND line_no ='" + value_arraylist(2)(row)(4) + "'", myConn)
+                                        myConn.Open()
+                                        Dim reader_temp As SqlDataReader = command_temp.ExecuteReader
+                                        While reader_temp.Read()
+                                            dkeyFromDO += reader_temp.GetValue(0).ToString
+                                        End While
+                                        myConn.Close()
+                                        query += "'" + dkeyFromDO + "',"
+                                        value_arraylist(2)(row)(3) = dkeyFromDO
                                     ElseIf Not (value_temp.Equals("{._!@#$%^&*()}")) Then
                                         query += "'" + value_temp + "',"
                                     End If
@@ -972,7 +980,8 @@ Public Class Delivery_Order_Form
                 End Using
             End Using
         Next
-        MsgBox("Data Import Sucessfully!" + vbNewLine + "Row Inserted: " + rowInsertNum.ToString)
+        Function_Form.printExcelResult("C:\Users\RBADM07\Desktop\Generated Result Delivery Order.xlsx", queryTable, value_arraylist, sql_format_arraylist, dgvExcel)
+        MsgBox("Data Import Sucessfully!" + vbNewLine + "Row Inserted: " + rowInsertNum.ToString, MsgBoxStyle.Information)
     End Sub
 
     Private Function existed_checker(table As String, sql_value As String, value As String)
