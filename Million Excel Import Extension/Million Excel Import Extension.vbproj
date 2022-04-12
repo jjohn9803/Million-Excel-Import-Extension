@@ -172,6 +172,12 @@
     <Compile Include="Quotation Form.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Sales Invoice Form.Designer.vb">
+      <DependentUpon>Sales Invoice Form.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Sales Invoice Form.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Sales Order Form.Designer.vb">
       <DependentUpon>Sales Order Form.vb</DependentUpon>
     </Compile>
@@ -206,6 +212,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Quotation Form.resx">
       <DependentUpon>Quotation Form.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Sales Invoice Form.resx">
+      <DependentUpon>Sales Invoice Form.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Sales Order Form.resx">
       <DependentUpon>Sales Order Form.vb</DependentUpon>
