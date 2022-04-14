@@ -854,6 +854,17 @@ Public Class Delivery_Order_Form
                     End If
                 End If
 
+                'prodbatch.batchcode / exist
+                table = "prodbatch"
+                value_name = "batchcode"
+                value = value_arraylist(1)(row)(56)
+                If Not value.Trim.Equals(String.Empty) Then
+                    If Not existed_checker(table, value_name, value) Then
+                        execute_valid = False
+                        exist_result += value_name + " '" + value + "' is not found in the database (" + table + ")!" + vbNewLine
+                    End If
+                End If
+
                 'gldata.accno / exist
                 table = "gldata"
                 value_name = "accno"
