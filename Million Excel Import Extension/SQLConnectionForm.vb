@@ -5,7 +5,7 @@ Imports System.ComponentModel
 
 Public Class SQL_Connection_Form
     Public serverName As String
-    Public database As String
+    Public database As String = ""
     Public myConn As SqlConnection
     Public statusConnection As Boolean
     Public pwd_query As String
@@ -21,9 +21,13 @@ Public Class SQL_Connection_Form
         Me.StartPosition = FormStartPosition.CenterScreen
         cbPasswordOption.SelectedIndex = 0
         pwd_mode = 0
-        getFileInfo()
-        getServerList()
-        tabFormLoad()
+        Try
+            getFileInfo()
+            getServerList()
+            tabFormLoad()
+        Catch ex As Exception
+            MsgBox("There is some issues at startup!", MsgBoxStyle.Critical)
+        End Try
     End Sub
     Private Sub tabFormLoad()
         form_default_size = Me.Size
@@ -91,11 +95,12 @@ Public Class SQL_Connection_Form
             End If
             objReader.Close()
         Catch ex As System.IO.FileNotFoundException
-
+            MsgBox("The file (" + getConnectionSetting() + ") might be having issue!", MsgBoxStyle.Critical)
+            Return
         End Try
     End Sub
     Private Function getConnectionSetting() As String
-        Return returnUpperFolder(Application.StartupPath(), 2) + "setting.dll"
+        Return "setting.dll"
     End Function
     Public Function returnUpperFolder(filePath As String, times As Integer)
         For index As Integer = 1 To times
@@ -103,6 +108,7 @@ Public Class SQL_Connection_Form
         Next
         Return filePath
     End Function
+    '葛葉
     Private Sub setPasswordOption()
         If pwd_mode = 0 Then
             pwd_query = "Trusted_Connection=yes;"

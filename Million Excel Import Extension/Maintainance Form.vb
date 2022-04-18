@@ -64,7 +64,7 @@ Public Class Maintainance_Form
         'End Try
     End Sub
     Private Function getMaintainSetting() As String
-        Return SQL_Connection_Form.returnUpperFolder(Application.StartupPath(), 2) + "maintain.xls"
+        Return "maintain.xls"
     End Function
 
     Private Sub cbManage_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbManage.SelectedIndexChanged

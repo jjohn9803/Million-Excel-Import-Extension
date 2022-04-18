@@ -34,9 +34,7 @@ Partial Class Sales_Order_Form
         Me.FlowLayoutPanel2 = New System.Windows.Forms.FlowLayoutPanel()
         Me.Label4 = New System.Windows.Forms.Label()
         Me.txtType = New System.Windows.Forms.TextBox()
-        Me.btnCreateTemplate = New System.Windows.Forms.Button()
         Me.btnImport = New System.Windows.Forms.Button()
-        Me.btnSync = New System.Windows.Forms.Button()
         Me.Panel3 = New System.Windows.Forms.Panel()
         Me.dgvExcel = New System.Windows.Forms.DataGridView()
         Me.Panel1.SuspendLayout()
@@ -121,9 +119,7 @@ Partial Class Sales_Order_Form
         '
         Me.FlowLayoutPanel2.Controls.Add(Me.Label4)
         Me.FlowLayoutPanel2.Controls.Add(Me.txtType)
-        Me.FlowLayoutPanel2.Controls.Add(Me.btnCreateTemplate)
         Me.FlowLayoutPanel2.Controls.Add(Me.btnImport)
-        Me.FlowLayoutPanel2.Controls.Add(Me.btnSync)
         Me.FlowLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill
         Me.FlowLayoutPanel2.Location = New System.Drawing.Point(0, 0)
         Me.FlowLayoutPanel2.Name = "FlowLayoutPanel2"
@@ -150,35 +146,15 @@ Partial Class Sales_Order_Form
         Me.txtType.Size = New System.Drawing.Size(160, 20)
         Me.txtType.TabIndex = 23
         '
-        'btnCreateTemplate
-        '
-        Me.btnCreateTemplate.Location = New System.Drawing.Point(313, 15)
-        Me.btnCreateTemplate.Margin = New System.Windows.Forms.Padding(50, 15, 3, 3)
-        Me.btnCreateTemplate.Name = "btnCreateTemplate"
-        Me.btnCreateTemplate.Size = New System.Drawing.Size(133, 23)
-        Me.btnCreateTemplate.TabIndex = 21
-        Me.btnCreateTemplate.Text = "Generate Template"
-        Me.btnCreateTemplate.UseVisualStyleBackColor = True
-        '
         'btnImport
         '
-        Me.btnImport.Location = New System.Drawing.Point(499, 15)
+        Me.btnImport.Location = New System.Drawing.Point(313, 15)
         Me.btnImport.Margin = New System.Windows.Forms.Padding(50, 15, 3, 3)
         Me.btnImport.Name = "btnImport"
         Me.btnImport.Size = New System.Drawing.Size(133, 23)
         Me.btnImport.TabIndex = 18
         Me.btnImport.Text = "Import"
         Me.btnImport.UseVisualStyleBackColor = True
-        '
-        'btnSync
-        '
-        Me.btnSync.Location = New System.Drawing.Point(685, 15)
-        Me.btnSync.Margin = New System.Windows.Forms.Padding(50, 15, 3, 3)
-        Me.btnSync.Name = "btnSync"
-        Me.btnSync.Size = New System.Drawing.Size(133, 23)
-        Me.btnSync.TabIndex = 22
-        Me.btnSync.Text = "Sync"
-        Me.btnSync.UseVisualStyleBackColor = True
         '
         'Panel3
         '
@@ -246,9 +222,7 @@ Partial Class Sales_Order_Form
     Friend WithEvents FlowLayoutPanel2 As FlowLayoutPanel
     Friend WithEvents Label4 As Label
     Friend WithEvents txtType As TextBox
-    Friend WithEvents btnCreateTemplate As Button
     Friend WithEvents btnImport As Button
-    Friend WithEvents btnSync As Button
     Friend WithEvents Panel3 As Panel
     Friend WithEvents dgvExcel As DataGridView
 End Class

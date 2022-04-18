@@ -56,7 +56,7 @@ Public Class Quotation_Form
         End Try
     End Sub
     Private Function getMaintainSetting() As String
-        Return SQL_Connection_Form.returnUpperFolder(Application.StartupPath(), 2) + "maintain.xls"
+        Return "maintain.xls"
     End Function
     Private Sub btnImport_Click(sender As Object, e As EventArgs) Handles btnImport.Click
         Dim importType = "Quotation"
@@ -893,6 +893,7 @@ Public Class Quotation_Form
         '        MsgBox("Row " + row.ToString + vbNewLine + strs)
         '    Next
         'Next
+
         'Quotation only end
         Dim rowInsertNum = 0
         For i As Integer = 0 To queryTable.Count - 1
@@ -932,7 +933,7 @@ Public Class Quotation_Form
             End Using
         Next
         MsgBox("Data Import Sucessfully!" + vbNewLine + "Row Inserted: " + rowInsertNum.ToString, MsgBoxStyle.Information)
-        Function_Form.printExcelResult("C:\Users\RBADM07\Desktop\Generated Result Quotation.xlsx", queryTable, value_arraylist, sql_format_arraylist, dgvExcel)
+        'Function_Form.printExcelResult("C:\Users\RBADM07\Desktop\Generated Result Quotation.xlsx", queryTable, value_arraylist, sql_format_arraylist, dgvExcel)
     End Sub
 
     Private Function existed_checker(table As String, sql_value As String, value As String)

@@ -22,8 +22,8 @@ Partial Class Sales_Invoice_Form
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Dim DataGridViewCellStyle3 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
-        Dim DataGridViewCellStyle4 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle1 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle2 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Me.Panel1 = New System.Windows.Forms.Panel()
         Me.FlowLayoutPanel1 = New System.Windows.Forms.FlowLayoutPanel()
         Me.Label2 = New System.Windows.Forms.Label()
@@ -34,9 +34,7 @@ Partial Class Sales_Invoice_Form
         Me.FlowLayoutPanel2 = New System.Windows.Forms.FlowLayoutPanel()
         Me.Label4 = New System.Windows.Forms.Label()
         Me.txtType = New System.Windows.Forms.TextBox()
-        Me.btnCreateTemplate = New System.Windows.Forms.Button()
         Me.btnImport = New System.Windows.Forms.Button()
-        Me.btnSync = New System.Windows.Forms.Button()
         Me.Panel3 = New System.Windows.Forms.Panel()
         Me.dgvExcel = New System.Windows.Forms.DataGridView()
         Me.Panel1.SuspendLayout()
@@ -121,9 +119,7 @@ Partial Class Sales_Invoice_Form
         '
         Me.FlowLayoutPanel2.Controls.Add(Me.Label4)
         Me.FlowLayoutPanel2.Controls.Add(Me.txtType)
-        Me.FlowLayoutPanel2.Controls.Add(Me.btnCreateTemplate)
         Me.FlowLayoutPanel2.Controls.Add(Me.btnImport)
-        Me.FlowLayoutPanel2.Controls.Add(Me.btnSync)
         Me.FlowLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill
         Me.FlowLayoutPanel2.Location = New System.Drawing.Point(0, 0)
         Me.FlowLayoutPanel2.Name = "FlowLayoutPanel2"
@@ -150,35 +146,15 @@ Partial Class Sales_Invoice_Form
         Me.txtType.Size = New System.Drawing.Size(160, 20)
         Me.txtType.TabIndex = 23
         '
-        'btnCreateTemplate
-        '
-        Me.btnCreateTemplate.Location = New System.Drawing.Point(313, 15)
-        Me.btnCreateTemplate.Margin = New System.Windows.Forms.Padding(50, 15, 3, 3)
-        Me.btnCreateTemplate.Name = "btnCreateTemplate"
-        Me.btnCreateTemplate.Size = New System.Drawing.Size(133, 23)
-        Me.btnCreateTemplate.TabIndex = 21
-        Me.btnCreateTemplate.Text = "Generate Template"
-        Me.btnCreateTemplate.UseVisualStyleBackColor = True
-        '
         'btnImport
         '
-        Me.btnImport.Location = New System.Drawing.Point(499, 15)
+        Me.btnImport.Location = New System.Drawing.Point(313, 15)
         Me.btnImport.Margin = New System.Windows.Forms.Padding(50, 15, 3, 3)
         Me.btnImport.Name = "btnImport"
         Me.btnImport.Size = New System.Drawing.Size(133, 23)
         Me.btnImport.TabIndex = 18
         Me.btnImport.Text = "Import"
         Me.btnImport.UseVisualStyleBackColor = True
-        '
-        'btnSync
-        '
-        Me.btnSync.Location = New System.Drawing.Point(685, 15)
-        Me.btnSync.Margin = New System.Windows.Forms.Padding(50, 15, 3, 3)
-        Me.btnSync.Name = "btnSync"
-        Me.btnSync.Size = New System.Drawing.Size(133, 23)
-        Me.btnSync.TabIndex = 22
-        Me.btnSync.Text = "Sync"
-        Me.btnSync.UseVisualStyleBackColor = True
         '
         'Panel3
         '
@@ -193,20 +169,20 @@ Partial Class Sales_Invoice_Form
         '
         Me.dgvExcel.AllowUserToAddRows = False
         Me.dgvExcel.AllowUserToDeleteRows = False
-        DataGridViewCellStyle3.NullValue = Nothing
-        Me.dgvExcel.AlternatingRowsDefaultCellStyle = DataGridViewCellStyle3
+        DataGridViewCellStyle1.NullValue = Nothing
+        Me.dgvExcel.AlternatingRowsDefaultCellStyle = DataGridViewCellStyle1
         Me.dgvExcel.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.DisplayedCells
         Me.dgvExcel.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.DisplayedHeaders
         Me.dgvExcel.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        DataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
-        DataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Window
-        DataGridViewCellStyle4.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        DataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.ControlText
-        DataGridViewCellStyle4.NullValue = Nothing
-        DataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Highlight
-        DataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.HighlightText
-        DataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
-        Me.dgvExcel.DefaultCellStyle = DataGridViewCellStyle4
+        DataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
+        DataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window
+        DataGridViewCellStyle2.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        DataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText
+        DataGridViewCellStyle2.NullValue = Nothing
+        DataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight
+        DataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText
+        DataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
+        Me.dgvExcel.DefaultCellStyle = DataGridViewCellStyle2
         Me.dgvExcel.Dock = System.Windows.Forms.DockStyle.Fill
         Me.dgvExcel.Location = New System.Drawing.Point(0, 0)
         Me.dgvExcel.Name = "dgvExcel"
@@ -246,9 +222,7 @@ Partial Class Sales_Invoice_Form
     Friend WithEvents FlowLayoutPanel2 As FlowLayoutPanel
     Friend WithEvents Label4 As Label
     Friend WithEvents txtType As TextBox
-    Friend WithEvents btnCreateTemplate As Button
     Friend WithEvents btnImport As Button
-    Friend WithEvents btnSync As Button
     Friend WithEvents Panel3 As Panel
     Friend WithEvents dgvExcel As DataGridView
 End Class

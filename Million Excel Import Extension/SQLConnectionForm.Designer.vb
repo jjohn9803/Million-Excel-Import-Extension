@@ -284,9 +284,10 @@ Partial Class SQL_Connection_Form
         Me.Controls.Add(Me.Panel1)
         Me.Controls.Add(Me.TabControl1)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow
+        Me.MaximizeBox = False
         Me.Name = "SQL_Connection_Form"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
-        Me.Text = "SQL Connection Form"
+        Me.Text = "SQL Connection Form1"
         Me.TabControl1.ResumeLayout(False)
         Me.TabPageSetting.ResumeLayout(False)
         Me.TabPageSetting.PerformLayout()

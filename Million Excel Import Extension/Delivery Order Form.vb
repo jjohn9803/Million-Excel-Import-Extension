@@ -56,31 +56,37 @@ Public Class Delivery_Order_Form
         End Try
     End Sub
     Private Function getMaintainSetting() As String
-        Return SQL_Connection_Form.returnUpperFolder(Application.StartupPath(), 2) + "maintain.xls"
+        Return "maintain.xls"
     End Function
     Private Sub btnImport_Click(sender As Object, e As EventArgs) Handles btnImport.Click
         Dim importType = "Delivery Order"
         Dim tableExcelSetting As DataTableCollection
         'Try
         Using stream = File.Open(getMaintainSetting, FileMode.Open, FileAccess.Read)
-                Using reader As IExcelDataReader = ExcelReaderFactory.CreateReader(stream)
-                    Dim result As DataSet = reader.AsDataSet(New ExcelDataSetConfiguration() With {
-                                                                         .ConfigureDataTable = Function(__) New ExcelDataTableConfiguration() With {
-                                                                         .UseHeaderRow = True}})
-                    tableExcelSetting = result.Tables
-                    Dim queryTable As New ArrayList
-                    queryTable.Add(New ArrayList)
-                    queryTable.Add(New ArrayList)
-                    queryTable.Add(New ArrayList)
-                    queryTable(0).add("Delivery Order") '0
-                    queryTable(0).add("sdo") '1
-                    queryTable(1).add("Delivery Order Desc")
-                    queryTable(1).add("sdodet")
-                    queryTable(2).add("Delivery Order Stock")
-                    queryTable(2).add("stock")
-                    quotationWriteIntoSQL(tableExcelSetting, queryTable)
-                End Using
+            Using reader As IExcelDataReader = ExcelReaderFactory.CreateReader(stream)
+                Dim result As DataSet = reader.AsDataSet(New ExcelDataSetConfiguration() With {
+                                                                        .ConfigureDataTable = Function(__) New ExcelDataTableConfiguration() With {
+                                                                        .UseHeaderRow = True}})
+                tableExcelSetting = result.Tables
+                Dim queryTable As New ArrayList
+                queryTable.Add(New ArrayList)
+                queryTable.Add(New ArrayList)
+                queryTable.Add(New ArrayList)
+                queryTable.Add(New ArrayList)
+                queryTable.Add(New ArrayList)
+                queryTable(0).add("Delivery Order") '0
+                queryTable(0).add("sdo") '1
+                queryTable(1).add("Delivery Order Desc")
+                queryTable(1).add("sdodet")
+                queryTable(2).add("Delivery Order Stock")
+                queryTable(2).add("stock")
+                queryTable(3).add("Product Serial No")
+                queryTable(3).add("prodsn")
+                queryTable(4).add("Stock Serial No")
+                queryTable(4).add("stocksn")
+                quotationWriteIntoSQL(tableExcelSetting, queryTable)
             End Using
+        End Using
         'Catch ex As Exception
         '    MsgBox(ex.Message + vbNewLine + ex.StackTrace, MsgBoxStyle.Critical)
         'End Try
@@ -924,6 +930,31 @@ Public Class Delivery_Order_Form
                     End If
                 End If
 
+                'prodsn.serialno / exist
+                table = "prodsn"
+                value_name = "serialno"
+                Dim values As New List(Of String)(value_arraylist(3)(row)(1).ToString.Trim.Split(","c))
+                For Each value_sn As String In values
+                    If Not value_sn.Trim.Equals(String.Empty) Then
+                        If Not existed_checker(table, value_name, value_sn) Then
+                            execute_valid = False
+                            exist_result += value_name + " '" + value_sn + "' is not found in the database (" + table + ")!" + vbNewLine
+                        End If
+                    End If
+                Next
+
+                'stocksn.serialno / exist
+                table = "stocksn"
+                value_name = "serialno"
+                Dim values2 As New List(Of String)(value_arraylist(3)(row)(1).ToString.Trim.Split(","c))
+                For Each value_sn As String In values2
+                    If Not value_sn.Trim.Equals(String.Empty) Then
+                        If Not existed_checker(table, value_name, value_sn) Then
+                            execute_valid = False
+                            exist_result += value_name + " '" + value_sn + "' is not found in the database (" + table + ")!" + vbNewLine
+                        End If
+                    End If
+                Next
             End If
 
         Next
@@ -942,9 +973,72 @@ Public Class Delivery_Order_Form
         '        MsgBox("Row " + row.ToString + vbNewLine + strs)
         '    Next
         'Next
+
+        init()
+        myConn = New SqlConnection("Data Source=" + serverName + ";" & "Initial Catalog=" + database + ";" + pwd_query)
+        Dim exist_serial As Boolean = False
+        Dim msg_serial As String = ""
+        For row As Integer = 0 To dgvExcel.RowCount - 1
+            If Not value_arraylist(3)(row)(1).ToString.Trim.Equals(String.Empty) Then
+                Dim serialnos As New List(Of String)(value_arraylist(3)(row)(1).ToString.Trim.Split(","c))
+                If row = 0 Then
+                    If serialnos.Count <> CInt(value_arraylist(1)(row)(9)) Then
+                        MsgBox("The serial no quantity (" + serialnos.Count.ToString + ") does not matched with items quantity(" + value_arraylist(1)(row)(9).ToString + ")" + vbNewLine + "The operation has been stopped!", MsgBoxStyle.Exclamation)
+                        Return
+                    End If
+                End If
+                For sn = 0 To serialnos.Count - 1
+                        Dim serialno As String = serialnos(sn)
+                        myConn.Open()
+                        Dim sncommand = New SqlCommand("SELECT * FROM stocksn WHERE serialno ='" + serialno + "' AND doc_type ='DO'", myConn)
+                        Dim snreader As SqlDataReader = sncommand.ExecuteReader
+                        While snreader.Read()
+                            msg_serial += vbTab + snreader.GetValue("serialno") + vbNewLine
+                            exist_serial = True
+                        End While
+                        myConn.Close()
+                    Next
+                End If
+        Next
+        If exist_serial Then
+            MsgBox("The following serial no has been used:" + vbNewLine + msg_serial + "The operation has been stopped!", MsgBoxStyle.Exclamation)
+            Return
+        End If
+        For row As Integer = 0 To dgvExcel.RowCount - 1
+            If Not value_arraylist(3)(row)(1).ToString.Trim.Equals(String.Empty) Then
+                Dim serialnos As New List(Of String)(value_arraylist(3)(row)(1).ToString.Trim.Split(","c))
+                For sn = 0 To serialnos.Count - 1
+                    Dim serialno As String = serialnos(sn)
+                    Dim qty = "-1"
+                    Dim location = value_arraylist(3)(row)(4)
+                    Dim doc_no = value_arraylist(3)(row)(8)
+                    Dim line_no = value_arraylist(3)(row)(9)
+                    Dim doc_date = value_arraylist(3)(row)(10)
+                    Dim procode = value_arraylist(3)(row)(0)
+                    Dim serialNoProdCommand As String = "UPDATE prodsn SET "
+                    Dim serialNoColumns = "qty='" + qty + "',"
+                    serialNoColumns += "location='" + location + "',"
+                    serialNoColumns += "doc_type='DO',"
+                    serialNoColumns += "doc_no='" + doc_no + "',"
+                    serialNoColumns += "line_no='" + line_no + "',"
+                    serialNoColumns += "doc_date='" + doc_date + "' "
+                    serialNoColumns += "WHERE prodcode='" + procode + "' AND serialno='" + serialno + "'"
+                    serialNoProdCommand += serialNoColumns
+                    Dim command = New SqlCommand(serialNoProdCommand, myConn)
+                    myConn.Open()
+                    command.ExecuteNonQuery()
+                    Dim serialNoStockdCommand As String = "INSERT INTO stocksn (prodcode,serialno,doc_type,doc_no,line_no,doc_date,qty,location) VALUES ('"
+                    serialNoStockdCommand += procode + "','" + serialno + "','DO','" + doc_no + "','" + line_no + "','" + doc_date + "','" + qty + "','" + location + "')"
+                    Dim command2 = New SqlCommand(serialNoStockdCommand, myConn)
+                    command2.ExecuteNonQuery()
+                    MsgBox(serialNoStockdCommand)
+                    myConn.Close()
+                Next
+            End If
+        Next
         'Quotation only end
         Dim rowInsertNum = 0
-        For i As Integer = 0 To queryTable.Count - 1
+        For i As Integer = 0 To 2
             init()
             Using myConn = New SqlConnection("Data Source=" + serverName + ";" & "Initial Catalog=" + database + ";" + pwd_query)
                 Using command As New SqlCommand("", myConn)
@@ -991,7 +1085,7 @@ Public Class Delivery_Order_Form
                 End Using
             End Using
         Next
-        Function_Form.printExcelResult("C:\Users\RBADM07\Desktop\Generated Result Delivery Order.xlsx", queryTable, value_arraylist, sql_format_arraylist, dgvExcel)
+        'Function_Form.printExcelResult("C:\Users\RBADM07\Desktop\Generated Result Delivery Order.xlsx", queryTable, value_arraylist, sql_format_arraylist, dgvExcel)
         MsgBox("Data Import Sucessfully!" + vbNewLine + "Row Inserted: " + rowInsertNum.ToString, MsgBoxStyle.Information)
     End Sub
 

@@ -11,9 +11,13 @@ Public Class Function_Form
         Else
 
         End If
-        SQL_Connection_Form.import_type = sender.text
-        form.Text = sender.text
-        form.ShowDialog()
+        If SQL_Connection_Form.statusConnection And Not SQL_Connection_Form.database.Equals(String.Empty) Then
+            SQL_Connection_Form.import_type = sender.text
+            form.Text = sender.text
+            form.ShowDialog()
+        Else
+            MsgBox("Please connect to server and database before get into it!", MsgBoxStyle.Critical)
+        End If
         'Dim form As ExcelImporter = New ExcelImporter
         'SQL_Connection_Form.import_type = sender.text
         'form.Text = sender.text

@@ -56,7 +56,7 @@ Public Class Sales_Order_Form
         End Try
     End Sub
     Private Function getMaintainSetting() As String
-        Return SQL_Connection_Form.returnUpperFolder(Application.StartupPath(), 2) + "maintain.xls"
+        Return "maintain.xls"
     End Function
     Private Sub btnImport_Click(sender As Object, e As EventArgs) Handles btnImport.Click
         Dim importType = "Sales Order"

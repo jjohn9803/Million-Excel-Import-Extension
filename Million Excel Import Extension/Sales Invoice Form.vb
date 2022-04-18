@@ -55,7 +55,7 @@ Public Class Sales_Invoice_Form
         End Try
     End Sub
     Private Function getMaintainSetting() As String
-        Return SQL_Connection_Form.returnUpperFolder(Application.StartupPath(), 2) + "maintain.xls"
+        Return "maintain.xls"
     End Function
     Private Sub btnImport_Click(sender As Object, e As EventArgs) Handles btnImport.Click
         Dim importType = "Delivery Order"
@@ -991,7 +991,7 @@ Public Class Sales_Invoice_Form
                 End Using
             End Using
         Next
-        Function_Form.printExcelResult("C:\Users\RBADM07\Desktop\Generated Result Delivery Order.xlsx", queryTable, value_arraylist, sql_format_arraylist, dgvExcel)
+        'Function_Form.printExcelResult("C:\Users\RBADM07\Desktop\Generated Result Delivery Order.xlsx", queryTable, value_arraylist, sql_format_arraylist, dgvExcel)
         MsgBox("Data Import Sucessfully!" + vbNewLine + "Row Inserted: " + rowInsertNum.ToString, MsgBoxStyle.Information)
     End Sub
     Private Function existed_checker(table As String, sql_value As String, value As String)
