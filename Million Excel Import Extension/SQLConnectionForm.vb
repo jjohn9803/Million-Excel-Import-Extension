@@ -120,7 +120,8 @@ Public Class SQL_Connection_Form
     End Sub
     Private Sub getServerList()
         Try
-            Dim dt As DataTable = SqlDataSourceEnumerator.Instance.GetDataSources
+            'Dim dt As DataTable = SqlDataSourceEnumerator.Instance.GetDataSources
+            Dim dt As DataTable = SqlClientFactory.Instance.CreateDataSourceEnumerator.GetDataSources()
             For Each dr As DataRow In dt.Rows
                 cbServerList.Items.Add(String.Concat(dr("ServerName"), "\", dr("InstanceName")))
             Next

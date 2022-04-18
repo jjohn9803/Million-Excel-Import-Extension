@@ -162,7 +162,7 @@ Public Class Sales_Order_Form
                                     value_arraylist(i)(row).add("   ")
                                 ElseIf data_type_temp.ToString.Contains("date") Or data_type_temp.ToString.Contains("time") Then
                                     value = New Date.ToString
-                                    value_arraylist(i)(row).add(New Date.ToString)
+                                    value_arraylist(i)(row).add(New Date.ToString("dd-MMM-yy HH:mm:ss"))
                                 Else
                                     value = "0"
                                     value_arraylist(i)(row).add("0")
@@ -225,7 +225,7 @@ Public Class Sales_Order_Form
                                             If data_type_temp.ToString.Contains("char") Or data_type_temp.ToString.Contains("text") Then
                                                 value_arraylist(i)(row)(g) = "   "
                                             ElseIf data_type_temp.ToString.Contains("date") Or data_type_temp.ToString.Contains("time") Then
-                                                value_arraylist(i)(row)(g) = New Date.ToString
+                                                value_arraylist(i)(row)(g) = New Date.ToString("dd-MMM-yy HH:mm:ss")
                                             Else
                                                 value_arraylist(i)(row)(g) = "0"
                                             End If
@@ -907,6 +907,12 @@ Public Class Sales_Order_Form
         '    Next
         'Next
         'Quotation only end
+
+        Dim confirmImport As DialogResult = MsgBox("Are you sure to import data?", MsgBoxStyle.YesNo)
+        If confirmImport = DialogResult.No Then
+            Return
+        End If
+
         Dim rowInsertNum = 0
         For i As Integer = 0 To queryTable.Count - 1
             init()
@@ -919,8 +925,11 @@ Public Class Sales_Order_Form
                                 For g As Integer = 0 To value_arraylist(i)(row).count - 1
                                     Dim value_temp As String = value_arraylist(i)(row)(g).ToString
                                     If sql_format_arraylist(i)(g).ToString.Trim.Equals("createdate") Or sql_format_arraylist(i)(g).ToString.Trim.Equals("lastupdate") Then
-                                        query += "'" + Date.Now.ToString + "',"
-                                        value_arraylist(i)(row)(g) = Date.Now.ToString
+                                        query += "'" + Date.Now.ToString("dd-MMM-yy HH:mm:ss") + "',"
+                                        value_arraylist(i)(row)(g) = Date.Now.ToString("dd-MMM-yy HH:mm:ss")
+                                    ElseIf data_type_arraylist(i)(g).ToString.Trim.Contains("date") Then
+                                        query += "'" + Convert.ToDateTime(value_temp).ToString("dd-MMM-yy HH:mm:ss") + "',"
+                                        value_arraylist(i)(row)(g) = Convert.ToDateTime(value_temp).ToString("dd-MMM-yy HH:mm:ss")
                                     ElseIf Not (value_temp.Equals("{._!@#$%^&*()}")) Then
                                         query += "'" + value_temp + "',"
                                     End If
@@ -945,7 +954,11 @@ Public Class Sales_Order_Form
             End Using
         Next
         MsgBox("Data Import Sucessfully!" + vbNewLine + "Row Inserted: " + rowInsertNum.ToString, MsgBoxStyle.Information)
-        Function_Form.printExcelResult("C:\Users\RBADM07\Desktop\Generated Result Sales Order.xlsx", queryTable, value_arraylist, sql_format_arraylist, dgvExcel)
+        Dim confirmReport As DialogResult = MsgBox("Are you want to save the result as report?", MsgBoxStyle.YesNo)
+        If confirmReport = DialogResult.No Then
+            Return
+        End If
+        Function_Form.printExcelResult("ReportMELE_Sales_Order_" + Date.Now.Year.ToString + Date.Now.Month.ToString("00") + Date.Now.Day.ToString("00") + ".xlsx", queryTable, value_arraylist, sql_format_arraylist, dgvExcel)
     End Sub
 
     Private Function existed_checker(table As String, sql_value As String, value As String)

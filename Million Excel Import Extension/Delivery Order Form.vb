@@ -170,8 +170,8 @@ Public Class Delivery_Order_Form
                                     value = "   "
                                     value_arraylist(i)(row).add("   ")
                                 ElseIf data_type_temp.ToString.Contains("date") Or data_type_temp.ToString.Contains("time") Then
-                                    value = New Date.ToString
-                                    value_arraylist(i)(row).add(New Date.ToString)
+                                    value = New Date.ToString("dd-MMM-yy HH:mm:ss")
+                                    value_arraylist(i)(row).add(New Date.ToString("dd-MMM-yy HH:mm:ss"))
                                 Else
                                     value = "0"
                                     value_arraylist(i)(row).add("0")
@@ -234,7 +234,7 @@ Public Class Delivery_Order_Form
                                             If data_type_temp.ToString.Contains("char") Or data_type_temp.ToString.Contains("text") Then
                                                 value_arraylist(i)(row)(g) = "   "
                                             ElseIf data_type_temp.ToString.Contains("date") Or data_type_temp.ToString.Contains("time") Then
-                                                value_arraylist(i)(row)(g) = New Date.ToString
+                                                value_arraylist(i)(row)(g) = New Date.ToString("dd-MMM-yy HH:mm:ss")
                                             Else
                                                 value_arraylist(i)(row)(g) = "0"
                                             End If
@@ -1004,6 +1004,12 @@ Public Class Delivery_Order_Form
             MsgBox("The following serial no has been used:" + vbNewLine + msg_serial + "The operation has been stopped!", MsgBoxStyle.Exclamation)
             Return
         End If
+
+        Dim confirmImport As DialogResult = MsgBox("Are you sure to import data?", MsgBoxStyle.YesNo)
+        If confirmImport = DialogResult.No Then
+            Return
+        End If
+
         For row As Integer = 0 To dgvExcel.RowCount - 1
             If Not value_arraylist(3)(row)(1).ToString.Trim.Equals(String.Empty) Then
                 Dim serialnos As New List(Of String)(value_arraylist(3)(row)(1).ToString.Trim.Split(","c))
@@ -1013,7 +1019,7 @@ Public Class Delivery_Order_Form
                     Dim location = value_arraylist(3)(row)(4)
                     Dim doc_no = value_arraylist(3)(row)(8)
                     Dim line_no = value_arraylist(3)(row)(9)
-                    Dim doc_date = value_arraylist(3)(row)(10)
+                    Dim doc_date = Convert.ToDateTime(value_arraylist(3)(row)(10)).ToString("dd-MMM-yy HH:mm:ss")
                     Dim procode = value_arraylist(3)(row)(0)
                     Dim serialNoProdCommand As String = "UPDATE prodsn SET "
                     Dim serialNoColumns = "qty='" + qty + "',"
@@ -1031,7 +1037,7 @@ Public Class Delivery_Order_Form
                     serialNoStockdCommand += procode + "','" + serialno + "','DO','" + doc_no + "','" + line_no + "','" + doc_date + "','" + qty + "','" + location + "')"
                     Dim command2 = New SqlCommand(serialNoStockdCommand, myConn)
                     command2.ExecuteNonQuery()
-                    MsgBox(serialNoStockdCommand)
+                    'MsgBox(serialNoStockdCommand)
                     myConn.Close()
                 Next
             End If
@@ -1049,8 +1055,11 @@ Public Class Delivery_Order_Form
                                 For g As Integer = 0 To value_arraylist(i)(row).count - 1
                                     Dim value_temp As String = value_arraylist(i)(row)(g).ToString
                                     If sql_format_arraylist(i)(g).ToString.Trim.Equals("createdate") Or sql_format_arraylist(i)(g).ToString.Trim.Equals("lastupdate") Then
-                                        query += "'" + Date.Now.ToString + "',"
-                                        value_arraylist(i)(row)(g) = Date.Now.ToString
+                                        query += "'" + Date.Now.ToString("dd-MMM-yy HH:mm:ss") + "',"
+                                        value_arraylist(i)(row)(g) = Date.Now.ToString("dd-MMM-yy HH:mm:ss")
+                                    ElseIf data_type_arraylist(i)(g).ToString.Trim.Contains("date") Then
+                                        query += "'" + Convert.ToDateTime(value_temp).ToString("dd-MMM-yy HH:mm:ss") + "',"
+                                        value_arraylist(i)(row)(g) = Convert.ToDateTime(value_temp).ToString("dd-MMM-yy HH:mm:ss")
                                     ElseIf i = 2 And g = 3 Then
                                         Dim dkeyFromDO As String = ""
                                         Dim command_temp = New SqlCommand("SELECT TOP 1 dkey FROM sdodet WHERE doc_no ='" + value_arraylist(2)(row)(2) + "' AND line_no ='" + value_arraylist(2)(row)(4) + "'", myConn)
@@ -1085,8 +1094,12 @@ Public Class Delivery_Order_Form
                 End Using
             End Using
         Next
-        'Function_Form.printExcelResult("C:\Users\RBADM07\Desktop\Generated Result Delivery Order.xlsx", queryTable, value_arraylist, sql_format_arraylist, dgvExcel)
         MsgBox("Data Import Sucessfully!" + vbNewLine + "Row Inserted: " + rowInsertNum.ToString, MsgBoxStyle.Information)
+        Dim confirmReport As DialogResult = MsgBox("Are you want to save the result as report?", MsgBoxStyle.YesNo)
+        If confirmReport = DialogResult.No Then
+            Return
+        End If
+        Function_Form.printExcelResult("ReportMELE_Delivery_Order_" + Date.Now.Year.ToString + Date.Now.Month.ToString("00") + Date.Now.Day.ToString("00") + ".xlsx", queryTable, value_arraylist, sql_format_arraylist, dgvExcel)
     End Sub
 
     Private Function existed_checker(table As String, sql_value As String, value As String)

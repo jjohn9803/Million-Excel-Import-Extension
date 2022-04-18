@@ -49,13 +49,37 @@ Public Class Function_Form
                 worksheet.Columns.Width = 25
             Next
             'C:\Users\RBADM07\Desktop\Generated Result.xlsx
-            workbook.SaveAs(filename)
-            'Using sfd As SaveFileDialog = New SaveFileDialog() With {.Filter = "Excel Workbook|*.xlsx|Excel 97-2003 Workbook|*.xls"}
-            '    sfd.FileName = "Generated Result"
-            '    If sfd.ShowDialog() = DialogResult.OK Then
-            '        workbook.SaveAs(sfd.FileName)
-            '    End If
-            'End Using
+            'workbook.SaveAs(filename)
+            Using sfd As SaveFileDialog = New SaveFileDialog() With {.Filter = "Excel Workbook|*.xlsx|Excel 97-2003 Workbook|*.xls"}
+                sfd.FileName = filename
+                If sfd.ShowDialog() = DialogResult.OK Then
+                    workbook.SaveAs(sfd.FileName)
+                End If
+            End Using
         End Using
     End Sub
+    Public Shared Sub clearDGV(dgvExcel As DataGridView)
+
+    End Sub
+    Public Shared Function validateExcelDateFormat(dgvExcel As DataGridView, validateDateFormatArray As String()) As Boolean
+        Dim result As Boolean = True
+        For cell As Integer = 0 To dgvExcel.Rows(0).Cells.Count - 1
+            Dim headerText As String = dgvExcel.Columns(cell).HeaderText.Trim
+            If validateDateFormatArray.Contains(headerText) Then
+                For row As Integer = 0 To dgvExcel.RowCount - 1
+                    Dim cellText As String = dgvExcel.Rows(row).Cells(cell).Value.ToString.Trim
+                    If Not cellText.Equals(String.Empty) Then
+                        Try
+                            Dim a = Convert.ToDateTime(cellText).ToString("dd-MMM-yy HH:mm:ss")
+                        Catch ex As Exception
+                            result = False
+                        End Try
+
+                    End If
+
+                Next
+            End If
+        Next
+        Return result
+    End Function
 End Class
