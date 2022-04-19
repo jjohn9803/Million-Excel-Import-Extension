@@ -58,10 +58,7 @@ Public Class Function_Form
             End Using
         End Using
     End Sub
-    Public Shared Sub clearDGV(dgvExcel As DataGridView)
-
-    End Sub
-    Public Shared Function validateExcelDateFormat(dgvExcel As DataGridView, validateDateFormatArray As String()) As Boolean
+    Public Shared Sub validateExcelDateFormat(dgvExcel As DataGridView, validateDateFormatArray As String())
         Dim result As Boolean = True
         For cell As Integer = 0 To dgvExcel.Rows(0).Cells.Count - 1
             Dim headerText As String = dgvExcel.Columns(cell).HeaderText.Trim
@@ -80,6 +77,10 @@ Public Class Function_Form
                 Next
             End If
         Next
-        Return result
-    End Function
+        If result = False Then
+            dgvExcel.DataSource = Nothing
+            dgvExcel.Refresh()
+            MsgBox("The imported excel format does not correct!", MsgBoxStyle.Critical)
+        End If
+    End Sub
 End Class

@@ -14,12 +14,12 @@ Public Class Sales_Invoice_Form
         init()
     End Sub
     Private Sub init()
-        serverName = SQL_Connection_Form.serverName
-        database = SQL_Connection_Form.database
-        myConn = SQL_Connection_Form.myConn
-        statusConnection = SQL_Connection_Form.statusConnection
-        pwd_query = SQL_Connection_Form.pwd_query
-        import_type = SQL_Connection_Form.import_type
+        serverName = Main_Form.serverName
+        database = Main_Form.database
+        myConn = Main_Form.myConn
+        statusConnection = Main_Form.statusConnection
+        pwd_query = Main_Form.pwd_query
+        import_type = Main_Form.import_type
         txtType.Text = import_type
     End Sub
     Private Sub cbSheet_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbSheet.SelectedIndexChanged

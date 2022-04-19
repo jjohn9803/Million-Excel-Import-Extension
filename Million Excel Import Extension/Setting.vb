@@ -2,48 +2,38 @@
 Imports System.Data.Sql
 Imports System.IO
 Imports System.ComponentModel
-
-Public Class SQL_Connection_Form
-    Public serverName As String
-    Public database As String = ""
-    Public myConn As SqlConnection
-    Public statusConnection As Boolean
-    Public pwd_query As String
-    Public import_type As String
+Public Class Setting
     Private pwd_mode As Integer
     Private uid As String
     Private pwd As String
-    'Public form2 As New ExcelImporter
-    Private form_default_size As New Size
-    Public form2 As New Function_Form
-    Public form3 As New Maintainance_Form
     Private Sub SQL_Connection_Form_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.StartPosition = FormStartPosition.CenterScreen
         cbPasswordOption.SelectedIndex = 0
         pwd_mode = 0
         Try
             getFileInfo()
-            getServerList()
-            tabFormLoad()
+            MsgBox("Server: " + Main_Form.getServerName + vbTab + "Database: " + Main_Form.getDatabase + vbTab + "Username: " + uid + vbTab + "Password: " + pwd)
+            'getServerList()
+            'tabFormLoad()
         Catch ex As Exception
-            MsgBox("There is some issues at startup!", MsgBoxStyle.Critical)
+            MsgBox("There is some issues at startup!" + vbNewLine + ex.Message, MsgBoxStyle.Critical)
         End Try
     End Sub
-    Private Sub tabFormLoad()
-        form_default_size = Me.Size
+    'Private Sub tabFormLoad()
+    '    form_default_size = Me.Size
 
-        form2.TopLevel = False
-        form2.FormBorderStyle = Windows.Forms.FormBorderStyle.None
-        form2.Location = New System.Drawing.Point(0, 0)
-        form2.Visible = False
-        TabPageExcel.Controls.Add(form2)
+    '    form2.TopLevel = False
+    '    form2.FormBorderStyle = Windows.Forms.FormBorderStyle.None
+    '    form2.Location = New System.Drawing.Point(0, 0)
+    '    form2.Visible = False
+    '    TabPageExcel.Controls.Add(form2)
 
-        form3.TopLevel = False
-        form3.FormBorderStyle = Windows.Forms.FormBorderStyle.None
-        form3.Location = New System.Drawing.Point(0, 0)
-        form3.Visible = False
-        TabPageMaintain.Controls.Add(form3)
-    End Sub
+    '    form3.TopLevel = False
+    '    form3.FormBorderStyle = Windows.Forms.FormBorderStyle.None
+    '    form3.Location = New System.Drawing.Point(0, 0)
+    '    form3.Visible = False
+    '    TabPageMaintain.Controls.Add(form3)
+    'End Sub
     Private Sub getFileInfo()
         'Try
         '    Dim fileReader As StreamReader = My.Computer.FileSystem.OpenTextFileReader(getConnectionSetting())
@@ -55,17 +45,18 @@ Public Class SQL_Connection_Form
             Dim settingBoolean As Boolean = False
             Do While objReader.Peek() <> -1
                 settingBoolean = True
-                Dim result = objReader.ReadLine
-                Dim result2 = (result.Substring(result.IndexOf(":") + 1)).Trim
+                Dim EncryptedResult = objReader.ReadLine
+                Dim result = Encryption.Decrypt(EncryptedResult, "")
+                Dim result2 = result.ToString.Split(":")(1).Trim
                 If result.Contains("Server Name:") Then
                     If result2 <> String.Empty Then
                         cbServerList.Text() = result2
-                        serverName = result2
+                        Main_Form.setServerName(result2)
                     End If
                 End If
                 If result.Contains("Database:") Then
                     If result2 <> String.Empty Then
-                        database = result2
+                        Main_Form.setDatabase(result2)
                     End If
                 End If
                 If result.Contains("pwd_option:") Then
@@ -88,14 +79,14 @@ Public Class SQL_Connection_Form
                 End If
             Loop
             If settingBoolean Then
-                Me.btnSql.PerformClick()
+                findDatabase()
                 If database <> String.Empty Then
                     cbDatabase.Text() = database
                 End If
             End If
             objReader.Close()
         Catch ex As System.IO.FileNotFoundException
-            MsgBox("The file (" + getConnectionSetting() + ") might be having issue!", MsgBoxStyle.Critical)
+            MsgBox("The setting file might be having issue!", MsgBoxStyle.Critical)
             Return
         End Try
     End Sub
@@ -124,12 +115,16 @@ Public Class SQL_Connection_Form
             Dim dt As DataTable = SqlClientFactory.Instance.CreateDataSourceEnumerator.GetDataSources()
             For Each dr As DataRow In dt.Rows
                 cbServerList.Items.Add(String.Concat(dr("ServerName"), "\", dr("InstanceName")))
+                'cbServerList.Items.Add(dr(4))
             Next
         Catch ex As Exception
             MsgBox(ex.Message, MsgBoxStyle.Critical, Me.Text)
         End Try
     End Sub
     Private Sub btnSql_Click(sender As Object, e As EventArgs) Handles btnSql.Click
+        findDatabase()
+    End Sub
+    Private Sub findDatabase()
         serverName = cbServerList.Text().Trim
         setPasswordOption()
 
@@ -171,25 +166,25 @@ Public Class SQL_Connection_Form
             End If
             cbDatabase.Items.Clear()
             cbDatabase.Enabled = False
-            lblSQLStatus.Text = "Disconnected"
-            lblSQLStatus.ForeColor = Color.Red
+            'lblSQLStatus.Text = "Disconnected"
+            'lblSQLStatus.ForeColor = Color.Red
             statusConnection = False
         ElseIf mode = 1 Then
             cbDatabase.Enabled = True
-            lblSQLStatus.Text = "Connected"
-            lblSQLStatus.ForeColor = Color.Green
+            'lblSQLStatus.Text = "Connected"
+            'lblSQLStatus.ForeColor = Color.Green
             statusConnection = True
         End If
     End Sub
     Private Sub btnSave_Click(sender As Object, e As EventArgs) Handles btnSave.Click
         Try
-            Dim content = "Server Name: " + serverName +
-                        vbNewLine + "Database: " + database +
-                        vbNewLine + "pwd_option: " + pwd_mode.ToString +
-                        vbNewLine + "user_id: " + uid +
-                        vbNewLine + "pwd: " + pwd
-            System.IO.File.WriteAllText(getConnectionSetting, content)
-            MsgBox("Setting Saved!")
+            Dim content = "Server Name:" + serverName +
+                        vbNewLine + "Database:" + database +
+                        vbNewLine + "pwd_option:" + pwd_mode.ToString +
+                        vbNewLine + "user_id:" + uid +
+                        vbNewLine + "pwd:" + pwd
+            System.IO.File.WriteAllText(getConnectionSetting, Encryption.Encrypt(content, My.Resources.myPassword))
+            MsgBox("'" + content + "'" + vbNewLine + vbNewLine + "Setting Saved!", MsgBoxStyle.Information)
         Catch ex As Exception
             MsgBox(ex.Message, MsgBoxStyle.Critical, Me.Text)
         End Try
@@ -260,26 +255,26 @@ Public Class SQL_Connection_Form
             txtPassword.PasswordChar = "*"
         End If
     End Sub
-    Private Sub TabControl1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles TabControl1.SelectedIndexChanged
-        If TabControl1.SelectedTab.TabIndex = 1 Then
-            form2.Visible = True
-            Me.Size = form2.Size
-            'Me.WindowState = FormWindowState.Maximized
-            Me.WindowState = FormWindowState.Normal
-            form2.WindowState = FormWindowState.Maximized
-        ElseIf TabControl1.SelectedTab.TabIndex = 2 Then
-            form3.Visible = True
-            Me.Size = form3.Size
-            Me.WindowState = FormWindowState.Normal
-            form3.WindowState = FormWindowState.Maximized
-            form3.readMaintainSetting()
-        Else
-            form2.Visible = False
-            form3.Visible = False
-            Me.Size = form_default_size
-            Me.WindowState = FormWindowState.Normal
-        End If
-    End Sub
+    'Private Sub TabControl1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles TabControl1.SelectedIndexChanged
+    '    If TabControl1.SelectedTab.TabIndex = 1 Then
+    '        form2.Visible = True
+    '        Me.Size = form2.Size
+    '        'Me.WindowState = FormWindowState.Maximized
+    '        Me.WindowState = FormWindowState.Normal
+    '        form2.WindowState = FormWindowState.Maximized
+    '    ElseIf TabControl1.SelectedTab.TabIndex = 2 Then
+    '        form3.Visible = True
+    '        Me.Size = form3.Size
+    '        Me.WindowState = FormWindowState.Normal
+    '        form3.WindowState = FormWindowState.Maximized
+    '        form3.readMaintainSetting()
+    '    Else
+    '        form2.Visible = False
+    '        form3.Visible = False
+    '        Me.Size = form_default_size
+    '        Me.WindowState = FormWindowState.Normal
+    '    End If
+    'End Sub
     Public Sub closeForm()
         Function_Form.Close()
         'ExcelImporter.Close()
@@ -288,5 +283,9 @@ Public Class SQL_Connection_Form
     End Sub
     Private Sub btnClose_Click(sender As Object, e As EventArgs) Handles btnClose.Click
         closeForm()
+    End Sub
+
+    Private Sub btnSearchServer_Click(sender As Object, e As EventArgs) Handles btnSearchServer.Click
+        getServerList()
     End Sub
 End Class

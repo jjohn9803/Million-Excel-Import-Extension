@@ -32,7 +32,7 @@ Namespace My
         
         <Global.System.Diagnostics.DebuggerStepThroughAttribute()>  _
         Protected Overrides Sub OnCreateMainForm()
-            Me.MainForm = Global.Million_Excel_Import_Extension.Setting
+            Me.MainForm = Global.Setting_Generator.Form1
         End Sub
     End Class
 End Namespace

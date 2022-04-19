@@ -139,10 +139,10 @@ Partial Class Quotation_Form
         '
         'txtType
         '
-        Me.txtType.Enabled = False
         Me.txtType.Location = New System.Drawing.Point(100, 17)
         Me.txtType.Margin = New System.Windows.Forms.Padding(10, 17, 3, 0)
         Me.txtType.Name = "txtType"
+        Me.txtType.ReadOnly = True
         Me.txtType.Size = New System.Drawing.Size(160, 20)
         Me.txtType.TabIndex = 23
         '
