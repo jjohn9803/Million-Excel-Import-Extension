@@ -16,12 +16,12 @@ Public Class Quotation_Form
         init()
     End Sub
     Private Sub init()
-        serverName = Main_Form.serverName
-        database = Main_Form.database
-        myConn = Main_Form.myConn
-        statusConnection = Main_Form.statusConnection
-        pwd_query = Main_Form.pwd_query
-        import_type = Main_Form.import_type
+        serverName = Main_Form.getServerName
+        database = Main_Form.getDatabase
+        myConn = Main_Form.getMyConn
+        statusConnection = Main_Form.getStatusConnection
+        pwd_query = Main_Form.getPwd_query
+        import_type = Main_Form.getImport_type
         txtType.Text = import_type
     End Sub
     Private Sub cbSheet_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbSheet.SelectedIndexChanged
@@ -51,12 +51,19 @@ Public Class Quotation_Form
                         Catch ex As Exceptions.HeaderException
                             MsgBox("The file is invalid! Please try another file!", MsgBoxStyle.Critical)
                             txtFileName.Text = String.Empty
+                            cbSheet.Items.Clear()
+                            dgvExcel.DataSource = Nothing
+                            dgvExcel.Refresh()
                         End Try
                     End Using
                 End If
             End Using
         Catch ex As Exception
             MsgBox(ex.Message, MsgBoxStyle.Critical)
+            txtFileName.Text = String.Empty
+            cbSheet.Items.Clear()
+            dgvExcel.DataSource = Nothing
+            dgvExcel.Refresh()
         End Try
     End Sub
     Private Function getMaintainSetting() As String
@@ -65,8 +72,8 @@ Public Class Quotation_Form
     Private Sub btnImport_Click(sender As Object, e As EventArgs) Handles btnImport.Click
         Dim importType = "Quotation"
         Dim tableExcelSetting As DataTableCollection
-        Try
-            Using stream = File.Open(getMaintainSetting, FileMode.Open, FileAccess.Read)
+        'Try
+        Using stream = File.Open(getMaintainSetting, FileMode.Open, FileAccess.Read)
                 Using reader As IExcelDataReader = ExcelReaderFactory.CreateReader(stream)
                     Dim result As DataSet = reader.AsDataSet(New ExcelDataSetConfiguration() With {
                                                                          .ConfigureDataTable = Function(__) New ExcelDataTableConfiguration() With {
@@ -82,9 +89,9 @@ Public Class Quotation_Form
                     quotationWriteIntoSQL(tableExcelSetting, queryTable)
                 End Using
             End Using
-        Catch ex As Exception
-            MsgBox(ex.Message + vbNewLine + ex.StackTrace, MsgBoxStyle.Critical)
-        End Try
+        'Catch ex As Exception
+        '    MsgBox(ex.Message + vbNewLine + ex.StackTrace, MsgBoxStyle.Critical)
+        'End Try
     End Sub
     Private Sub quotationWriteIntoSQL(tableExcelSetting As DataTableCollection, queryTable As ArrayList)
         Dim value_arraylist = New ArrayList
@@ -739,6 +746,26 @@ Public Class Quotation_Form
                 value = value_arraylist(0)(row)(9)
                 If Not value.Trim.Equals(String.Empty) Then
                     If Not existed_checker(table, value_name, value) Then
+                        execute_valid = False
+                        exist_result += value_name + " '" + value + "' is not found in the database (" + table + ")!" + vbNewLine
+                    End If
+                End If
+
+                'custaddr.addr / exist
+                table = "custaddr"
+                value_name = "addr"
+                value = dgvExcel.Rows(row).Cells("Delivery Address").Value.ToString
+                Dim value2 = value_arraylist(0)(row)(9)
+                If Not value.Trim.Equals(String.Empty) And Not value2.Trim.Equals(String.Empty) Then
+                    myConn.Open()
+                    Dim exist_value As Boolean = False
+                    Dim command = New SqlCommand("SELECT * FROM " + table + " WHERE cast(" + value_name + " as varchar(MAX)) ='" + value + "' AND custcode ='" + value2 + "'", myConn)
+                    Dim reader As SqlDataReader = command.ExecuteReader
+                    While reader.Read()
+                        exist_value = True
+                    End While
+                    myConn.Close()
+                    If Not exist_value Then
                         execute_valid = False
                         exist_result += value_name + " '" + value + "' is not found in the database (" + table + ")!" + vbNewLine
                     End If

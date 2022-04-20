@@ -16,10 +16,14 @@ Public Class Main_Form
     Private Sub mainFormLoad()
         Dim form As New Function_Form
         form.TopLevel = False
+        Me.WindowState = FormWindowState.Normal
+        form.WindowState = FormWindowState.Maximized
         form.FormBorderStyle = Windows.Forms.FormBorderStyle.None
-        form.Location = New System.Drawing.Point(0, 0)
-        form.Visible = False
+        form.Visible = True
+
         panelMain.Controls.Add(form)
+
+        Setting.getFileInfo()
     End Sub
     Public Function getServerName() As String
         Return Me.serverName
@@ -41,14 +45,23 @@ Public Class Main_Form
     End Function
     Public Sub setServerName(ByVal serverName As String)
         Me.serverName = serverName
+        txtServerName.Text = serverName
     End Sub
     Public Sub setDatabase(ByVal database As String)
         Me.database = database
+        txtDatabaseName.Text = database
     End Sub
     Public Sub setMyConn(ByVal myConn As SqlConnection)
         Me.myConn = myConn
     End Sub
     Public Sub setStatusConnection(ByVal statusConnection As Boolean)
+        If statusConnection Then
+            lblSQLStatus.Text = "Connected"
+            lblSQLStatus.ForeColor = Color.Green
+        Else
+            lblSQLStatus.Text = "Disconnected"
+            lblSQLStatus.ForeColor = Color.Red
+        End If
         Me.statusConnection = statusConnection
     End Sub
     Public Sub setPwd_query(ByVal pwd_query As String)
@@ -56,5 +69,14 @@ Public Class Main_Form
     End Sub
     Public Sub setImport_type(ByVal import_type As String)
         Me.import_type = import_type
+    End Sub
+
+    Private Sub btnSetting_Click(sender As Object, e As EventArgs) Handles btnSetting.Click
+        Dim loginForm As New Login
+        loginForm.ShowDialog()
+    End Sub
+    Public Sub showSettingForm()
+        Dim settingForm As New Setting
+        settingForm.ShowDialog()
     End Sub
 End Class

@@ -13,11 +13,11 @@ Public Class Maintainance_Form
 
     End Sub
     Private Sub init()
-        serverName = SQL_Connection_Form.serverName
-        database = SQL_Connection_Form.database
-        myConn = SQL_Connection_Form.myConn
-        statusConnection = SQL_Connection_Form.statusConnection
-        pwd_query = SQL_Connection_Form.pwd_query
+        serverName = Main_Form.getServerName
+        database = Main_Form.getDatabase
+        myConn = Main_Form.getMyConn
+        statusConnection = Main_Form.getStatusConnection
+        pwd_query = Main_Form.getPwd_query
     End Sub
     Public Sub readMaintainSetting()
         Try

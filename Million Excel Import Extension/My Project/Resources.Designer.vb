@@ -68,5 +68,23 @@ Namespace My.Resources
                 Return ResourceManager.GetString("myPassword", resourceCulture)
             End Get
         End Property
+        
+        '''<summary>
+        '''  Looks up a localized string similar to OUZ2DKvWYQCE8mnUtgDi/w==.
+        '''</summary>
+        Friend ReadOnly Property staffID() As String
+            Get
+                Return ResourceManager.GetString("staffID", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized string similar to FIU/ivsLraBglvnQdqCROg==.
+        '''</summary>
+        Friend ReadOnly Property staffPassword() As String
+            Get
+                Return ResourceManager.GetString("staffPassword", resourceCulture)
+            End Get
+        End Property
     End Module
 End Namespace

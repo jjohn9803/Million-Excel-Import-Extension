@@ -3,6 +3,7 @@ Imports System.Data.Sql
 Imports System.IO
 Imports System.ComponentModel
 Public Class Setting
+    Private myConnn As SqlConnection
     Private pwd_mode As Integer
     Private uid As String
     Private pwd As String
@@ -10,44 +11,28 @@ Public Class Setting
         Me.StartPosition = FormStartPosition.CenterScreen
         cbPasswordOption.SelectedIndex = 0
         pwd_mode = 0
-        Try
-            getFileInfo()
-            MsgBox("Server: " + Main_Form.getServerName + vbTab + "Database: " + Main_Form.getDatabase + vbTab + "Username: " + uid + vbTab + "Password: " + pwd)
-            'getServerList()
-            'tabFormLoad()
-        Catch ex As Exception
-            MsgBox("There is some issues at startup!" + vbNewLine + ex.Message, MsgBoxStyle.Critical)
-        End Try
+        getFileInfo()
     End Sub
-    'Private Sub tabFormLoad()
-    '    form_default_size = Me.Size
-
-    '    form2.TopLevel = False
-    '    form2.FormBorderStyle = Windows.Forms.FormBorderStyle.None
-    '    form2.Location = New System.Drawing.Point(0, 0)
-    '    form2.Visible = False
-    '    TabPageExcel.Controls.Add(form2)
-
-    '    form3.TopLevel = False
-    '    form3.FormBorderStyle = Windows.Forms.FormBorderStyle.None
-    '    form3.Location = New System.Drawing.Point(0, 0)
-    '    form3.Visible = False
-    '    TabPageMaintain.Controls.Add(form3)
-    'End Sub
-    Private Sub getFileInfo()
+    Public Sub getFileInfo()
         'Try
         '    Dim fileReader As StreamReader = My.Computer.FileSystem.OpenTextFileReader(getConnectionSetting())
         'Catch ex As System.IO.FileNotFoundException
         '    Return
         'End Try
         Try
-            Dim objReader As New System.IO.StreamReader(getConnectionSetting)
+            If FileLen(getConnectionSetting()) = 0 Then
+                Return
+            End If
+            Dim lineOneFromFile As String = Encryption.Decrypt(IO.File.ReadAllLines(getConnectionSetting)(0), My.Resources.myPassword)
+            Dim objReader As New System.IO.StringReader(lineOneFromFile)
             Dim settingBoolean As Boolean = False
             Do While objReader.Peek() <> -1
                 settingBoolean = True
-                Dim EncryptedResult = objReader.ReadLine
-                Dim result = Encryption.Decrypt(EncryptedResult, "")
-                Dim result2 = result.ToString.Split(":")(1).Trim
+                'Dim EncryptedResult = objReader.ReadLine
+                'Dim result = Encryption.Decrypt(EncryptedResult, My.Resources.myPassword)
+                'Dim result2 = result.ToString.Split(":")(1).Trim
+                Dim result = objReader.ReadLine
+                Dim result2 = result.Split(":")(1)
                 If result.Contains("Server Name:") Then
                     If result2 <> String.Empty Then
                         cbServerList.Text() = result2
@@ -61,7 +46,7 @@ Public Class Setting
                 End If
                 If result.Contains("pwd_option:") Then
                     If result2 <> String.Empty Then
-                        cbPasswordOption.SelectedIndex = result2
+                        cbPasswordOption.SelectedIndex = CInt(result2)
                         pwd_mode = result2
                     End If
                 End If
@@ -80,8 +65,8 @@ Public Class Setting
             Loop
             If settingBoolean Then
                 findDatabase()
-                If database <> String.Empty Then
-                    cbDatabase.Text() = database
+                If Main_Form.getDatabase <> String.Empty Then
+                    cbDatabase.Text() = Main_Form.getDatabase
                 End If
             End If
             objReader.Close()
@@ -99,19 +84,19 @@ Public Class Setting
         Next
         Return filePath
     End Function
-    '葛葉
     Private Sub setPasswordOption()
         If pwd_mode = 0 Then
-            pwd_query = "Trusted_Connection=yes;"
+            Main_Form.setPwd_query("Trusted_Connection=yes;")
         Else
             uid = txtUserId.Text.ToString
             pwd = txtPassword.Text.ToString
-            pwd_query = "user id = " + uid + ";password=" + pwd
+            Main_Form.setPwd_query("user id = " + uid + ";password=" + pwd)
         End If
     End Sub
     Private Sub getServerList()
         Try
             'Dim dt As DataTable = SqlDataSourceEnumerator.Instance.GetDataSources
+            cbServerList.Items.Clear()
             Dim dt As DataTable = SqlClientFactory.Instance.CreateDataSourceEnumerator.GetDataSources()
             For Each dr As DataRow In dt.Rows
                 cbServerList.Items.Add(String.Concat(dr("ServerName"), "\", dr("InstanceName")))
@@ -125,18 +110,18 @@ Public Class Setting
         findDatabase()
     End Sub
     Private Sub findDatabase()
-        serverName = cbServerList.Text().Trim
+        Main_Form.setServerName(cbServerList.Text().Trim)
         setPasswordOption()
 
-        If (serverName.Equals(String.Empty)) Then
+        If (Main_Form.getServerName.Equals(String.Empty)) Then
             updateSQLStatus(0, "Server name must be filled out!")
         End If
         Try
-            myConn = New SqlConnection("Data Source=" + serverName + ";" &
-                                    "Initial Catalog=master;" + pwd_query)
-            myConn.Open()
-            Using myConn
-                Dim cmd As New SqlCommand("Select name from master.dbo.sysdatabases WHERE dbid > 4;", myConn)
+            Main_Form.setMyConn(New SqlConnection("Data Source=" + Main_Form.getServerName + ";" &
+                                    "Initial Catalog=master;" + Main_Form.getPwd_query))
+            Main_Form.myConn.Open()
+            Using Main_Form.myConn
+                Dim cmd As New SqlCommand("Select name from master.dbo.sysdatabases WHERE dbid > 4;", Main_Form.myConn)
                 Using reader As SqlDataReader = cmd.ExecuteReader()
                     cbDatabase.Items.Clear()
                     While reader.Read()
@@ -149,7 +134,7 @@ Public Class Setting
                     updateSQLStatus(0, "Could not find any database from the server!")
                 End If
             End Using
-            myConn.Close()
+            Main_Form.myConn.Close()
         Catch ex As Exception
             If (ex.GetHashCode = 49205706) Then
                 updateSQLStatus(0, "Failed to connect the server!")
@@ -166,20 +151,16 @@ Public Class Setting
             End If
             cbDatabase.Items.Clear()
             cbDatabase.Enabled = False
-            'lblSQLStatus.Text = "Disconnected"
-            'lblSQLStatus.ForeColor = Color.Red
-            statusConnection = False
+            Main_Form.setStatusConnection(False)
         ElseIf mode = 1 Then
             cbDatabase.Enabled = True
-            'lblSQLStatus.Text = "Connected"
-            'lblSQLStatus.ForeColor = Color.Green
-            statusConnection = True
+            Main_Form.setStatusConnection(True)
         End If
     End Sub
     Private Sub btnSave_Click(sender As Object, e As EventArgs) Handles btnSave.Click
         Try
-            Dim content = "Server Name:" + serverName +
-                        vbNewLine + "Database:" + database +
+            Dim content = "Server Name:" + Main_Form.getServerName +
+                        vbNewLine + "Database:" + Main_Form.getDatabase +
                         vbNewLine + "pwd_option:" + pwd_mode.ToString +
                         vbNewLine + "user_id:" + uid +
                         vbNewLine + "pwd:" + pwd
@@ -192,9 +173,9 @@ Public Class Setting
     End Sub
     Private Sub btnTestConnection_Click(sender As Object, e As EventArgs) Handles btnTestConnection.Click
         Try
-            myConn = New SqlConnection("Data Source=" + serverName + ";" &
-                                   "Initial Catalog=" + database + ";" + pwd_query)
-            myConn.Open()
+            Main_Form.setMyConn(New SqlConnection("Data Source=" + Main_Form.getServerName + ";" &
+                                    "Initial Catalog=master;" + Main_Form.getPwd_query))
+            Main_Form.myConn.Open()
             'Using myConn
             '    Dim cmd As New SqlCommand("Select * from master.dbo.sysdatabases WHERE dbid > 4;", myConn)
             '    'Dim cmd As New SqlCommand("Select * from master.dbo.systemdatabases where name='" + database.Trim + "'", myConn)
@@ -213,10 +194,10 @@ Public Class Setting
             '        lblSQLStatus.ForeColor = Color.Red
             '    End If
             'End Using
-            If myConn.State = 1 Then
+            If Main_Form.getMyConn.State = 1 Then
                 MsgBox("Connect successfully!", MsgBoxStyle.Information)
             End If
-            myConn.Close()
+            Main_Form.myConn.Close()
         Catch ex As Exception
             If (ex.GetHashCode = 49205706) Then
                 updateSQLStatus(0, "Failed to connect the server!")
@@ -227,7 +208,7 @@ Public Class Setting
     End Sub
 
     Private Sub cbDatabase_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbDatabase.SelectedIndexChanged
-        database = cbDatabase.Text.ToString
+        Main_Form.setDatabase(cbDatabase.Text.ToString)
     End Sub
 
     Private Sub cbPasswordOption_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbPasswordOption.SelectedIndexChanged
@@ -286,6 +267,8 @@ Public Class Setting
     End Sub
 
     Private Sub btnSearchServer_Click(sender As Object, e As EventArgs) Handles btnSearchServer.Click
+        Me.Cursor = Cursors.WaitCursor
         getServerList()
+        Me.Cursor = Cursors.Default
     End Sub
 End Class

@@ -43,16 +43,25 @@ Public Class Sales_Order_Form
                                 For Each table As DataTable In tables
                                     cbSheet.Items.Add(table.TableName)
                                 Next
+                                dgvExcel.DataSource = Nothing
+                                dgvExcel.Refresh()
                             End Using
                         Catch ex As Exceptions.HeaderException
                             MsgBox("The file is invalid! Please try another file!", MsgBoxStyle.Critical)
                             txtFileName.Text = String.Empty
+                            cbSheet.Items.Clear()
+                            dgvExcel.DataSource = Nothing
+                            dgvExcel.Refresh()
                         End Try
                     End Using
                 End If
             End Using
         Catch ex As Exception
             MsgBox(ex.Message, MsgBoxStyle.Critical)
+            txtFileName.Text = String.Empty
+            cbSheet.Items.Clear()
+            dgvExcel.DataSource = Nothing
+            dgvExcel.Refresh()
         End Try
     End Sub
     Private Function getMaintainSetting() As String

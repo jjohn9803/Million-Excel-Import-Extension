@@ -1,4 +1,7 @@
-﻿Imports ClosedXML.Excel
+﻿Imports System.IO
+Imports ClosedXML.Excel
+Imports ExcelDataReader
+
 Public Class Function_Form
     Private Sub openExcelImport(sender As Object, e As EventArgs) Handles btnQuotation.Click, btnDeliveryOrder.Click, btnSalesOrder.Click
         Dim form
@@ -11,8 +14,8 @@ Public Class Function_Form
         Else
 
         End If
-        If SQL_Connection_Form.statusConnection And Not SQL_Connection_Form.database.Equals(String.Empty) Then
-            SQL_Connection_Form.import_type = sender.text
+        If Main_Form.getStatusConnection And Not Main_Form.getDatabase.Equals(String.Empty) Then
+            Main_Form.setImport_type(sender.text)
             form.Text = sender.text
             form.ShowDialog()
         Else

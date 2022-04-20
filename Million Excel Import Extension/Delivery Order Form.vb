@@ -15,12 +15,12 @@ Public Class Delivery_Order_Form
         init()
     End Sub
     Private Sub init()
-        serverName = Main_Form.serverName
-        database = Main_Form.database
-        myConn = Main_Form.myConn
-        statusConnection = Main_Form.statusConnection
-        pwd_query = Main_Form.pwd_query
-        import_type = Main_Form.import_type
+        serverName = Main_Form.getServerName
+        database = Main_Form.getDatabase
+        myConn = Main_Form.getMyConn
+        statusConnection = Main_Form.getStatusConnection
+        pwd_query = Main_Form.getPwd_query
+        import_type = Main_Form.getImport_type
         txtType.Text = import_type
     End Sub
     Private Sub cbSheet_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbSheet.SelectedIndexChanged
@@ -43,16 +43,25 @@ Public Class Delivery_Order_Form
                                 For Each table As DataTable In tables
                                     cbSheet.Items.Add(table.TableName)
                                 Next
+                                dgvExcel.DataSource = Nothing
+                                dgvExcel.Refresh()
                             End Using
                         Catch ex As Exceptions.HeaderException
                             MsgBox("The file is invalid! Please try another file!", MsgBoxStyle.Critical)
                             txtFileName.Text = String.Empty
+                            cbSheet.Items.Clear()
+                            dgvExcel.DataSource = Nothing
+                            dgvExcel.Refresh()
                         End Try
                     End Using
                 End If
             End Using
         Catch ex As Exception
             MsgBox(ex.Message, MsgBoxStyle.Critical)
+            txtFileName.Text = String.Empty
+            cbSheet.Items.Clear()
+            dgvExcel.DataSource = Nothing
+            dgvExcel.Refresh()
         End Try
     End Sub
     Private Function getMaintainSetting() As String
