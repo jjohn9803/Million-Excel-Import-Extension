@@ -313,7 +313,7 @@ Public Class Sales_Invoice_Form
                                             value_arraylist(i)(row)(g) = 0
                                         Else
                                             init()
-                                            myConn = New SqlConnection("Data Source=" + serverName + ";" & "Initial Catalog=" + database + ";" + pwd_query)
+                                            'myConn = New SqlConnection("Data Source=" + serverName + ";" & "Initial Catalog=" + database + ";" + pwd_query)
 
                                             Dim command = New SqlCommand("SELECT " + destination_sql_value + " FROM " + destination_table + " WHERE " + source_sql_value + "='" + source_value + "'", myConn)
                                             myConn.Open()
@@ -758,7 +758,7 @@ Public Class Sales_Invoice_Form
         Dim execute_valid As Boolean = True
         Dim exist_result As String = ""
         init()
-        myConn = New SqlConnection("Data Source=" + serverName + ";" & "Initial Catalog=" + database + ";" + pwd_query)
+        'myConn = New SqlConnection("Data Source=" + serverName + ";" & "Initial Catalog=" + database + ";" + pwd_query)
         For row As Integer = 0 To dgvExcel.RowCount - 1
             Dim table As String
             Dim value_name As String
@@ -957,49 +957,47 @@ Public Class Sales_Invoice_Form
         Dim rowInsertNum = 0
         For i As Integer = 0 To queryTable.Count - 1
             init()
-            Using myConn = New SqlConnection("Data Source=" + serverName + ";" & "Initial Catalog=" + database + ";" + pwd_query)
-                Using command As New SqlCommand("", myConn)
-                    For row As Integer = 0 To dgvExcel.RowCount - 1
-                        Using r As DataGridViewRow = dgvExcel.Rows(row)
-                            If Not value_arraylist(i)(row)(0).Equals("{INVALID ARRAY}") Then
-                                Dim query = ""
-                                For g As Integer = 0 To value_arraylist(i)(row).count - 1
-                                    Dim value_temp As String = value_arraylist(i)(row)(g).ToString
-                                    If sql_format_arraylist(i)(g).ToString.Trim.Equals("createdate") Or sql_format_arraylist(i)(g).ToString.Trim.Equals("lastupdate") Then
-                                        query += "'" + Date.Now.ToString + "',"
-                                        value_arraylist(i)(row)(g) = Date.Now.ToString
-                                    ElseIf i = 2 And g = 3 Then
-                                        Dim dkeyFromDO As String = ""
-                                        Dim command_temp = New SqlCommand("SELECT TOP 1 dkey FROM sdodet WHERE doc_no ='" + value_arraylist(2)(row)(2) + "' AND line_no ='" + value_arraylist(2)(row)(4) + "'", myConn)
-                                        myConn.Open()
-                                        Dim reader_temp As SqlDataReader = command_temp.ExecuteReader
-                                        While reader_temp.Read()
-                                            dkeyFromDO += reader_temp.GetValue(0).ToString
-                                        End While
-                                        myConn.Close()
-                                        query += "'" + dkeyFromDO + "',"
-                                        value_arraylist(2)(row)(3) = dkeyFromDO
-                                    ElseIf Not (value_temp.Equals("{._!@#$%^&*()}")) Then
-                                        query += "'" + value_temp + "',"
-                                    End If
-                                Next
-                                Dim command_text As String = queryTable(i)(2) + query
-                                command_text = command_text.Substring(0, command_text.Length - 1) + ")"
-                                'MsgBox(command_text)
-                                command.CommandText = command_text
-                                myConn.Open()
-                                Try
-                                    rowInsertNum += 1
-                                    command.ExecuteNonQuery()
-                                Catch ex As Exception
-                                    MsgBox(ex.Message + vbNewLine + command_text, MsgBoxStyle.Exclamation)
-                                End Try
-                                myConn.Close()
-                            End If
+            Using command As New SqlCommand("", myConn)
+                For row As Integer = 0 To dgvExcel.RowCount - 1
+                    Using r As DataGridViewRow = dgvExcel.Rows(row)
+                        If Not value_arraylist(i)(row)(0).Equals("{INVALID ARRAY}") Then
+                            Dim query = ""
+                            For g As Integer = 0 To value_arraylist(i)(row).count - 1
+                                Dim value_temp As String = value_arraylist(i)(row)(g).ToString
+                                If sql_format_arraylist(i)(g).ToString.Trim.Equals("createdate") Or sql_format_arraylist(i)(g).ToString.Trim.Equals("lastupdate") Then
+                                    query += "'" + Date.Now.ToString + "',"
+                                    value_arraylist(i)(row)(g) = Date.Now.ToString
+                                ElseIf i = 2 And g = 3 Then
+                                    Dim dkeyFromDO As String = ""
+                                    Dim command_temp = New SqlCommand("SELECT TOP 1 dkey FROM sdodet WHERE doc_no ='" + value_arraylist(2)(row)(2) + "' AND line_no ='" + value_arraylist(2)(row)(4) + "'", myConn)
+                                    myConn.Open()
+                                    Dim reader_temp As SqlDataReader = command_temp.ExecuteReader
+                                    While reader_temp.Read()
+                                        dkeyFromDO += reader_temp.GetValue(0).ToString
+                                    End While
+                                    myConn.Close()
+                                    query += "'" + dkeyFromDO + "',"
+                                    value_arraylist(2)(row)(3) = dkeyFromDO
+                                ElseIf Not (value_temp.Equals("{._!@#$%^&*()}")) Then
+                                    query += "'" + value_temp + "',"
+                                End If
+                            Next
+                            Dim command_text As String = queryTable(i)(2) + query
+                            command_text = command_text.Substring(0, command_text.Length - 1) + ")"
+                            'MsgBox(command_text)
+                            command.CommandText = command_text
+                            myConn.Open()
+                            Try
+                                rowInsertNum += 1
+                                command.ExecuteNonQuery()
+                            Catch ex As Exception
+                                MsgBox(ex.Message + vbNewLine + command_text, MsgBoxStyle.Exclamation)
+                            End Try
+                            myConn.Close()
+                        End If
 
-                        End Using
-                    Next
-                End Using
+                    End Using
+                Next
             End Using
         Next
         MsgBox("Data Import Sucessfully!" + vbNewLine + "Row Inserted: " + rowInsertNum.ToString, MsgBoxStyle.Information)
