@@ -172,30 +172,26 @@ Public Class Setting
 
     End Sub
     Private Sub btnTestConnection_Click(sender As Object, e As EventArgs) Handles btnTestConnection.Click
+        Me.Cursor = Cursors.WaitCursor
         Try
+            If Main_Form.getServerName.Equals(String.Empty) And Main_Form.getDatabase.Equals(String.Empty) And Not Main_Form.getStatusConnection Then
+                MsgBox("Failed to connect the server!", MsgBoxStyle.Critical)
+                Return
+            End If
             Main_Form.setMyConn(New SqlConnection("Data Source=" + Main_Form.getServerName + ";" &
-                                    "Initial Catalog=master;" + Main_Form.getPwd_query))
+                                    "Initial Catalog=" + Main_Form.getDatabase + ";" + Main_Form.getPwd_query))
             Main_Form.myConn.Open()
-            'Using myConn
-            '    Dim cmd As New SqlCommand("Select * from master.dbo.sysdatabases WHERE dbid > 4;", myConn)
-            '    'Dim cmd As New SqlCommand("Select * from master.dbo.systemdatabases where name='" + database.Trim + "'", myConn)
-            '    Using reader As SqlDataReader = cmd.ExecuteReader()
-            '        While reader.Read()
-            '            cbDatabase.Items.Add(reader.GetValue(0))
-            '        End While
-            '    End Using
-            '    If (cbDatabase.Items.Count > 0) Then
-            '        cbDatabase.Enabled = True
-            '        lblSQLStatus.Text = "Connected"
-            '        lblSQLStatus.ForeColor = Color.Green
-            '    Else
-            '        cbDatabase.Enabled = False
-            '        lblSQLStatus.Text = "Disconnected"
-            '        lblSQLStatus.ForeColor = Color.Red
-            '    End If
-            'End Using
-            If Main_Form.getMyConn.State = 1 Then
+            Dim connectStatus = False
+            Dim cmd As New SqlCommand("SELECT * FROM INFORMATION_SCHEMA.COLUMNS", Main_Form.getMyConn)
+            Using reader As SqlDataReader = cmd.ExecuteReader()
+                While reader.Read()
+                    connectStatus = True
+                End While
+            End Using
+            If Main_Form.getMyConn.State = ConnectionState.Open And connectStatus Then
                 MsgBox("Connect successfully!", MsgBoxStyle.Information)
+            Else
+                MsgBox("Failed to connect the server!", MsgBoxStyle.Critical)
             End If
             Main_Form.myConn.Close()
         Catch ex As Exception
@@ -205,6 +201,7 @@ Public Class Setting
                 MsgBox(ex.Message, MsgBoxStyle.Critical, Me.Text)
             End If
         End Try
+        Me.Cursor = Cursors.Default
     End Sub
 
     Private Sub cbDatabase_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbDatabase.SelectedIndexChanged

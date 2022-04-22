@@ -10,21 +10,23 @@ Public Class Sales_Invoice_Form
     Private statusConnection As Boolean
     Private pwd_query As String
     Private import_type As String
+    Private validateDateFormatArray() As String = {"Date"}
     Private Sub Sales_Invoice_Form_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         init()
     End Sub
     Private Sub init()
         serverName = Main_Form.getServerName
         database = Main_Form.getDatabase
-        myConn = Main_Form.getMyConn
-        statusConnection = Main_Form.getStatusConnection
         pwd_query = Main_Form.getPwd_query
-        import_type = Main_Form.import_type
+        myConn = New SqlConnection("Data Source=" + serverName + ";" & "Initial Catalog=" + database + ";" + pwd_query)
+        statusConnection = Main_Form.getStatusConnection
+        import_type = Main_Form.getImport_type
         txtType.Text = import_type
     End Sub
     Private Sub cbSheet_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbSheet.SelectedIndexChanged
         Dim dt As DataTable = tables(cbSheet.SelectedItem.ToString())
         dgvExcel.DataSource = dt
+        Function_Form.validateExcelDateFormat(dgvExcel, validateDateFormatArray)
     End Sub
     Private Sub txtFileName_MouseClick(sender As Object, e As MouseEventArgs) Handles txtFileName.MouseClick
         Try
@@ -1000,8 +1002,8 @@ Public Class Sales_Invoice_Form
                 End Using
             End Using
         Next
-        'Function_Form.printExcelResult("C:\Users\RBADM07\Desktop\Generated Result Delivery Order.xlsx", queryTable, value_arraylist, sql_format_arraylist, dgvExcel)
         MsgBox("Data Import Sucessfully!" + vbNewLine + "Row Inserted: " + rowInsertNum.ToString, MsgBoxStyle.Information)
+        Function_Form.printExcelResult("Sales_Order", queryTable, value_arraylist, sql_format_arraylist, dgvExcel)
     End Sub
     Private Function existed_checker(table As String, sql_value As String, value As String)
         myConn.Open()

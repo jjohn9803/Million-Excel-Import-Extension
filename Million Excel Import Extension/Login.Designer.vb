@@ -76,7 +76,6 @@ Partial Class Login
         Me.btnSetting.Name = "btnSetting"
         Me.btnSetting.Size = New System.Drawing.Size(120, 30)
         Me.btnSetting.TabIndex = 2
-        Me.btnSetting.TabStop = False
         Me.btnSetting.Text = "Login"
         Me.btnSetting.UseVisualStyleBackColor = True
         '

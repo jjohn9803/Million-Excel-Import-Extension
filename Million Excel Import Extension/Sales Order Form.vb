@@ -11,21 +11,23 @@ Public Class Sales_Order_Form
     Private statusConnection As Boolean
     Private pwd_query As String
     Private import_type As String
+    Private validateDateFormatArray() As String = {"Date"}
     Private Sub Sales_Order_Form_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         init()
     End Sub
     Private Sub init()
-        serverName = Main_Form.serverName
-        database = Main_Form.database
-        myConn = Main_Form.myConn
-        statusConnection = Main_Form.statusConnection
-        pwd_query = Main_Form.pwd_query
-        import_type = Main_Form.import_type
+        serverName = Main_Form.getServerName
+        database = Main_Form.getDatabase
+        pwd_query = Main_Form.getPwd_query
+        myConn = New SqlConnection("Data Source=" + serverName + ";" & "Initial Catalog=" + database + ";" + pwd_query)
+        statusConnection = Main_Form.getStatusConnection
+        import_type = Main_Form.getImport_type
         txtType.Text = import_type
     End Sub
     Private Sub cbSheet_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbSheet.SelectedIndexChanged
         Dim dt As DataTable = tables(cbSheet.SelectedItem.ToString())
         dgvExcel.DataSource = dt
+        Function_Form.validateExcelDateFormat(dgvExcel, validateDateFormatArray)
     End Sub
     Private Sub txtFileName_MouseClick(sender As Object, e As MouseEventArgs) Handles txtFileName.MouseClick
         Try
@@ -390,14 +392,6 @@ Public Class Sales_Order_Form
                 value_arraylist(1)(row)(27) = Math.Round(nett_amt, 2)
             End If
 
-            'amt
-            If value_arraylist(1)(row)(28).Equals("{FORMULA_VALUE}") Then
-                Dim gross_amt = CDbl(value_arraylist(1)(row)(26))
-                Dim disamt = CDbl(value_arraylist(1)(row)(17))
-                Dim amt = gross_amt - disamt
-                value_arraylist(1)(row)(28) = Math.Round(amt, 2)
-            End If
-
             'taxamt1
             If value_arraylist(1)(row)(21).Equals("{FORMULA_VALUE}") Then
                 Dim nett_amt = CDbl(value_arraylist(1)(row)(27))
@@ -415,6 +409,33 @@ Public Class Sales_Order_Form
                 Dim taxamt2 = CDbl(value_arraylist(1)(row)(22))
                 Dim taxamt = taxamt1 + taxamt2
                 value_arraylist(1)(row)(24) = Math.Round(taxamt, 2)
+            End If
+
+            'amt
+            If value_arraylist(1)(row)(28).Equals("{FORMULA_VALUE}") Then
+                Dim taxcode = dgvExcel.Rows(row).Cells("Tax Code").Value.ToString.Trim
+                Dim taxinclude As Boolean = False
+                If Not taxcode.Equals(String.Empty) Then
+                    init()
+                    myConn.Open()
+                    Dim command = New SqlCommand("select taxmethod from gltax WHERE taxcode='" + taxcode + "'", myConn)
+                    Dim reader As SqlDataReader = command.ExecuteReader
+                    While reader.Read()
+                        If reader.GetValue(0).ToString = "I" Then
+                            taxinclude = True
+                        End If
+                    End While
+                    myConn.Close()
+                End If
+
+                Dim gross_amt = CDbl(value_arraylist(1)(row)(26))
+                Dim disamt = CDbl(value_arraylist(1)(row)(17))
+                Dim amt = gross_amt - disamt
+                If taxinclude Then
+                    Dim taxamt = CDbl(value_arraylist(1)(row)(24))
+                    amt -= taxamt
+                End If
+                value_arraylist(1)(row)(28) = Math.Round(amt, 2)
             End If
 
             'local converter
@@ -762,6 +783,27 @@ Public Class Sales_Order_Form
                     End If
                 End If
 
+                'custaddr.addr / exist
+                table = "custaddr"
+                value_name = "addr"
+                value = dgvExcel.Rows(row).Cells("Delivery Address").Value.ToString
+                Dim value2 = value_arraylist(0)(row)(9)
+                If Not value.Trim.Equals(String.Empty) And Not value2.Trim.Equals(String.Empty) Then
+                    value = value.Replace(vbLf, vbCr + vbLf)
+                    myConn.Open()
+                    Dim exist_value As Boolean = False
+                    Dim command = New SqlCommand("SELECT * FROM " + table + " WHERE cast(" + value_name + " as varchar(MAX)) ='" + value + "' AND custcode ='" + value2 + "'", myConn)
+                    Dim reader As SqlDataReader = command.ExecuteReader
+                    While reader.Read()
+                        exist_value = True
+                    End While
+                    myConn.Close()
+                    If Not exist_value Then
+                        execute_valid = False
+                        exist_result += value_name + " '" + value + "'(" + value2 + ") is not found in the database (" + table + ")!" + vbNewLine
+                    End If
+                End If
+
                 'accmgr.accmgr_id / exist
                 table = "accmgr"
                 value_name = "accmgr_id"
@@ -963,11 +1005,7 @@ Public Class Sales_Order_Form
             End Using
         Next
         MsgBox("Data Import Sucessfully!" + vbNewLine + "Row Inserted: " + rowInsertNum.ToString, MsgBoxStyle.Information)
-        Dim confirmReport As DialogResult = MsgBox("Are you want to save the result as report?", MsgBoxStyle.YesNo)
-        If confirmReport = DialogResult.No Then
-            Return
-        End If
-        Function_Form.printExcelResult("ReportMELE_Sales_Order_" + Date.Now.Year.ToString + Date.Now.Month.ToString("00") + Date.Now.Day.ToString("00") + ".xlsx", queryTable, value_arraylist, sql_format_arraylist, dgvExcel)
+        Function_Form.printExcelResult("Sales_Order", queryTable, value_arraylist, sql_format_arraylist, dgvExcel)
     End Sub
 
     Private Function existed_checker(table As String, sql_value As String, value As String)

@@ -54,10 +54,14 @@ Public Class Function_Form
             'C:\Users\RBADM07\Desktop\Generated Result.xlsx
             'workbook.SaveAs(filename)
             Using sfd As SaveFileDialog = New SaveFileDialog() With {.Filter = "Excel Workbook|*.xlsx|Excel 97-2003 Workbook|*.xls"}
-                sfd.FileName = filename
-                If sfd.ShowDialog() = DialogResult.OK Then
-                    workbook.SaveAs(sfd.FileName)
-                End If
+                Dim saveFile As String = Application.StartupPath + "\Report\ReportMELE_" + filename + "_" + Date.Now.Year.ToString + Date.Now.Month.ToString("00") + Date.Now.Day.ToString("00") + "_" + Date.Now.Hour.ToString("00") + Date.Now.Minute.ToString("00") + Date.Now.Second.ToString("00") + ".xlsx"
+                sfd.FileName = saveFile
+                workbook.SaveAs(saveFile)
+                MsgBox("The report has been saved in " + saveFile, MsgBoxStyle.Information)
+
+                'If sfd.ShowDialog() = DialogResult.OK Then
+
+                'End If
             End Using
         End Using
     End Sub
@@ -86,4 +90,14 @@ Public Class Function_Form
             MsgBox("The imported excel format does not correct!", MsgBoxStyle.Critical)
         End If
     End Sub
+    'Public Shared Function convertCharToHex16(text As String, char16 As Char) As String
+    '    Dim convertedText As String = ""
+    '    Dim bts As New List(Of Byte)
+    '    For Each ch As Char In text
+    '        If Not ch.Equals(char16) Then
+    '            bts += Convert.ToString(Convert.ToInt32(ch), 16)
+    '        End If
+    '    Next
+    '    Return System.Text.Encoding.ASCII.GetString(convertedText)
+    'End Function
 End Class

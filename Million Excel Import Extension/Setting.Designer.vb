@@ -58,7 +58,7 @@ Partial Class Setting
         Me.cbShowPassword.Location = New System.Drawing.Point(389, 113)
         Me.cbShowPassword.Name = "cbShowPassword"
         Me.cbShowPassword.Size = New System.Drawing.Size(139, 25)
-        Me.cbShowPassword.TabIndex = 41
+        Me.cbShowPassword.TabIndex = 95
         Me.cbShowPassword.Text = "Show password"
         Me.cbShowPassword.UseVisualStyleBackColor = True
         '
@@ -69,7 +69,7 @@ Partial Class Setting
         Me.cbServerList.Location = New System.Drawing.Point(163, 6)
         Me.cbServerList.Name = "cbServerList"
         Me.cbServerList.Size = New System.Drawing.Size(278, 29)
-        Me.cbServerList.TabIndex = 31
+        Me.cbServerList.TabIndex = 100
         '
         'Label6
         '
@@ -87,7 +87,7 @@ Partial Class Setting
         Me.btnSql.Location = New System.Drawing.Point(185, 146)
         Me.btnSql.Name = "btnSql"
         Me.btnSql.Size = New System.Drawing.Size(140, 37)
-        Me.btnSql.TabIndex = 27
+        Me.btnSql.TabIndex = 94
         Me.btnSql.Text = "Connect"
         Me.btnSql.UseVisualStyleBackColor = True
         '
@@ -109,7 +109,7 @@ Partial Class Setting
         Me.txtPassword.Name = "txtPassword"
         Me.txtPassword.PasswordChar = Global.Microsoft.VisualBasic.ChrW(42)
         Me.txtPassword.Size = New System.Drawing.Size(220, 29)
-        Me.txtPassword.TabIndex = 38
+        Me.txtPassword.TabIndex = 96
         '
         'txtUserId
         '
@@ -118,7 +118,7 @@ Partial Class Setting
         Me.txtUserId.Location = New System.Drawing.Point(163, 76)
         Me.txtUserId.Name = "txtUserId"
         Me.txtUserId.Size = New System.Drawing.Size(220, 29)
-        Me.txtUserId.TabIndex = 37
+        Me.txtUserId.TabIndex = 97
         '
         'cbPasswordOption
         '
@@ -129,7 +129,7 @@ Partial Class Setting
         Me.cbPasswordOption.Location = New System.Drawing.Point(163, 41)
         Me.cbPasswordOption.Name = "cbPasswordOption"
         Me.cbPasswordOption.Size = New System.Drawing.Size(278, 29)
-        Me.cbPasswordOption.TabIndex = 35
+        Me.cbPasswordOption.TabIndex = 98
         '
         'Label4
         '
@@ -150,7 +150,7 @@ Partial Class Setting
         Me.cbDatabase.Location = New System.Drawing.Point(163, 188)
         Me.cbDatabase.Name = "cbDatabase"
         Me.cbDatabase.Size = New System.Drawing.Size(278, 29)
-        Me.cbDatabase.TabIndex = 28
+        Me.cbDatabase.TabIndex = 93
         '
         'Label3
         '
@@ -165,20 +165,21 @@ Partial Class Setting
         'btnTestConnection
         '
         Me.btnTestConnection.Font = New System.Drawing.Font("Ebrima", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnTestConnection.Location = New System.Drawing.Point(191, 225)
+        Me.btnTestConnection.ForeColor = System.Drawing.SystemColors.ControlText
+        Me.btnTestConnection.Location = New System.Drawing.Point(35, 225)
         Me.btnTestConnection.Name = "btnTestConnection"
         Me.btnTestConnection.Size = New System.Drawing.Size(150, 40)
-        Me.btnTestConnection.TabIndex = 34
+        Me.btnTestConnection.TabIndex = 92
         Me.btnTestConnection.Text = "Test Connection"
         Me.btnTestConnection.UseVisualStyleBackColor = True
         '
         'btnSave
         '
         Me.btnSave.Font = New System.Drawing.Font("Ebrima", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnSave.Location = New System.Drawing.Point(35, 225)
+        Me.btnSave.Location = New System.Drawing.Point(191, 225)
         Me.btnSave.Name = "btnSave"
         Me.btnSave.Size = New System.Drawing.Size(150, 40)
-        Me.btnSave.TabIndex = 32
+        Me.btnSave.TabIndex = 91
         Me.btnSave.Text = "Save"
         Me.btnSave.UseVisualStyleBackColor = True
         '
@@ -188,7 +189,7 @@ Partial Class Setting
         Me.btnClose.Location = New System.Drawing.Point(347, 225)
         Me.btnClose.Name = "btnClose"
         Me.btnClose.Size = New System.Drawing.Size(150, 40)
-        Me.btnClose.TabIndex = 33
+        Me.btnClose.TabIndex = 90
         Me.btnClose.Text = "Close"
         Me.btnClose.UseVisualStyleBackColor = True
         '
@@ -197,7 +198,7 @@ Partial Class Setting
         Me.btnSearchServer.Location = New System.Drawing.Point(447, 6)
         Me.btnSearchServer.Name = "btnSearchServer"
         Me.btnSearchServer.Size = New System.Drawing.Size(32, 29)
-        Me.btnSearchServer.TabIndex = 42
+        Me.btnSearchServer.TabIndex = 99
         Me.btnSearchServer.Text = "..."
         Me.btnSearchServer.UseVisualStyleBackColor = True
         '

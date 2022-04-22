@@ -18,9 +18,9 @@ Public Class Quotation_Form
     Private Sub init()
         serverName = Main_Form.getServerName
         database = Main_Form.getDatabase
-        myConn = Main_Form.getMyConn
-        statusConnection = Main_Form.getStatusConnection
         pwd_query = Main_Form.getPwd_query
+        myConn = New SqlConnection("Data Source=" + serverName + ";" & "Initial Catalog=" + database + ";" + pwd_query)
+        statusConnection = Main_Form.getStatusConnection
         import_type = Main_Form.getImport_type
         txtType.Text = import_type
     End Sub
@@ -72,12 +72,12 @@ Public Class Quotation_Form
     Private Sub btnImport_Click(sender As Object, e As EventArgs) Handles btnImport.Click
         Dim importType = "Quotation"
         Dim tableExcelSetting As DataTableCollection
-        'Try
-        Using stream = File.Open(getMaintainSetting, FileMode.Open, FileAccess.Read)
+        Try
+            Using stream = File.Open(getMaintainSetting, FileMode.Open, FileAccess.Read)
                 Using reader As IExcelDataReader = ExcelReaderFactory.CreateReader(stream)
                     Dim result As DataSet = reader.AsDataSet(New ExcelDataSetConfiguration() With {
-                                                                         .ConfigureDataTable = Function(__) New ExcelDataTableConfiguration() With {
-                                                                         .UseHeaderRow = True}})
+                                                                             .ConfigureDataTable = Function(__) New ExcelDataTableConfiguration() With {
+                                                                             .UseHeaderRow = True}})
                     tableExcelSetting = result.Tables
                     Dim queryTable As New ArrayList
                     queryTable.Add(New ArrayList)
@@ -89,9 +89,9 @@ Public Class Quotation_Form
                     quotationWriteIntoSQL(tableExcelSetting, queryTable)
                 End Using
             End Using
-        'Catch ex As Exception
-        '    MsgBox(ex.Message + vbNewLine + ex.StackTrace, MsgBoxStyle.Critical)
-        'End Try
+        Catch ex As Exception
+            MsgBox(ex.Message + vbNewLine + ex.StackTrace, MsgBoxStyle.Critical)
+        End Try
     End Sub
     Private Sub quotationWriteIntoSQL(tableExcelSetting As DataTableCollection, queryTable As ArrayList)
         Dim value_arraylist = New ArrayList
@@ -297,9 +297,7 @@ Public Class Quotation_Form
                                         If source_value.ToString.Trim.Equals(String.Empty) Then
                                             value_arraylist(i)(row)(g) = 0
                                         Else
-                                            init()
-                                            myConn = New SqlConnection("Data Source=" + serverName + ";" & "Initial Catalog=" + database + ";" + pwd_query)
-
+                                            'init()
                                             Dim command = New SqlCommand("SELECT " + destination_sql_value + " FROM " + destination_table + " WHERE " + source_sql_value + "='" + source_value + "'", myConn)
                                             myConn.Open()
                                             Dim reader As SqlDataReader = command.ExecuteReader
@@ -392,13 +390,6 @@ Public Class Quotation_Form
                 value_arraylist(1)(row)(25) = Math.Round(nett_amt, 2)
             End If
 
-            'amt
-            If value_arraylist(1)(row)(26).Equals("{FORMULA_VALUE}") Then
-                Dim gross_amt = CDbl(value_arraylist(1)(row)(24))
-                Dim disamt = CDbl(value_arraylist(1)(row)(17))
-                Dim amt = gross_amt - disamt
-                value_arraylist(1)(row)(26) = Math.Round(amt, 2)
-            End If
             'taxamt1
             If value_arraylist(1)(row)(19).Equals("{FORMULA_VALUE}") Then
                 Dim nett_amt = CDbl(value_arraylist(1)(row)(25))
@@ -409,12 +400,40 @@ Public Class Quotation_Form
                 Dim taxamt1 = nett_amt * (taxp1 * 0.01)
                 value_arraylist(1)(row)(19) = Math.Round(taxamt1, 2)
             End If
+
             'taxamt
             If value_arraylist(1)(row)(22).Equals("{FORMULA_VALUE}") Then
                 Dim taxamt1 = CDbl(value_arraylist(1)(row)(19))
                 Dim taxamt2 = CDbl(value_arraylist(1)(row)(20))
                 Dim taxamt = taxamt1 + taxamt2
                 value_arraylist(1)(row)(22) = Math.Round(taxamt, 2)
+            End If
+
+            'amt
+            If value_arraylist(1)(row)(26).Equals("{FORMULA_VALUE}") Then
+                Dim taxcode = dgvExcel.Rows(row).Cells("Tax Code").Value.ToString.Trim
+                Dim taxinclude As Boolean = False
+                If Not taxcode.Equals(String.Empty) Then
+                    'init()
+                    myConn.Open()
+                    Dim command = New SqlCommand("select taxmethod from gltax WHERE taxcode='" + taxcode + "'", myConn)
+                    Dim reader As SqlDataReader = command.ExecuteReader
+                    While reader.Read()
+                        If reader.GetValue(0).ToString = "I" Then
+                            taxinclude = True
+                        End If
+                    End While
+                    myConn.Close()
+                End If
+
+                Dim gross_amt = CDbl(value_arraylist(1)(row)(24))
+                Dim disamt = CDbl(value_arraylist(1)(row)(17))
+                Dim amt = gross_amt - disamt
+                If taxinclude Then
+                    Dim taxamt = CDbl(value_arraylist(1)(row)(22))
+                    amt -= taxamt
+                End If
+                value_arraylist(1)(row)(26) = Math.Round(amt, 2)
             End If
 
             'local converter
@@ -723,8 +742,7 @@ Public Class Quotation_Form
         'hardcore exist checker
         Dim execute_valid As Boolean = True
         Dim exist_result As String = ""
-        init()
-        myConn = New SqlConnection("Data Source=" + serverName + ";" & "Initial Catalog=" + database + ";" + pwd_query)
+        'init()
         For row As Integer = 0 To dgvExcel.RowCount - 1
             Dim table As String
             Dim value_name As String
@@ -757,17 +775,22 @@ Public Class Quotation_Form
                 value = dgvExcel.Rows(row).Cells("Delivery Address").Value.ToString
                 Dim value2 = value_arraylist(0)(row)(9)
                 If Not value.Trim.Equals(String.Empty) And Not value2.Trim.Equals(String.Empty) Then
+                    value = value.Replace(vbLf, vbCr + vbLf)
                     myConn.Open()
                     Dim exist_value As Boolean = False
-                    Dim command = New SqlCommand("SELECT * FROM " + table + " WHERE cast(" + value_name + " as varchar(MAX)) ='" + value + "' AND custcode ='" + value2 + "'", myConn)
+                    Dim mkey As String = ""
+                    Dim command = New SqlCommand("SELECT mkey FROM " + table + " WHERE cast(" + value_name + " as varchar(MAX)) ='" + value + "' AND custcode ='" + value2 + "'", myConn)
                     Dim reader As SqlDataReader = command.ExecuteReader
                     While reader.Read()
+                        mkey = reader.GetValue(0)
                         exist_value = True
                     End While
                     myConn.Close()
                     If Not exist_value Then
                         execute_valid = False
-                        exist_result += value_name + " '" + value + "' is not found in the database (" + table + ")!" + vbNewLine
+                        exist_result += value_name + " '" + value + "'(" + value2 + ") is not found in the database (" + table + ")!" + vbNewLine
+                    Else
+                        value_arraylist(0)(row)(12) = mkey
                     End If
                 End If
 
@@ -935,51 +958,49 @@ Public Class Quotation_Form
 
         Dim rowInsertNum = 0
         For i As Integer = 0 To queryTable.Count - 1
-            init()
-            Using myConn = New SqlConnection("Data Source=" + serverName + ";" & "Initial Catalog=" + database + ";" + pwd_query)
-                Using command As New SqlCommand("", myConn)
-                    For row As Integer = 0 To dgvExcel.RowCount - 1
-                        Using r As DataGridViewRow = dgvExcel.Rows(row)
-                            If Not value_arraylist(i)(row)(0).Equals("{INVALID ARRAY}") Then
-                                Dim query = ""
-                                For g As Integer = 0 To value_arraylist(i)(row).count - 1
-                                    Dim value_temp As String = value_arraylist(i)(row)(g).ToString
-                                    If sql_format_arraylist(i)(g).ToString.Trim.Equals("createdate") Or sql_format_arraylist(i)(g).ToString.Trim.Equals("lastupdate") Then
-                                        query += "'" + Date.Now.ToString("dd-MMM-yy HH:mm:ss") + "',"
-                                        value_arraylist(i)(row)(g) = Date.Now.ToString("dd-MMM-yy HH:mm:ss")
-                                    ElseIf data_type_arraylist(i)(g).ToString.Trim.Contains("date") Then
-                                        query += "'" + Convert.ToDateTime(value_temp).ToString("dd-MMM-yy HH:mm:ss") + "',"
-                                        value_arraylist(i)(row)(g) = Convert.ToDateTime(value_temp).ToString("dd-MMM-yy HH:mm:ss")
-                                    ElseIf Not (value_temp.Equals("{._!@#$%^&*()}")) Then
-                                        query += "'" + value_temp + "',"
-                                    End If
-                                Next
-                                Dim command_text As String = queryTable(i)(2) + query
-                                command_text = command_text.Substring(0, command_text.Length - 1) + ")"
-                                'MsgBox(command_text)
-                                command.CommandText = command_text
-                                myConn.Open()
-                                Try
-                                    rowInsertNum += 1
-                                    command.ExecuteNonQuery()
-                                Catch ex As Exception
-                                    MsgBox(ex.Message + vbNewLine + command_text, MsgBoxStyle.Exclamation)
-                                    Return
-                                End Try
-                                myConn.Close()
-                            End If
+            'init()
+            Using command As New SqlCommand("", myConn)
+                For row As Integer = 0 To dgvExcel.RowCount - 1
+                    Using r As DataGridViewRow = dgvExcel.Rows(row)
+                        If Not value_arraylist(i)(row)(0).Equals("{INVALID ARRAY}") Then
+                            Dim query = ""
+                            For g As Integer = 0 To value_arraylist(i)(row).count - 1
+                                Dim value_temp As String = value_arraylist(i)(row)(g).ToString
+                                If sql_format_arraylist(i)(g).ToString.Trim.Equals("createdate") Or sql_format_arraylist(i)(g).ToString.Trim.Equals("lastupdate") Then
+                                    query += "'" + Date.Now.ToString("dd-MMM-yy HH:mm:ss") + "',"
+                                    value_arraylist(i)(row)(g) = Date.Now.ToString("dd-MMM-yy HH:mm:ss")
+                                ElseIf data_type_arraylist(i)(g).ToString.Trim.Contains("date") Then
+                                    query += "'" + Convert.ToDateTime(value_temp).ToString("dd-MMM-yy HH:mm:ss") + "',"
+                                    value_arraylist(i)(row)(g) = Convert.ToDateTime(value_temp).ToString("dd-MMM-yy HH:mm:ss")
+                                ElseIf Not (value_temp.Equals("{._!@#$%^&*()}")) Then
+                                    query += "'" + value_temp + "',"
+                                End If
+                            Next
+                            Dim command_text As String = queryTable(i)(2) + query
+                            command_text = command_text.Substring(0, command_text.Length - 1) + ")"
+                            'MsgBox(command_text)
+                            command.CommandText = command_text
+                            myConn.Open()
+                            Try
+                                rowInsertNum += 1
+                                command.ExecuteNonQuery()
+                            Catch ex As Exception
+                                MsgBox(ex.Message + vbNewLine + command_text, MsgBoxStyle.Exclamation)
+                                Return
+                            End Try
+                            myConn.Close()
+                        End If
 
-                        End Using
-                    Next
-                End Using
+                    End Using
+                Next
             End Using
         Next
         MsgBox("Data Import Sucessfully!" + vbNewLine + "Row Inserted: " + rowInsertNum.ToString, MsgBoxStyle.Information)
-        Dim confirmReport As DialogResult = MsgBox("Are you want to save the result as report?", MsgBoxStyle.YesNo)
-        If confirmReport = DialogResult.No Then
-            Return
-        End If
-        Function_Form.printExcelResult("ReportMELE_Quotation_" + Date.Now.Year.ToString + Date.Now.Month.ToString("00") + Date.Now.Day.ToString("00") + ".xlsx", queryTable, value_arraylist, sql_format_arraylist, dgvExcel)
+        'Dim confirmReport As DialogResult = MsgBox("Are you want to save the result as report?", MsgBoxStyle.YesNo)
+        'If confirmReport = DialogResult.No Then
+        '    Return
+        'End If
+        Function_Form.printExcelResult("Quotation", queryTable, value_arraylist, sql_format_arraylist, dgvExcel)
     End Sub
     Private Function existed_checker(table As String, sql_value As String, value As String)
         myConn.Open()
