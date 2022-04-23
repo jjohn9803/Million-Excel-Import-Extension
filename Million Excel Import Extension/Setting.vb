@@ -71,8 +71,7 @@ Public Class Setting
             End If
             objReader.Close()
         Catch ex As System.IO.FileNotFoundException
-            MsgBox("The setting file might be having issue!", MsgBoxStyle.Critical)
-            Return
+
         End Try
     End Sub
     Private Function getConnectionSetting() As String
@@ -102,6 +101,11 @@ Public Class Setting
                 cbServerList.Items.Add(String.Concat(dr("ServerName"), "\", dr("InstanceName")))
                 'cbServerList.Items.Add(dr(4))
             Next
+            If dt.Rows.Count <= 1 Then
+                MsgBox("Found " + cbServerList.Items.Count.ToString + " server!", MsgBoxStyle.Information)
+            Else
+                MsgBox("Found " + cbServerList.Items.Count.ToString + " servers!", MsgBoxStyle.Information)
+            End If
         Catch ex As Exception
             MsgBox(ex.Message, MsgBoxStyle.Critical, Me.Text)
         End Try
@@ -112,9 +116,9 @@ Public Class Setting
     Private Sub findDatabase()
         Main_Form.setServerName(cbServerList.Text().Trim)
         setPasswordOption()
-
         If (Main_Form.getServerName.Equals(String.Empty)) Then
             updateSQLStatus(0, "Server name must be filled out!")
+            Return
         End If
         Try
             Main_Form.setMyConn(New SqlConnection("Data Source=" + Main_Form.getServerName + ";" &
@@ -174,8 +178,9 @@ Public Class Setting
     Private Sub btnTestConnection_Click(sender As Object, e As EventArgs) Handles btnTestConnection.Click
         Me.Cursor = Cursors.WaitCursor
         Try
-            If Main_Form.getServerName.Equals(String.Empty) And Main_Form.getDatabase.Equals(String.Empty) And Not Main_Form.getStatusConnection Then
+            If Main_Form.getServerName.Equals(String.Empty) Or Main_Form.getDatabase.Equals(String.Empty) Or Not Main_Form.getStatusConnection Then
                 MsgBox("Failed to connect the server!", MsgBoxStyle.Critical)
+                Me.Cursor = Cursors.Default
                 Return
             End If
             Main_Form.setMyConn(New SqlConnection("Data Source=" + Main_Form.getServerName + ";" &

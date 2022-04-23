@@ -4,7 +4,7 @@ Imports System.IO
 Imports System.ComponentModel
 
 Public Class Main_Form
-    Public serverName As String
+    Public serverName As String = ""
     Public database As String = ""
     Public myConn As SqlConnection
     Public statusConnection As Boolean

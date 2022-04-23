@@ -27,6 +27,7 @@ Public Class Sales_Invoice_Form
         Dim dt As DataTable = tables(cbSheet.SelectedItem.ToString())
         dgvExcel.DataSource = dt
         Function_Form.validateExcelDateFormat(dgvExcel, validateDateFormatArray)
+        btnImport.Enabled = True
     End Sub
     Private Sub txtFileName_MouseClick(sender As Object, e As MouseEventArgs) Handles txtFileName.MouseClick
         Try
@@ -46,6 +47,7 @@ Public Class Sales_Invoice_Form
                                 Next
                                 dgvExcel.DataSource = Nothing
                                 dgvExcel.Refresh()
+                                btnImport.Enabled = False
                             End Using
                         Catch ex As Exceptions.HeaderException
                             MsgBox("The file is invalid! Please try another file!", MsgBoxStyle.Critical)
@@ -53,6 +55,7 @@ Public Class Sales_Invoice_Form
                             cbSheet.Items.Clear()
                             dgvExcel.DataSource = Nothing
                             dgvExcel.Refresh()
+                            btnImport.Enabled = False
                         End Try
                     End Using
                 End If
@@ -63,6 +66,7 @@ Public Class Sales_Invoice_Form
             cbSheet.Items.Clear()
             dgvExcel.DataSource = Nothing
             dgvExcel.Refresh()
+            btnImport.Enabled = False
         End Try
     End Sub
     Private Function getMaintainSetting() As String
@@ -408,14 +412,6 @@ Public Class Sales_Invoice_Form
                 value_arraylist(1)(row)(26) = Math.Round(nett_amt, 2)
             End If
 
-            'amt
-            If value_arraylist(1)(row)(27).Equals("{FORMULA_VALUE}") Then
-                Dim gross_amt = CDbl(value_arraylist(1)(row)(25))
-                Dim disamt = CDbl(value_arraylist(1)(row)(16))
-                Dim amt = gross_amt - disamt
-                value_arraylist(1)(row)(27) = Math.Round(amt, 2)
-            End If
-
             'taxamt1
             If value_arraylist(1)(row)(20).Equals("{FORMULA_VALUE}") Then
                 Dim nett_amt = CDbl(value_arraylist(1)(row)(26))
@@ -433,6 +429,33 @@ Public Class Sales_Invoice_Form
                 Dim taxamt2 = CDbl(value_arraylist(1)(row)(21))
                 Dim taxamt = taxamt1 + taxamt2
                 value_arraylist(1)(row)(23) = Math.Round(taxamt, 2)
+            End If
+
+            'amt
+            If value_arraylist(1)(row)(28).Equals("{FORMULA_VALUE}") Then
+                Dim taxcode = dgvExcel.Rows(row).Cells("Tax Code").Value.ToString.Trim
+                Dim taxinclude As Boolean = False
+                If Not taxcode.Equals(String.Empty) Then
+                    init()
+                    myConn.Open()
+                    Dim command = New SqlCommand("select taxmethod from gltax WHERE taxcode='" + taxcode + "'", myConn)
+                    Dim reader As SqlDataReader = command.ExecuteReader
+                    While reader.Read()
+                        If reader.GetValue(0).ToString = "I" Then
+                            taxinclude = True
+                        End If
+                    End While
+                    myConn.Close()
+                End If
+
+                Dim gross_amt = CDbl(value_arraylist(1)(row)(25))
+                Dim disamt = CDbl(value_arraylist(1)(row)(16))
+                Dim amt = gross_amt - disamt
+                If taxinclude Then
+                    Dim taxamt = CDbl(value_arraylist(1)(row)(23))
+                    amt -= taxamt
+                End If
+                value_arraylist(1)(row)(27) = Math.Round(amt, 2)
             End If
 
             'local converter
@@ -763,7 +786,7 @@ Public Class Sales_Invoice_Form
             Dim table As String
             Dim value_name As String
             Dim value As String
-            'Delivery Order
+            'Sales Invoice
             If Not value_arraylist(0)(row)(0).Equals("{INVALID ARRAY}") Then
                 'sdo.doc_no / duplicate
                 table = "sdo"
@@ -782,6 +805,27 @@ Public Class Sales_Invoice_Form
                     If Not existed_checker(table, value_name, value) Then
                         execute_valid = False
                         exist_result += value_name + " '" + value + "' is not found in the database (" + table + ")!" + vbNewLine
+                    End If
+                End If
+
+                'custaddr.addr / exist
+                table = "custaddr"
+                value_name = "addr"
+                value = dgvExcel.Rows(row).Cells("Delivery Address").Value.ToString
+                Dim value2 = value_arraylist(0)(row)(10) 'custcode
+                If Not value.Trim.Equals(String.Empty) And Not value2.Trim.Equals(String.Empty) Then
+                    value = value.Replace(vbLf, vbCr + vbLf)
+                    myConn.Open()
+                    Dim exist_value As Boolean = False
+                    Dim command = New SqlCommand("SELECT * FROM " + table + " WHERE cast(" + value_name + " as varchar(MAX)) ='" + value + "' AND custcode ='" + value2 + "'", myConn)
+                    Dim reader As SqlDataReader = command.ExecuteReader
+                    While reader.Read()
+                        exist_value = True
+                    End While
+                    myConn.Close()
+                    If Not exist_value Then
+                        execute_valid = False
+                        exist_result += value_name + " '" + value + "'(" + value2 + ") is not found in the database (" + table + ")!" + vbNewLine
                     End If
                 End If
 
@@ -841,7 +885,7 @@ Public Class Sales_Invoice_Form
                 End If
             End If
 
-            'Delivery Order Desc
+            'Sales Invoice Desc
             If Not value_arraylist(1)(row)(0).Equals(String.Empty) Then
                 'sdodet.doc_no / duplicate
                 table = "sdodet"
@@ -911,7 +955,7 @@ Public Class Sales_Invoice_Form
 
             End If
 
-            'Delivery Order Stock
+            'Sales Invoice Stock
             If Not value_arraylist(2)(row)(0).Equals(String.Empty) Then
                 'product.prodcode / exist
                 table = "product"
@@ -1001,7 +1045,7 @@ Public Class Sales_Invoice_Form
             End Using
         Next
         MsgBox("Data Import Sucessfully!" + vbNewLine + "Row Inserted: " + rowInsertNum.ToString, MsgBoxStyle.Information)
-        Function_Form.printExcelResult("Sales_Order", queryTable, value_arraylist, sql_format_arraylist, dgvExcel)
+        Function_Form.printExcelResult("Sales_Invoice", queryTable, value_arraylist, sql_format_arraylist, dgvExcel)
     End Sub
     Private Function existed_checker(table As String, sql_value As String, value As String)
         myConn.Open()

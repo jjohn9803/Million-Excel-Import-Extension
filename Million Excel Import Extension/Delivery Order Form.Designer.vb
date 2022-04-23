@@ -22,8 +22,10 @@ Partial Class Delivery_Order_Form
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
-        Dim DataGridViewCellStyle1 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
-        Dim DataGridViewCellStyle2 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle4 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle5 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle6 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Delivery_Order_Form))
         Me.Panel1 = New System.Windows.Forms.Panel()
         Me.FlowLayoutPanel1 = New System.Windows.Forms.FlowLayoutPanel()
         Me.Label2 = New System.Windows.Forms.Label()
@@ -69,41 +71,45 @@ Partial Class Delivery_Order_Form
         'Label2
         '
         Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(50, 15)
-        Me.Label2.Margin = New System.Windows.Forms.Padding(50, 15, 3, 0)
+        Me.Label2.Font = New System.Drawing.Font("Ebrima", 11.0!)
+        Me.Label2.Location = New System.Drawing.Point(30, 15)
+        Me.Label2.Margin = New System.Windows.Forms.Padding(30, 15, 3, 0)
         Me.Label2.Name = "Label2"
         Me.Label2.Padding = New System.Windows.Forms.Padding(0, 5, 0, 5)
-        Me.Label2.Size = New System.Drawing.Size(52, 23)
+        Me.Label2.Size = New System.Drawing.Size(72, 30)
         Me.Label2.TabIndex = 10
         Me.Label2.Text = "Filename:"
         '
         'txtFileName
         '
+        Me.txtFileName.Font = New System.Drawing.Font("Ebrima", 11.0!)
         Me.txtFileName.Location = New System.Drawing.Point(108, 15)
         Me.txtFileName.Margin = New System.Windows.Forms.Padding(3, 15, 3, 3)
         Me.txtFileName.Name = "txtFileName"
-        Me.txtFileName.Size = New System.Drawing.Size(387, 20)
+        Me.txtFileName.Size = New System.Drawing.Size(387, 27)
         Me.txtFileName.TabIndex = 9
         '
         'Label1
         '
         Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(548, 15)
-        Me.Label1.Margin = New System.Windows.Forms.Padding(50, 15, 3, 0)
+        Me.Label1.Font = New System.Drawing.Font("Ebrima", 11.0!)
+        Me.Label1.Location = New System.Drawing.Point(528, 15)
+        Me.Label1.Margin = New System.Windows.Forms.Padding(30, 15, 3, 0)
         Me.Label1.Name = "Label1"
         Me.Label1.Padding = New System.Windows.Forms.Padding(0, 5, 0, 5)
-        Me.Label1.Size = New System.Drawing.Size(38, 23)
+        Me.Label1.Size = New System.Drawing.Size(49, 30)
         Me.Label1.TabIndex = 11
         Me.Label1.Text = "Sheet:"
         '
         'cbSheet
         '
         Me.cbSheet.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cbSheet.Font = New System.Drawing.Font("Ebrima", 11.0!)
         Me.cbSheet.FormattingEnabled = True
-        Me.cbSheet.Location = New System.Drawing.Point(592, 15)
+        Me.cbSheet.Location = New System.Drawing.Point(583, 15)
         Me.cbSheet.Margin = New System.Windows.Forms.Padding(3, 15, 3, 3)
         Me.cbSheet.Name = "cbSheet"
-        Me.cbSheet.Size = New System.Drawing.Size(261, 21)
+        Me.cbSheet.Size = New System.Drawing.Size(261, 28)
         Me.cbSheet.TabIndex = 6
         '
         'Panel2
@@ -121,6 +127,7 @@ Partial Class Delivery_Order_Form
         Me.FlowLayoutPanel2.Controls.Add(Me.txtType)
         Me.FlowLayoutPanel2.Controls.Add(Me.btnImport)
         Me.FlowLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.FlowLayoutPanel2.Font = New System.Drawing.Font("Ebrima", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.FlowLayoutPanel2.Location = New System.Drawing.Point(0, 0)
         Me.FlowLayoutPanel2.Name = "FlowLayoutPanel2"
         Me.FlowLayoutPanel2.Size = New System.Drawing.Size(884, 60)
@@ -129,29 +136,33 @@ Partial Class Delivery_Order_Form
         'Label4
         '
         Me.Label4.AutoSize = True
+        Me.Label4.Font = New System.Drawing.Font("Ebrima", 11.0!)
         Me.Label4.Location = New System.Drawing.Point(50, 15)
         Me.Label4.Margin = New System.Windows.Forms.Padding(50, 15, 3, 0)
         Me.Label4.Name = "Label4"
         Me.Label4.Padding = New System.Windows.Forms.Padding(0, 5, 0, 5)
-        Me.Label4.Size = New System.Drawing.Size(37, 23)
+        Me.Label4.Size = New System.Drawing.Size(48, 30)
         Me.Label4.TabIndex = 19
         Me.Label4.Text = "Type: "
         '
         'txtType
         '
-        Me.txtType.Location = New System.Drawing.Point(100, 17)
+        Me.txtType.Font = New System.Drawing.Font("Ebrima", 11.0!)
+        Me.txtType.Location = New System.Drawing.Point(111, 17)
         Me.txtType.Margin = New System.Windows.Forms.Padding(10, 17, 3, 0)
         Me.txtType.Name = "txtType"
         Me.txtType.ReadOnly = True
-        Me.txtType.Size = New System.Drawing.Size(160, 20)
+        Me.txtType.Size = New System.Drawing.Size(275, 27)
         Me.txtType.TabIndex = 23
         '
         'btnImport
         '
-        Me.btnImport.Location = New System.Drawing.Point(313, 15)
-        Me.btnImport.Margin = New System.Windows.Forms.Padding(50, 15, 3, 3)
+        Me.btnImport.Enabled = False
+        Me.btnImport.Font = New System.Drawing.Font("Ebrima", 11.0!)
+        Me.btnImport.Location = New System.Drawing.Point(539, 15)
+        Me.btnImport.Margin = New System.Windows.Forms.Padding(150, 15, 3, 3)
         Me.btnImport.Name = "btnImport"
-        Me.btnImport.Size = New System.Drawing.Size(133, 23)
+        Me.btnImport.Size = New System.Drawing.Size(175, 33)
         Me.btnImport.TabIndex = 18
         Me.btnImport.Text = "Import"
         Me.btnImport.UseVisualStyleBackColor = True
@@ -169,20 +180,29 @@ Partial Class Delivery_Order_Form
         '
         Me.dgvExcel.AllowUserToAddRows = False
         Me.dgvExcel.AllowUserToDeleteRows = False
-        DataGridViewCellStyle1.NullValue = Nothing
-        Me.dgvExcel.AlternatingRowsDefaultCellStyle = DataGridViewCellStyle1
+        DataGridViewCellStyle4.NullValue = Nothing
+        Me.dgvExcel.AlternatingRowsDefaultCellStyle = DataGridViewCellStyle4
         Me.dgvExcel.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.DisplayedCells
-        Me.dgvExcel.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.DisplayedHeaders
+        Me.dgvExcel.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.AllCells
+        DataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
+        DataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.ControlLight
+        DataGridViewCellStyle5.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        DataGridViewCellStyle5.ForeColor = System.Drawing.SystemColors.WindowText
+        DataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight
+        DataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText
+        DataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.[True]
+        Me.dgvExcel.ColumnHeadersDefaultCellStyle = DataGridViewCellStyle5
         Me.dgvExcel.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        DataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
-        DataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window
-        DataGridViewCellStyle2.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        DataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText
-        DataGridViewCellStyle2.NullValue = Nothing
-        DataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight
-        DataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText
-        DataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
-        Me.dgvExcel.DefaultCellStyle = DataGridViewCellStyle2
+        DataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
+        DataGridViewCellStyle6.BackColor = System.Drawing.SystemColors.Window
+        DataGridViewCellStyle6.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        DataGridViewCellStyle6.ForeColor = System.Drawing.SystemColors.ControlText
+        DataGridViewCellStyle6.NullValue = Nothing
+        DataGridViewCellStyle6.Padding = New System.Windows.Forms.Padding(0, 3, 0, 3)
+        DataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.Highlight
+        DataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.HighlightText
+        DataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.[True]
+        Me.dgvExcel.DefaultCellStyle = DataGridViewCellStyle6
         Me.dgvExcel.Dock = System.Windows.Forms.DockStyle.Fill
         Me.dgvExcel.Location = New System.Drawing.Point(0, 0)
         Me.dgvExcel.Name = "dgvExcel"
@@ -198,6 +218,7 @@ Partial Class Delivery_Order_Form
         Me.Controls.Add(Me.Panel3)
         Me.Controls.Add(Me.Panel2)
         Me.Controls.Add(Me.Panel1)
+        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Name = "Delivery_Order_Form"
         Me.Text = "Delivery Order"
         Me.Panel1.ResumeLayout(False)

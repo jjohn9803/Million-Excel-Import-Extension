@@ -23,9 +23,10 @@ Partial Class Function_Form
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Me.FlowLayoutPanel1 = New System.Windows.Forms.FlowLayoutPanel()
-        Me.btnDeliveryOrder = New System.Windows.Forms.Button()
-        Me.btnSalesOrder = New System.Windows.Forms.Button()
         Me.btnQuotation = New System.Windows.Forms.Button()
+        Me.btnSalesOrder = New System.Windows.Forms.Button()
+        Me.btnDeliveryOrder = New System.Windows.Forms.Button()
+        Me.btnSalesInvoice = New System.Windows.Forms.Button()
         Me.FlowLayoutPanel1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -34,33 +35,12 @@ Partial Class Function_Form
         Me.FlowLayoutPanel1.Controls.Add(Me.btnQuotation)
         Me.FlowLayoutPanel1.Controls.Add(Me.btnSalesOrder)
         Me.FlowLayoutPanel1.Controls.Add(Me.btnDeliveryOrder)
+        Me.FlowLayoutPanel1.Controls.Add(Me.btnSalesInvoice)
         Me.FlowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.FlowLayoutPanel1.Location = New System.Drawing.Point(0, 0)
         Me.FlowLayoutPanel1.Name = "FlowLayoutPanel1"
         Me.FlowLayoutPanel1.Size = New System.Drawing.Size(654, 268)
         Me.FlowLayoutPanel1.TabIndex = 3
-        '
-        'btnDeliveryOrder
-        '
-        Me.btnDeliveryOrder.Font = New System.Drawing.Font("Microsoft YaHei", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnDeliveryOrder.Location = New System.Drawing.Point(418, 30)
-        Me.btnDeliveryOrder.Margin = New System.Windows.Forms.Padding(50, 30, 3, 30)
-        Me.btnDeliveryOrder.Name = "btnDeliveryOrder"
-        Me.btnDeliveryOrder.Size = New System.Drawing.Size(131, 59)
-        Me.btnDeliveryOrder.TabIndex = 5
-        Me.btnDeliveryOrder.Text = "Delivery Order"
-        Me.btnDeliveryOrder.UseVisualStyleBackColor = True
-        '
-        'btnSalesOrder
-        '
-        Me.btnSalesOrder.Font = New System.Drawing.Font("Microsoft YaHei", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnSalesOrder.Location = New System.Drawing.Point(234, 30)
-        Me.btnSalesOrder.Margin = New System.Windows.Forms.Padding(50, 30, 3, 30)
-        Me.btnSalesOrder.Name = "btnSalesOrder"
-        Me.btnSalesOrder.Size = New System.Drawing.Size(131, 59)
-        Me.btnSalesOrder.TabIndex = 4
-        Me.btnSalesOrder.Text = "Sales Order"
-        Me.btnSalesOrder.UseVisualStyleBackColor = True
         '
         'btnQuotation
         '
@@ -70,8 +50,45 @@ Partial Class Function_Form
         Me.btnQuotation.Name = "btnQuotation"
         Me.btnQuotation.Size = New System.Drawing.Size(131, 59)
         Me.btnQuotation.TabIndex = 3
+        Me.btnQuotation.TabStop = False
         Me.btnQuotation.Text = "Quotation"
         Me.btnQuotation.UseVisualStyleBackColor = True
+        '
+        'btnSalesOrder
+        '
+        Me.btnSalesOrder.Font = New System.Drawing.Font("Microsoft YaHei", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.btnSalesOrder.Location = New System.Drawing.Point(234, 30)
+        Me.btnSalesOrder.Margin = New System.Windows.Forms.Padding(50, 30, 3, 30)
+        Me.btnSalesOrder.Name = "btnSalesOrder"
+        Me.btnSalesOrder.Size = New System.Drawing.Size(131, 59)
+        Me.btnSalesOrder.TabIndex = 4
+        Me.btnSalesOrder.TabStop = False
+        Me.btnSalesOrder.Text = "Sales Order"
+        Me.btnSalesOrder.UseVisualStyleBackColor = True
+        '
+        'btnDeliveryOrder
+        '
+        Me.btnDeliveryOrder.Font = New System.Drawing.Font("Microsoft YaHei", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.btnDeliveryOrder.Location = New System.Drawing.Point(418, 30)
+        Me.btnDeliveryOrder.Margin = New System.Windows.Forms.Padding(50, 30, 3, 30)
+        Me.btnDeliveryOrder.Name = "btnDeliveryOrder"
+        Me.btnDeliveryOrder.Size = New System.Drawing.Size(131, 59)
+        Me.btnDeliveryOrder.TabIndex = 5
+        Me.btnDeliveryOrder.TabStop = False
+        Me.btnDeliveryOrder.Text = "Delivery Order"
+        Me.btnDeliveryOrder.UseVisualStyleBackColor = True
+        '
+        'btnSalesInvoice
+        '
+        Me.btnSalesInvoice.Font = New System.Drawing.Font("Microsoft YaHei", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.btnSalesInvoice.Location = New System.Drawing.Point(50, 149)
+        Me.btnSalesInvoice.Margin = New System.Windows.Forms.Padding(50, 30, 3, 30)
+        Me.btnSalesInvoice.Name = "btnSalesInvoice"
+        Me.btnSalesInvoice.Size = New System.Drawing.Size(131, 59)
+        Me.btnSalesInvoice.TabIndex = 6
+        Me.btnSalesInvoice.TabStop = False
+        Me.btnSalesInvoice.Text = "Sales Invoice"
+        Me.btnSalesInvoice.UseVisualStyleBackColor = True
         '
         'Function_Form
         '
@@ -90,4 +107,5 @@ Partial Class Function_Form
     Friend WithEvents btnDeliveryOrder As Button
     Friend WithEvents btnSalesOrder As Button
     Friend WithEvents btnQuotation As Button
+    Friend WithEvents btnSalesInvoice As Button
 End Class

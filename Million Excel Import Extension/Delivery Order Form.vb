@@ -28,6 +28,7 @@ Public Class Delivery_Order_Form
         Dim dt As DataTable = tables(cbSheet.SelectedItem.ToString())
         dgvExcel.DataSource = dt
         Function_Form.validateExcelDateFormat(dgvExcel, validateDateFormatArray)
+        btnImport.Enabled = True
     End Sub
     Private Sub txtFileName_MouseClick(sender As Object, e As MouseEventArgs) Handles txtFileName.MouseClick
         Try
@@ -47,6 +48,7 @@ Public Class Delivery_Order_Form
                                 Next
                                 dgvExcel.DataSource = Nothing
                                 dgvExcel.Refresh()
+                                btnImport.Enabled = False
                             End Using
                         Catch ex As Exceptions.HeaderException
                             MsgBox("The file is invalid! Please try another file!", MsgBoxStyle.Critical)
@@ -54,6 +56,7 @@ Public Class Delivery_Order_Form
                             cbSheet.Items.Clear()
                             dgvExcel.DataSource = Nothing
                             dgvExcel.Refresh()
+                            btnImport.Enabled = False
                         End Try
                     End Using
                 End If
@@ -64,6 +67,7 @@ Public Class Delivery_Order_Form
             cbSheet.Items.Clear()
             dgvExcel.DataSource = Nothing
             dgvExcel.Refresh()
+            btnImport.Enabled = False
         End Try
     End Sub
     Private Function getMaintainSetting() As String
@@ -803,7 +807,7 @@ Public Class Delivery_Order_Form
                 table = "custaddr"
                 value_name = "addr"
                 value = dgvExcel.Rows(row).Cells("Delivery Address").Value.ToString
-                Dim value2 = value_arraylist(0)(row)(9)
+                Dim value2 = value_arraylist(0)(row)(9) 'custcode
                 If Not value.Trim.Equals(String.Empty) And Not value2.Trim.Equals(String.Empty) Then
                     value = value.Replace(vbLf, vbCr + vbLf)
                     myConn.Open()
@@ -1158,4 +1162,48 @@ Public Class Delivery_Order_Form
         myConn.Close()
         Return exist_value
     End Function
+
+    Private Sub FlowLayoutPanel1_Paint(sender As Object, e As PaintEventArgs) Handles FlowLayoutPanel1.Paint
+
+    End Sub
+
+    Private Sub Panel1_Paint(sender As Object, e As PaintEventArgs) Handles Panel1.Paint
+
+    End Sub
+
+    Private Sub Label2_Click(sender As Object, e As EventArgs) Handles Label2.Click
+
+    End Sub
+
+    Private Sub txtFileName_TextChanged(sender As Object, e As EventArgs) Handles txtFileName.TextChanged
+
+    End Sub
+
+    Private Sub Label1_Click(sender As Object, e As EventArgs) Handles Label1.Click
+
+    End Sub
+
+    Private Sub Panel2_Paint(sender As Object, e As PaintEventArgs) Handles Panel2.Paint
+
+    End Sub
+
+    Private Sub FlowLayoutPanel2_Paint(sender As Object, e As PaintEventArgs) Handles FlowLayoutPanel2.Paint
+
+    End Sub
+
+    Private Sub Label4_Click(sender As Object, e As EventArgs) Handles Label4.Click
+
+    End Sub
+
+    Private Sub txtType_TextChanged(sender As Object, e As EventArgs) Handles txtType.TextChanged
+
+    End Sub
+
+    Private Sub Panel3_Paint(sender As Object, e As PaintEventArgs) Handles Panel3.Paint
+
+    End Sub
+
+    Private Sub dgvExcel_CellContentClick(sender As Object, e As DataGridViewCellEventArgs) Handles dgvExcel.CellContentClick
+
+    End Sub
 End Class

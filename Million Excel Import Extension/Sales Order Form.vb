@@ -28,6 +28,7 @@ Public Class Sales_Order_Form
         Dim dt As DataTable = tables(cbSheet.SelectedItem.ToString())
         dgvExcel.DataSource = dt
         Function_Form.validateExcelDateFormat(dgvExcel, validateDateFormatArray)
+        btnImport.Enabled = True
     End Sub
     Private Sub txtFileName_MouseClick(sender As Object, e As MouseEventArgs) Handles txtFileName.MouseClick
         Try
@@ -47,6 +48,7 @@ Public Class Sales_Order_Form
                                 Next
                                 dgvExcel.DataSource = Nothing
                                 dgvExcel.Refresh()
+                                btnImport.Enabled = False
                             End Using
                         Catch ex As Exceptions.HeaderException
                             MsgBox("The file is invalid! Please try another file!", MsgBoxStyle.Critical)
@@ -54,6 +56,7 @@ Public Class Sales_Order_Form
                             cbSheet.Items.Clear()
                             dgvExcel.DataSource = Nothing
                             dgvExcel.Refresh()
+                            btnImport.Enabled = False
                         End Try
                     End Using
                 End If
@@ -64,6 +67,7 @@ Public Class Sales_Order_Form
             cbSheet.Items.Clear()
             dgvExcel.DataSource = Nothing
             dgvExcel.Refresh()
+            btnImport.Enabled = False
         End Try
     End Sub
     Private Function getMaintainSetting() As String
@@ -787,7 +791,7 @@ Public Class Sales_Order_Form
                 table = "custaddr"
                 value_name = "addr"
                 value = dgvExcel.Rows(row).Cells("Delivery Address").Value.ToString
-                Dim value2 = value_arraylist(0)(row)(9)
+                Dim value2 = value_arraylist(0)(row)(9) 'custcode
                 If Not value.Trim.Equals(String.Empty) And Not value2.Trim.Equals(String.Empty) Then
                     value = value.Replace(vbLf, vbCr + vbLf)
                     myConn.Open()

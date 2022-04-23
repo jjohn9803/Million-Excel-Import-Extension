@@ -3,7 +3,7 @@ Imports ClosedXML.Excel
 Imports ExcelDataReader
 
 Public Class Function_Form
-    Private Sub openExcelImport(sender As Object, e As EventArgs) Handles btnQuotation.Click, btnDeliveryOrder.Click, btnSalesOrder.Click
+    Private Sub openExcelImport(sender As Object, e As EventArgs) Handles btnQuotation.Click, btnDeliveryOrder.Click, btnSalesOrder.Click, btnSalesInvoice.Click
         Dim form
         If sender.text.Equals("Quotation") Then
             form = New Quotation_Form
@@ -11,8 +11,8 @@ Public Class Function_Form
             form = New Sales_Order_Form
         ElseIf sender.text.Equals("Delivery Order") Then
             form = New Delivery_Order_Form
-        Else
-
+        ElseIf sender.text.Equals("Sales Invoice") Then
+            form = New Sales_Invoice_Form
         End If
         If Main_Form.getStatusConnection And Not Main_Form.getDatabase.Equals(String.Empty) Then
             Main_Form.setImport_type(sender.text)

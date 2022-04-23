@@ -22,6 +22,7 @@ Partial Class Main_Form
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Main_Form))
         Me.FlowLayoutPanel1 = New System.Windows.Forms.FlowLayoutPanel()
         Me.Label7 = New System.Windows.Forms.Label()
         Me.txtServerName = New System.Windows.Forms.TextBox()
@@ -29,8 +30,8 @@ Partial Class Main_Form
         Me.txtDatabaseName = New System.Windows.Forms.TextBox()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.lblSQLStatus = New System.Windows.Forms.Label()
-        Me.panelMain = New System.Windows.Forms.Panel()
         Me.btnSetting = New System.Windows.Forms.Button()
+        Me.panelMain = New System.Windows.Forms.Panel()
         Me.FlowLayoutPanel1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -116,14 +117,6 @@ Partial Class Main_Form
         Me.lblSQLStatus.TabIndex = 38
         Me.lblSQLStatus.Text = "Disconnected"
         '
-        'panelMain
-        '
-        Me.panelMain.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.panelMain.Location = New System.Drawing.Point(0, 0)
-        Me.panelMain.Name = "panelMain"
-        Me.panelMain.Size = New System.Drawing.Size(594, 304)
-        Me.panelMain.TabIndex = 35
-        '
         'btnSetting
         '
         Me.btnSetting.Font = New System.Drawing.Font("Yu Gothic Medium", 9.75!, System.Drawing.FontStyle.Bold)
@@ -136,6 +129,14 @@ Partial Class Main_Form
         Me.btnSetting.Text = "Setting"
         Me.btnSetting.UseVisualStyleBackColor = True
         '
+        'panelMain
+        '
+        Me.panelMain.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.panelMain.Location = New System.Drawing.Point(0, 0)
+        Me.panelMain.Name = "panelMain"
+        Me.panelMain.Size = New System.Drawing.Size(594, 304)
+        Me.panelMain.TabIndex = 35
+        '
         'Main_Form
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -143,6 +144,8 @@ Partial Class Main_Form
         Me.ClientSize = New System.Drawing.Size(594, 406)
         Me.Controls.Add(Me.panelMain)
         Me.Controls.Add(Me.FlowLayoutPanel1)
+        Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle
+        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.MaximizeBox = False
         Me.Name = "Main_Form"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
