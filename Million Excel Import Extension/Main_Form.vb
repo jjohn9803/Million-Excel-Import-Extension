@@ -10,6 +10,7 @@ Public Class Main_Form
     Public statusConnection As Boolean
     Public pwd_query As String
     Public import_type As String
+    Public features As New ArrayList
     Private Sub SQL_Connection_Form_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         mainFormLoad()
     End Sub
@@ -43,6 +44,9 @@ Public Class Main_Form
     Public Function getImport_type() As String
         Return Me.import_type
     End Function
+    Public Function getFeatures() As ArrayList
+        Return Me.features
+    End Function
     Public Sub setServerName(ByVal serverName As String)
         Me.serverName = serverName
         txtServerName.Text = serverName
@@ -70,7 +74,15 @@ Public Class Main_Form
     Public Sub setImport_type(ByVal import_type As String)
         Me.import_type = import_type
     End Sub
-
+    Public Sub setFeatures(ByVal features As ArrayList)
+        Me.features = features
+    End Sub
+    Public Sub clearFeature()
+        Me.features.Clear()
+    End Sub
+    Public Sub appendFeature(ByVal feature As String)
+        Me.features.add(feature)
+    End Sub
     Private Sub btnSetting_Click(sender As Object, e As EventArgs) Handles btnSetting.Click
         Dim loginForm As New Login
         loginForm.ShowDialog()

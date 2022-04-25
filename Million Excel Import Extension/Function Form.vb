@@ -4,19 +4,24 @@ Imports ExcelDataReader
 
 Public Class Function_Form
     Private Sub openExcelImport(sender As Object, e As EventArgs) Handles btnQuotation.Click, btnDeliveryOrder.Click, btnSalesOrder.Click, btnSalesInvoice.Click
+        Dim formName = sender.text
+        If Not Main_Form.getFeatures.Contains(sender.text) Then
+            MsgBox("You have not enough privilege to access!", MsgBoxStyle.Critical)
+            Return
+        End If
         Dim form
-        If sender.text.Equals("Quotation") Then
+        If formName.Equals("Quotation") Then
             form = New Quotation_Form
-        ElseIf sender.text.Equals("Sales Order") Then
+        ElseIf formName.Equals("Sales Order") Then
             form = New Sales_Order_Form
-        ElseIf sender.text.Equals("Delivery Order") Then
+        ElseIf formName.Equals("Delivery Order") Then
             form = New Delivery_Order_Form
-        ElseIf sender.text.Equals("Sales Invoice") Then
+        ElseIf formName.Equals("Sales Invoice") Then
             form = New Sales_Invoice_Form
         End If
         If Main_Form.getStatusConnection And Not Main_Form.getDatabase.Equals(String.Empty) Then
-            Main_Form.setImport_type(sender.text)
-            form.Text = sender.text
+            Main_Form.setImport_type(formName)
+            form.Text = formName
             form.ShowDialog()
         Else
             MsgBox("Please connect to server and database before get into it!", MsgBoxStyle.Critical)

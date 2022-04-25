@@ -39,6 +39,7 @@ Partial Class Setting
         Me.btnSave = New System.Windows.Forms.Button()
         Me.btnClose = New System.Windows.Forms.Button()
         Me.btnSearchServer = New System.Windows.Forms.Button()
+        Me.checkBoxFeature = New System.Windows.Forms.CheckedListBox()
         Me.SuspendLayout()
         '
         'Label2
@@ -167,7 +168,7 @@ Partial Class Setting
         '
         Me.btnTestConnection.Font = New System.Drawing.Font("Ebrima", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btnTestConnection.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.btnTestConnection.Location = New System.Drawing.Point(41, 233)
+        Me.btnTestConnection.Location = New System.Drawing.Point(41, 320)
         Me.btnTestConnection.Name = "btnTestConnection"
         Me.btnTestConnection.Size = New System.Drawing.Size(150, 40)
         Me.btnTestConnection.TabIndex = 8
@@ -177,7 +178,7 @@ Partial Class Setting
         'btnSave
         '
         Me.btnSave.Font = New System.Drawing.Font("Ebrima", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnSave.Location = New System.Drawing.Point(197, 233)
+        Me.btnSave.Location = New System.Drawing.Point(197, 320)
         Me.btnSave.Name = "btnSave"
         Me.btnSave.Size = New System.Drawing.Size(150, 40)
         Me.btnSave.TabIndex = 9
@@ -187,7 +188,7 @@ Partial Class Setting
         'btnClose
         '
         Me.btnClose.Font = New System.Drawing.Font("Ebrima", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnClose.Location = New System.Drawing.Point(353, 233)
+        Me.btnClose.Location = New System.Drawing.Point(353, 320)
         Me.btnClose.Name = "btnClose"
         Me.btnClose.Size = New System.Drawing.Size(150, 40)
         Me.btnClose.TabIndex = 10
@@ -203,13 +204,27 @@ Partial Class Setting
         Me.btnSearchServer.Text = "..."
         Me.btnSearchServer.UseVisualStyleBackColor = True
         '
+        'checkBoxFeature
+        '
+        Me.checkBoxFeature.CheckOnClick = True
+        Me.checkBoxFeature.ColumnWidth = 150
+        Me.checkBoxFeature.Font = New System.Drawing.Font("Ebrima", 12.0!)
+        Me.checkBoxFeature.FormattingEnabled = True
+        Me.checkBoxFeature.Items.AddRange(New Object() {"Quotation", "Sales Order", "Delivery Order", "Sales Invoice"})
+        Me.checkBoxFeature.Location = New System.Drawing.Point(41, 231)
+        Me.checkBoxFeature.MultiColumn = True
+        Me.checkBoxFeature.Name = "checkBoxFeature"
+        Me.checkBoxFeature.Size = New System.Drawing.Size(462, 76)
+        Me.checkBoxFeature.TabIndex = 41
+        '
         'Setting
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.AutoSize = True
         Me.BackColor = System.Drawing.SystemColors.Control
-        Me.ClientSize = New System.Drawing.Size(545, 291)
+        Me.ClientSize = New System.Drawing.Size(545, 379)
+        Me.Controls.Add(Me.checkBoxFeature)
         Me.Controls.Add(Me.btnSearchServer)
         Me.Controls.Add(Me.Label2)
         Me.Controls.Add(Me.cbShowPassword)
@@ -255,4 +270,5 @@ Partial Class Setting
     Friend WithEvents btnSave As Button
     Friend WithEvents btnClose As Button
     Friend WithEvents btnSearchServer As Button
+    Friend WithEvents checkBoxFeature As CheckedListBox
 End Class

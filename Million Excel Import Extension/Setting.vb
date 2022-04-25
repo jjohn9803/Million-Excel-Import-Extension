@@ -62,6 +62,16 @@ Public Class Setting
                         pwd = result2
                     End If
                 End If
+                If result.Contains("Features:") Then
+                    If result2 <> String.Empty Then
+                        Main_Form.clearFeature()
+                        Dim feature_split() As String = result2.Split(","c)
+                        For Each feature_temp In feature_split
+                            Main_Form.appendFeature(feature_temp)
+                            checkBoxFeature.SetItemChecked(checkBoxFeature.Items.IndexOf(feature_temp), True)
+                        Next
+                    End If
+                End If
             Loop
             If settingBoolean Then
                 findDatabase()
@@ -163,11 +173,20 @@ Public Class Setting
     End Sub
     Private Sub btnSave_Click(sender As Object, e As EventArgs) Handles btnSave.Click
         Try
+
+            Dim features As String = ""
+            Main_Form.clearFeature()
+            For Each item In checkBoxFeature.CheckedItems
+                features += item.ToString + ","
+                Main_Form.appendFeature(item.ToString)
+            Next
+            features = features.Substring(0, features.Length - 1)
             Dim content = "Server Name:" + Main_Form.getServerName +
                         vbNewLine + "Database:" + Main_Form.getDatabase +
                         vbNewLine + "pwd_option:" + pwd_mode.ToString +
                         vbNewLine + "user_id:" + uid +
-                        vbNewLine + "pwd:" + pwd
+                        vbNewLine + "pwd:" + pwd +
+                        vbNewLine + "Features:" + features
             System.IO.File.WriteAllText(getConnectionSetting, Encryption.Encrypt(content, My.Resources.myPassword))
             MsgBox("'" + content + "'" + vbNewLine + vbNewLine + "Setting Saved!", MsgBoxStyle.Information)
         Catch ex As Exception

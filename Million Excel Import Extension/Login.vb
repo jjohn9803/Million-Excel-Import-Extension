@@ -9,6 +9,18 @@
             MsgBox("Staff Id or password is incorrect!", MsgBoxStyle.Critical)
         End If
     End Sub
+    Private Sub txtStaffID_KeyPress(sender As Object, e As KeyPressEventArgs) Handles txtStaffID.KeyPress
+        If e.KeyChar = Microsoft.VisualBasic.ChrW(Keys.Return) Then
+            txtPassword.Focus()
+            e.Handled = True
+        End If
+    End Sub
+    Private Sub txtPassword_KeyPress(sender As Object, e As KeyPressEventArgs) Handles txtPassword.KeyPress
+        If e.KeyChar = Microsoft.VisualBasic.ChrW(Keys.Return) Then
+            btnSetting.Focus()
+            e.Handled = True
+        End If
+    End Sub
     Private Function getStaffID() As String
         Return Encryption.Encrypt(txtStaffID.Text, My.Resources.myPassword)
     End Function
