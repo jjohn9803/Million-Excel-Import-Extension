@@ -73,7 +73,7 @@ Public Class Sales_Invoice_Form
         Return "maintain.xls"
     End Function
     Private Sub btnImport_Click(sender As Object, e As EventArgs) Handles btnImport.Click
-        Dim importType = "Delivery Order"
+        Dim importType = "Sales Invoice"
         Dim tableExcelSetting As DataTableCollection
         'Try
         Using stream = File.Open(getMaintainSetting, FileMode.Open, FileAccess.Read)
@@ -83,13 +83,9 @@ Public Class Sales_Invoice_Form
                                                                          .UseHeaderRow = True}})
                 tableExcelSetting = result.Tables
                 Dim queryTable As New ArrayList
-                queryTable.Add(New ArrayList)
-                queryTable.Add(New ArrayList)
-                queryTable.Add(New ArrayList)
-                queryTable.Add(New ArrayList)
-                queryTable.Add(New ArrayList)
-                queryTable.Add(New ArrayList)
-                queryTable.Add(New ArrayList)
+                For i = 0 To 8
+                    queryTable.Add(New ArrayList)
+                Next
                 queryTable(0).add("Sales Invoice") '0
                 queryTable(0).add("sinv") '1
                 queryTable(1).add("Sales Invoice Desc")
@@ -98,12 +94,16 @@ Public Class Sales_Invoice_Form
                 queryTable(2).add("stock")
                 queryTable(3).add("Sales Invoice AR") '0
                 queryTable(3).add("ar") '1
-                queryTable(4).add("Sales Invoice GL Off")
-                queryTable(4).add("gloff")
-                queryTable(5).add("Sales Invoice GL")
-                queryTable(5).add("gl")
+                queryTable(4).add("Sales Invoice GL")
+                queryTable(4).add("gl")
+                queryTable(5).add("Sales Invoice GL Off")
+                queryTable(5).add("gloff")
                 queryTable(6).add("Sales Invoice GL Audit")
                 queryTable(6).add("glaudit")
+                queryTable(7).add("SI Product Serial No")
+                queryTable(7).add("prodsn")
+                queryTable(8).add("SI Stock Serial No")
+                queryTable(8).add("stocksn")
                 quotationWriteIntoSQL(tableExcelSetting, queryTable)
             End Using
         End Using
@@ -345,15 +345,17 @@ Public Class Sales_Invoice_Form
 
         'Hardcode Formula
         For row As Integer = 0 To dgvExcel.RowCount - 1
+            'sinv
             If Not value_arraylist(0)(row)(0).Equals("{INVALID ARRAY}") Then
                 'batchno
-                If value_arraylist(0)(row)(47).length = 2 Then
+                If value_arraylist(0)(row)(48).length = 2 Then
                     Dim date1 = value_arraylist(0)(row)(2)
-                    Dim batchno = value_arraylist(0)(row)(47)
-                    value_arraylist(0)(row)(47) = Year(date1).ToString.Substring(2) + Month(date1).ToString("00") + batchno
+                    Dim batchno = value_arraylist(0)(row)(48)
+                    value_arraylist(0)(row)(48) = Year(date1).ToString.Substring(2) + Month(date1).ToString("00") + batchno
                 End If
             End If
 
+            'sinvdet
             'qtyrp
             If value_arraylist(1)(row)(10).Equals("{FORMULA_VALUE}") Then
                 Dim qty = value_arraylist(1)(row)(9)
@@ -466,7 +468,7 @@ Public Class Sales_Invoice_Form
                     Exit For
                 End If
             Next
-            Dim fx_rate = CDbl(value_arraylist(0)(find_local)(17))
+            Dim fx_rate = CDbl(value_arraylist(0)(find_local)(18))
 
             'local_price
             If value_arraylist(1)(row)(28).Equals("{FORMULA_VALUE}") Then
@@ -755,7 +757,7 @@ Public Class Sales_Invoice_Form
         For row As Integer = 0 To dgvExcel.RowCount - 1
             If Not value_arraylist(0)(row)(0).Equals("{INVALID ARRAY}") Then
                 'taxable
-                If value_arraylist(0)(row)(26).ToString.Trim.Equals("0") Then
+                If value_arraylist(0)(row)(27).ToString.Trim.Equals("0") Then
                     'get query target
 
                     Dim taxable As Double = 0
@@ -771,7 +773,7 @@ Public Class Sales_Invoice_Form
                             End If
                         End If
                     Next
-                    value_arraylist(0)(row)(26) = Math.Round(taxable, 2)
+                    value_arraylist(0)(row)(27) = Math.Round(taxable, 2)
                 End If
             End If
         Next
@@ -800,7 +802,7 @@ Public Class Sales_Invoice_Form
                 'customer.custcode / exist
                 table = "customer"
                 value_name = "custcode"
-                value = value_arraylist(0)(row)(9)
+                value = value_arraylist(0)(row)(10)
                 If Not value.Trim.Equals(String.Empty) Then
                     If Not existed_checker(table, value_name, value) Then
                         execute_valid = False
@@ -814,7 +816,7 @@ Public Class Sales_Invoice_Form
                 value = dgvExcel.Rows(row).Cells("Delivery Address").Value.ToString
                 Dim value2 = value_arraylist(0)(row)(10) 'custcode
                 If Not value.Trim.Equals(String.Empty) And Not value2.Trim.Equals(String.Empty) Then
-                    value = value.Replace(vbLf, vbCr + vbLf)
+                    value = value.Replace(vbLf, vbCrLf)
                     myConn.Open()
                     Dim exist_value As Boolean = False
                     Dim command = New SqlCommand("SELECT * FROM " + table + " WHERE cast(" + value_name + " as varchar(MAX)) ='" + value + "' AND custcode ='" + value2 + "'", myConn)
@@ -832,7 +834,7 @@ Public Class Sales_Invoice_Form
                 'accmgr.accmgr_id / exist
                 table = "accmgr"
                 value_name = "accmgr_id"
-                value = value_arraylist(0)(row)(15)
+                value = value_arraylist(0)(row)(16)
                 If Not value.Trim.Equals(String.Empty) Then
                     If Not existed_checker(table, value_name, value) Then
                         execute_valid = False
@@ -843,7 +845,7 @@ Public Class Sales_Invoice_Form
                 'currency.curr_code / exist
                 table = "currency"
                 value_name = "curr_code"
-                value = value_arraylist(0)(row)(16)
+                value = value_arraylist(0)(row)(17)
                 If Not value.Trim.Equals(String.Empty) Then
                     If Not existed_checker(table, value_name, value) Then
                         execute_valid = False
@@ -854,7 +856,7 @@ Public Class Sales_Invoice_Form
                 'glbatch.batchno / exist
                 table = "glbatch"
                 value_name = "batchno"
-                value = value_arraylist(0)(row)(47)
+                value = value_arraylist(0)(row)(48)
                 If Not value.Trim.Equals(String.Empty) Then
                     If Not existed_checker(table, value_name, value) Then
                         execute_valid = False
@@ -865,7 +867,7 @@ Public Class Sales_Invoice_Form
                 'project.projcode / exist
                 table = "project"
                 value_name = "projcode"
-                value = value_arraylist(0)(row)(48)
+                value = value_arraylist(0)(row)(49)
                 If Not value.Trim.Equals(String.Empty) Then
                     If Not existed_checker(table, value_name, value) Then
                         execute_valid = False
@@ -876,7 +878,7 @@ Public Class Sales_Invoice_Form
                 'deptment.deptcode / exist
                 table = "deptment"
                 value_name = "deptcode"
-                value = value_arraylist(0)(row)(49)
+                value = value_arraylist(0)(row)(50)
                 If Not value.Trim.Equals(String.Empty) Then
                     If Not existed_checker(table, value_name, value) Then
                         execute_valid = False
@@ -978,28 +980,143 @@ Public Class Sales_Invoice_Form
                         exist_result += value_name + " '" + value + "' is not found in the database (" + table + ")!" + vbNewLine
                     End If
                 End If
-
             End If
 
+            'Delivery Order Serial No
+            If Not value_arraylist(7)(row)(0).Equals(String.Empty) Then
+                'prodsn.serialno / exist
+                table = "prodsn"
+                value_name = "serialno"
+                Dim values As New List(Of String)(value_arraylist(7)(row)(1).ToString.Trim.Split(","c))
+                For Each value_sn As String In values
+                    If Not value_sn.Trim.Equals(String.Empty) Then
+                        If Not existed_checker(table, value_name, value_sn) Then
+                            execute_valid = False
+                            exist_result += value_name + " '" + value_sn + "' is not found in the database (" + table + ")!" + vbNewLine
+                        End If
+                    End If
+                Next
+
+                'stocksn.serialno / exist
+                table = "stocksn"
+                value_name = "serialno"
+                Dim values2 As New List(Of String)(value_arraylist(7)(row)(1).ToString.Trim.Split(","c))
+                For Each value_sn As String In values2
+                    If Not value_sn.Trim.Equals(String.Empty) Then
+                        If Not existed_checker(table, value_name, value_sn) Then
+                            execute_valid = False
+                            exist_result += value_name + " '" + value_sn + "' is not found in the database (" + table + ")!" + vbNewLine
+                        End If
+                    End If
+                Next
+            End If
         Next
         If execute_valid = False Then
             MsgBox(exist_result + vbNewLine + "The operation has been stopped!", MsgBoxStyle.Exclamation)
             Return
         End If
+
         'endhardcore exist checker
 
-        'For i As Integer = 0 To queryTable.Count - 1
-        '    For row As Integer = 0 To dgvExcel.RowCount - 1
-        '        Dim strs = ""
-        '        For Each str As String In value_arraylist(i)(row)
-        '            strs += str + vbTab
-        '        Next
-        '        MsgBox("Row " + row.ToString + vbNewLine + strs)
-        '    Next
-        'Next
-        'Quotation only end
+        init()
+        'myConn = New SqlConnection("Data Source=" + serverName + ";" & "Initial Catalog=" + database + ";" + pwd_query)
+        Dim exist_serial As Boolean = False
+        Dim msg_serial As String = ""
+        For row As Integer = 0 To dgvExcel.RowCount - 1
+            If Not value_arraylist(7)(row)(1).ToString.Trim.Equals(String.Empty) Then
+                Dim serialnos As New List(Of String)(value_arraylist(7)(row)(1).ToString.Trim.Split(","c))
+                If row = 0 Then
+                    If serialnos.Count <> CInt(value_arraylist(1)(row)(9)) Then
+                        MsgBox("The serial no quantity (" + serialnos.Count.ToString + ") does not matched with items quantity(" + value_arraylist(1)(row)(9).ToString + ")" + vbNewLine + "The operation has been stopped!", MsgBoxStyle.Exclamation)
+                        Return
+                    End If
+                End If
+                For sn = 0 To serialnos.Count - 1
+                    Dim serialno As String = serialnos(sn)
+                    myConn.Open()
+                    Dim sncommand = New SqlCommand("SELECT * FROM stocksn WHERE serialno ='" + serialno + "' AND doc_type ='SI'", myConn)
+                    Dim snreader As SqlDataReader = sncommand.ExecuteReader
+                    While snreader.Read()
+                        msg_serial += vbTab + snreader.GetValue("serialno") + vbNewLine
+                        exist_serial = True
+                    End While
+                    myConn.Close()
+                Next
+            End If
+        Next
+        If exist_serial Then
+            MsgBox("The following serial no has been used:" + vbNewLine + msg_serial + "The operation has been stopped!", MsgBoxStyle.Exclamation)
+            Return
+        End If
+
+        Dim confirmImport As DialogResult = MsgBox("Are you sure to import data?", MsgBoxStyle.YesNo)
+        If confirmImport = DialogResult.No Then
+            Return
+        End If
+
         Dim rowInsertNum = 0
-        For i As Integer = 0 To queryTable.Count - 1
+        For row As Integer = 0 To dgvExcel.RowCount - 1
+            If Not value_arraylist(0)(row)(0).Equals("{INVALID ARRAY}") Then
+                Dim startRange As Integer = -1
+                Dim endRange As Integer = -1
+                For Each range As String In rangeQuo
+                    If range.Split(".")(0).ToString.Trim.Equals(row.ToString.Trim) Then
+                        startRange = CInt(range.Split(".")(0).ToString.Trim)
+                        endRange = CInt(range.Split(".")(1).ToString.Trim)
+                        Exit For
+                    End If
+                Next
+                Dim seq = 1
+                Dim cmd = queryTable(4)(2)
+                For i = startRange To endRange
+                    Dim queryAL As New ArrayList
+                    queryAL.Add(value_arraylist(1)(i)(57)) 'accno
+                    queryAL.Add("SI") 'doc_type
+                    queryAL.Add(value_arraylist(0)(i)(1)) 'doc_no
+                    queryAL.Add(seq) 'seq
+                    queryAL.Add(value_arraylist(0)(i)(2)) 'doc_date
+                    queryAL.Add(value_arraylist(0)(i)(1)) 'refno
+                    queryAL.Add(Function_Form.getNull(0)) 'refno2
+                    queryAL.Add(Function_Form.getNull(0)) 'refno3
+                    queryAL.Add(value_arraylist(0)(i)(3)) 'desp
+                    queryAL.Add(value_arraylist(0)(i)(4)) 'desp2
+                    queryAL.Add(Function_Form.getNull(0)) 'desp3
+                    queryAL.Add(Function_Form.getNull(0)) 'desp4
+                    Dim amount = Math.Round(CDbl(value_arraylist(1)(i)(26)) * -1, 2)
+                    queryAL.Add(amount) 'amount
+                    Dim debit = 0
+                    Dim credit = 0
+                    If amount < 0 Then
+                        credit = amount * -1
+                    Else
+                        debit = amount
+                    End If
+                    queryAL.Add(debit) 'debit
+                    queryAL.Add(credit) 'credit
+                    Dim fx_rate = CDbl(value_arraylist(0)(i)(18))
+                    Dim fx_amount = Math.Round(amount * fx_rate, 2)
+                    Dim fx_debit = Math.Round(debit * fx_rate, 2)
+                    Dim fx_credit = Math.Round(credit * fx_rate, 2)
+                    queryAL.Add(fx_amount) 'fx_amount
+                    queryAL.Add(fx_debit) 'fx_debit
+                    queryAL.Add(fx_credit) 'fx_credit
+                    queryAL.Add(fx_rate) 'fx_rate
+                    queryAL.Add(value_arraylist(0)(i)(17)) 'curr_code
+                    queryAL.Add(value_arraylist(0)(i)(48)) 'batchno
+                    queryAL.Add(value_arraylist(0)(i)(49)) 'projcode
+                    queryAL.Add(value_arraylist(0)(i)(50)) 'deptcode
+                    queryAL.Add(value_arraylist(1)(i)(54)) 'taxcode
+                    Dim taxable = Math.Round(CDbl(value_arraylist(0)(i)(27)) * -1, 2)
+                    Dim fx_taxable = taxable * fx_rate
+                    Dim link_seq = seq
+
+                    seq += 1
+                Next
+            End If
+        Next
+
+        Return
+        For i As Integer = 0 To 2
             init()
             Using command As New SqlCommand("", myConn)
                 For row As Integer = 0 To dgvExcel.RowCount - 1
@@ -1033,7 +1150,7 @@ Public Class Sales_Invoice_Form
                             myConn.Open()
                             Try
                                 rowInsertNum += 1
-                                command.ExecuteNonQuery()
+                                'command.ExecuteNonQuery()
                             Catch ex As Exception
                                 MsgBox(ex.Message + vbNewLine + command_text, MsgBoxStyle.Exclamation)
                             End Try

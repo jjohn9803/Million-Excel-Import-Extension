@@ -95,9 +95,9 @@ Public Class Delivery_Order_Form
                 queryTable(1).add("sdodet")
                 queryTable(2).add("Delivery Order Stock")
                 queryTable(2).add("stock")
-                queryTable(3).add("Product Serial No")
+                queryTable(3).add("DO Product Serial No")
                 queryTable(3).add("prodsn")
-                queryTable(4).add("Stock Serial No")
+                queryTable(4).add("DO Stock Serial No")
                 queryTable(4).add("stocksn")
                 quotationWriteIntoSQL(tableExcelSetting, queryTable)
             End Using
@@ -809,7 +809,7 @@ Public Class Delivery_Order_Form
                 value = dgvExcel.Rows(row).Cells("Delivery Address").Value.ToString
                 Dim value2 = value_arraylist(0)(row)(9) 'custcode
                 If Not value.Trim.Equals(String.Empty) And Not value2.Trim.Equals(String.Empty) Then
-                    value = value.Replace(vbLf, vbCr + vbLf)
+                    value = value.Replace(vbLf, vbCrLf)
                     myConn.Open()
                     Dim exist_value As Boolean = False
                     Dim command = New SqlCommand("SELECT * FROM " + table + " WHERE cast(" + value_name + " as varchar(MAX)) ='" + value + "' AND custcode ='" + value2 + "'", myConn)
@@ -984,7 +984,10 @@ Public Class Delivery_Order_Form
                         exist_result += value_name + " '" + value + "' is not found in the database (" + table + ")!" + vbNewLine
                     End If
                 End If
+            End If
 
+            'Delivery Order Serial No
+            If Not value_arraylist(3)(row)(0).Equals(String.Empty) Then
                 'prodsn.serialno / exist
                 table = "prodsn"
                 value_name = "serialno"
@@ -1065,6 +1068,8 @@ Public Class Delivery_Order_Form
             Return
         End If
 
+        Dim rowInsertNum = 0
+
         For row As Integer = 0 To dgvExcel.RowCount - 1
             If Not value_arraylist(3)(row)(1).ToString.Trim.Equals(String.Empty) Then
                 Dim serialnos As New List(Of String)(value_arraylist(3)(row)(1).ToString.Trim.Split(","c))
@@ -1098,7 +1103,6 @@ Public Class Delivery_Order_Form
             End If
         Next
         'Quotation only end
-        Dim rowInsertNum = 0
         For i As Integer = 0 To 2
             init()
             Using command As New SqlCommand("", myConn)

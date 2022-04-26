@@ -95,14 +95,18 @@ Public Class Function_Form
             MsgBox("The imported excel format does not correct!", MsgBoxStyle.Critical)
         End If
     End Sub
-    'Public Shared Function convertCharToHex16(text As String, char16 As Char) As String
-    '    Dim convertedText As String = ""
-    '    Dim bts As New List(Of Byte)
-    '    For Each ch As Char In text
-    '        If Not ch.Equals(char16) Then
-    '            bts += Convert.ToString(Convert.ToInt32(ch), 16)
-    '        End If
-    '    Next
-    '    Return System.Text.Encoding.ASCII.GetString(convertedText)
-    'End Function
+    Public Shared Function getNull(ByVal type As Integer) As String
+        'type: 0 = " ", 1 = "new Date", 2 = "current Date", 3="0"
+        Dim result As String = ""
+        If type = 0 Then
+            result = "   "
+        ElseIf type = 1 Then
+            result = New Date.ToString("dd-MMM-yy HH:mm:ss")
+        ElseIf type = 2 Then
+            result = Date.Now.ToString("dd-MMM-yy HH:mm:ss")
+        ElseIf type = 3 Then
+            result = "0"
+        End If
+        Return result
+    End Function
 End Class
