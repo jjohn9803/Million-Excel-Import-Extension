@@ -109,4 +109,7 @@ Public Class Function_Form
         End If
         Return result
     End Function
+    Public Shared Function convertDateFormat(ByVal datetime As String) As String
+        Return Convert.ToDateTime(datetime).ToString("dd-MMM-yy HH:mm:ss")
+    End Function
 End Class

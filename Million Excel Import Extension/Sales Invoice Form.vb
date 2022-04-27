@@ -561,223 +561,341 @@ Public Class Sales_Invoice_Form
                 Dim local_amount = qty * cost
                 value_arraylist(2)(row)(15) = Math.Round(local_amount, 2)
             End If
-
         Next
 
-        'End Hardcode Formula
-
-        For i As Integer = 0 To 0
-            For row As Integer = 0 To dgvExcel.RowCount - 1
-                For g As Integer = 0 To value_arraylist(i)(row).count - 1
-                    Dim value_temp As String = value_arraylist(i)(row)(g).ToString.Trim
-                    If value_temp.Equals("{FORMULA_VALUE}") Then
-                        Dim formula_temp = formula_arraylist(i)(g).ToString.Trim
-                        Dim finalized_temp = New List(Of String)(formula_temp.Split("?"c))
-                        Dim cal_result = ""
-                        Dim cal_type = ""
-                        For Each local_formula As String In finalized_temp
-                            If local_formula.Contains("+") Or local_formula.Contains("-") Or local_formula.Contains("*") Then
-                                Dim expression = New List(Of String)(local_formula.Split(New [Char]() {"+"c, "*"c, "-"c}))
-                                Dim calculation = local_formula
-                                'MsgBox(local_formula)
-                                For Each express As String In expression
-                                    Dim table_name_index = -1
-                                    Dim table_value_index = -1
-                                    Dim express_temp = (express.Replace("(", "")).Replace(")", "").Trim
-                                    Dim cal_value_temp = ""
-                                    If express_temp.Contains("~") Then
-                                        Dim table_name = express_temp.Split("~")(0).Trim
-                                        Dim table_value_name = express_temp.Split("~")(1).Trim
-                                        For yu = 0 To queryTable.Count - 1
-                                            Dim search_table_name = queryTable(yu)(1)
-                                            If table_name.Equals(search_table_name) Then
-                                                table_name_index = yu
-                                            End If
-                                        Next
-                                        'table_name_index=找到quo还是quo_desc OUTPUT:0或者1 同辈：query.i value(这里)()()
-                                        'getDescSource=找到这个desc是属于哪一个quo的(row) 例如：quo1拥有product1,2 quo2拥有product3,4,5 OUTPUT:0或者2 同辈：row value()(这里)()
-                                        'table_value_index=从sql的0或1找到符合formula express value名字在valuearraylist的位置 value()()(这里)
-                                        'value_arraylist=(type)(row)(value)
-                                        table_value_index = sql_format_arraylist(table_name_index).IndexOf(table_value_name)
-
-                                        Dim myTargets As New List(Of String)
-                                        For Each target As String In rangeQuo
-                                            Dim rangeStart = target.Split(".")(0)
-                                            If rangeStart.Equals(row.ToString) Then
-                                                myTargets.Add(target.Split(".")(1))
-                                                'MsgBox(row.ToString + " is adding " + target.Split(".")(1) + " as its target")
-                                            End If
-                                        Next
-                                        For Each target As String In myTargets
-                                            Dim getValueOfTarget = value_arraylist(table_name_index)(CInt(target))(table_value_index).ToString.Trim
-                                            cal_value_temp += getValueOfTarget + "+"
-                                        Next
-                                        cal_value_temp = "(" + cal_value_temp.Substring(0, cal_value_temp.Length - 1) + ")"
-
-                                        If cal_value_temp.Contains("{FORMULA_VALUE}") Then
-                                            MsgBox("No way formula_value gonna exists here!")
-                                            cal_value_temp = 0
-                                        End If
-
-                                        cal_type = "1"
-                                    Else
-                                        'valuearraylist(querytable,i)(table_name,0,1 % row)(table_index,values_index)
-                                        'Dim getDescSource = CInt(rangeQuo(row).ToString.Split(".")(0))
-                                        'table_name_index = 1
-                                        table_name_index = i
-                                        Dim table_value_name = express_temp.Trim
-                                        table_value_index = sql_format_arraylist(table_name_index).IndexOf(table_value_name)
-                                        If table_value_index <> -1 Then
-                                            cal_value_temp = value_arraylist(table_name_index)(row)(table_value_index).ToString.Trim
-                                            If cal_value_temp.Equals("{FORMULA_VALUE}") Then
-                                                MsgBox("WHY ARE YOU A FORMULA")
-                                                cal_value_temp = 0
-                                            End If
-                                        Else
-                                            'MsgBox("404 not found" + vbNewLine + table_name_index.ToString + vbNewLine + row.ToString + vbNewLine + table_value_index.ToString + vbNewLine + table_value_name)
-                                        End If
-
-                                        cal_type = "2"
-                                    End If
-                                    'MsgBox("From " + express_temp.ToString + " TO " + cal_value_temp.ToString)
-                                    If Not express_temp.Contains(".") Then
-                                        calculation = calculation.Replace(express_temp, cal_value_temp)
-                                    End If
-                                Next
-                                Try
-                                    cal_result = New DataTable().Compute(calculation, Nothing)
-                                    'MsgBox("After calculation and the result: " + cal_result)
-                                Catch ex As Exception
-                                    MsgBox("This calculation has problem -> " + calculation + vbNewLine + local_formula, MsgBoxStyle.Exclamation)
-                                    MsgBox(value_arraylist(0)(row)(33))
-                                    'Dim str = ""
-                                    'For Each temp As String In value_arraylist(0)(row)
-                                    '    str += temp + vbTab
-                                    'Next
-                                    'MsgBox(str)
-                                End Try
-
-                                'MsgBox("Calculation:" + vbTab + calculation + vbNewLine + local_formula)
-                            Else
-                                '没有加减乘除的单个value
-                                Dim table_name_index = -1
-                                Dim table_value_index = -1
-                                Dim cal_value_temp = ""
-                                Dim calculation = local_formula
-                                If calculation.Contains("~") Then
-                                    Dim table_name = calculation.Split("~")(0).Trim
-                                    Dim table_value_name = calculation.Split("~")(1).Trim
-                                    For yu = 0 To queryTable.Count - 1
-                                        Dim search_table_name = queryTable(yu)(1)
-                                        If table_name.Equals(search_table_name) Then
-                                            table_name_index = yu
-                                        End If
-                                    Next
-                                    'table_name_index=找到quo还是quo_desc OUTPUT:0或者1 同辈：query.i value(这里)()()
-                                    'getDescSource=找到这个desc是属于哪一个quo的(row) 例如：quo1拥有product1,2 quo2拥有product3,4,5 OUTPUT:0或者2 同辈：row value()(这里)()
-                                    'table_value_index=从sql的0或1找到符合formula express value名字在valuearraylist的位置 value()()(这里)
-                                    'value_arraylist=(type)(row)(value)
-                                    table_value_index = sql_format_arraylist(table_name_index).IndexOf(table_value_name)
-
-                                    Dim myTargets As New List(Of String)
-                                    For Each target As String In rangeQuo
-                                        Dim rangeStart = target.Split(".")(0)
-                                        If rangeStart.Equals(row.ToString) Then
-                                            myTargets.Add(target.Split(".")(1))
-                                            'MsgBox(row.ToString + " is adding " + target.Split(".")(1) + " as its target")
-                                        End If
-                                    Next
-                                    For Each target As String In myTargets
-                                        Dim getValueOfTarget = value_arraylist(table_name_index)(CInt(target))(table_value_index).ToString.Trim
-                                        cal_value_temp += getValueOfTarget + "+"
-                                    Next
-                                    cal_value_temp = "(" + cal_value_temp.Substring(0, cal_value_temp.Length - 1) + ")"
-                                    'MsgBox("Expresses: " + expresses.Substring(0, expresses.Length - 1) + vbNewLine + local_formula)
-                                    'Dim getDescSource = CInt(rangeQuo(row).ToString.Split(".")(0))
-
-                                    'cal_value_temp = value_arraylist(table_name_index)(getDescSource)(table_value_index).ToString.Trim
-                                    If cal_value_temp.Contains("{FORMULA_VALUE}") Then
-                                        MsgBox("No way formula_value gonna exists here!")
-                                        cal_value_temp = 0
-                                    End If
-                                    cal_type = "B1"
-                                Else
-                                    'table_name_index=找到quo还是quo_desc OUTPUT:0或者1 同辈：query.i value(这里)()()
-                                    'getDescSource=找到这个desc是属于哪一个quo的(row) 例如：quo1拥有product1,2 quo2拥有product3,4,5 OUTPUT:0或者2 同辈：row value()(这里)()
-                                    'table_value_index=从sql的0或1找到符合formula express value名字在valuearraylist的位置 value()()(这里)
-                                    'value_arraylist=(type)(row)(value)
-                                    table_name_index = i
-                                    Dim table_value_name = local_formula.Trim
-                                    table_value_index = sql_format_arraylist(table_name_index).IndexOf(table_value_name)
-                                    If table_value_index <> -1 Then
-                                        cal_value_temp = value_arraylist(table_name_index)(row)(table_value_index).ToString.Trim
-                                        If cal_value_temp.Equals("{FORMULA_VALUE}") Then
-                                            MsgBox("WHY ARE YOU A FORMULA")
-                                            cal_value_temp = 0
-                                        End If
-                                    Else
-                                        MsgBox("单品 404 not found" + vbNewLine + table_name_index.ToString + vbNewLine + row.ToString + vbNewLine + table_value_index.ToString + vbNewLine + table_value_name)
-                                    End If
-                                    cal_type = "B2"
-                                End If
-                                If Not calculation.Contains(".") Then
-                                    calculation = cal_value_temp
-                                End If
-                                Try
-                                    cal_result = New DataTable().Compute(calculation, Nothing)
-                                    'MsgBox("After calculation and the result: " + cal_result)
-                                Catch ex As Exception
-                                    MsgBox("This calculation has problem -> " + calculation + vbNewLine + local_formula, MsgBoxStyle.Exclamation)
-                                    MsgBox(value_arraylist(0)(row)(33))
-                                    'Dim str = ""
-                                    'For Each temp As String In value_arraylist(0)(row)
-                                    '    str += temp + vbTab
-                                    'Next
-                                    'MsgBox(str)
-                                End Try
-                            End If
-
-                        Next
-                        If cal_type = "" Then
-                            MsgBox("Empty -> " + formula_temp + vbNewLine + finalized_temp(0).ToString)
-                        End If
-                        'MsgBox("Upgrade value: " + value_arraylist(i)(row)(g) + vbNewLine + "This calculation -> " + cal_result + vbNewLine + formula_temp + vbNewLine + "Cal Type: " + cal_type, MsgBoxStyle.Exclamation)
-                        'value_arraylist(i)(row)(g) = Format(CDec(cal_result), "0.00").ToString
-                        If CDec(cal_result) <> 0 Then
-                            value_arraylist(i)(row)(g) = Format(CDec(cal_result), "0.00").ToString
-                        Else
-                            value_arraylist(i)(row)(g) = cal_result.ToString
-                        End If
-                    End If
-                Next
-            Next
-        Next
-
-        'Hardcore Taxable
+        'Hardcore Formula sinv
         For row As Integer = 0 To dgvExcel.RowCount - 1
             If Not value_arraylist(0)(row)(0).Equals("{INVALID ARRAY}") Then
-                'taxable
-                If value_arraylist(0)(row)(27).ToString.Trim.Equals("0") Then
+
+                Dim myTarget As New ArrayList
+                For Each target In rangeQuo
+                    If target.ToString.Split(".")(0).Equals(row.ToString) Then
+                        Dim targetRow = CInt(target.ToString.Split(".")(1))
+                        myTarget.Add(targetRow)
+                    End If
+                Next
+
+                'sinv.discount
+                If value_arraylist(0)(row)(21).Equals("{FORMULA_VALUE}") Then
+                    Dim discount1 = CDbl(value_arraylist(0)(row)(19))
+                    Dim discount2 = CDbl(value_arraylist(0)(row)(20))
+                    Dim discount = discount1 * discount2
+                    value_arraylist(0)(row)(21) = Math.Round(discount, 2)
+                End If
+
+                'sinv.taxable
+                If value_arraylist(0)(row)(27).Equals("{FORMULA_VALUE}") Then
                     'get query target
 
                     Dim taxable As Double = 0
-                    Dim myTarget As New ArrayList
-                    For Each target In rangeQuo
-                        If target.ToString.Split(".")(0).Equals(row.ToString) Then
-                            Dim targetRow = CInt(target.ToString.Split(".")(1))
-                            'myTarget.Add(target.ToString.Split(".")(1))
-                            Dim nett_amt = value_arraylist(1)(targetRow)(26)
-                            Dim taxcode = value_arraylist(1)(targetRow)(54)
-                            If taxcode.ToString.Trim.ToCharArray.Count > 0 Then
-                                taxable += nett_amt
-                            End If
+                    For Each targetRow As Integer In myTarget
+                        Dim nett_amt = value_arraylist(1)(targetRow)(26)
+                        Dim taxcode = value_arraylist(1)(targetRow)(54)
+                        If taxcode.ToString.Trim.ToCharArray.Count > 0 Then
+                            taxable += nett_amt
                         End If
                     Next
                     value_arraylist(0)(row)(27) = Math.Round(taxable, 2)
                 End If
+
+                'sinv.tax
+                If value_arraylist(0)(row)(31).Equals("{FORMULA_VALUE}") Then
+                    Dim tax = 0
+                    For Each targetRow As Integer In myTarget
+                        Dim taxamt1 = value_arraylist(1)(targetRow)(20)
+                        Dim taxamt2 = value_arraylist(1)(targetRow)(21)
+                        tax += taxamt1 + taxamt2
+                    Next
+                    value_arraylist(0)(row)(31) = Math.Round(tax, 2)
+                End If
+
+                'sinv.subtotal
+                If value_arraylist(0)(row)(33).Equals("{FORMULA_VALUE}") Then
+                    Dim subtotal = 0
+                    For Each targetRow As Integer In myTarget
+                        Dim amt = value_arraylist(1)(targetRow)(27)
+                        subtotal += amt
+                    Next
+                    value_arraylist(0)(row)(33) = Math.Round(subtotal, 2)
+                End If
+
+                'sinv.nett
+                If value_arraylist(0)(row)(34).Equals("{FORMULA_VALUE}") Then
+                    Dim nett = 0
+                    For Each targetRow As Integer In myTarget
+                        Dim nett_amt = value_arraylist(1)(targetRow)(26)
+                        nett += nett_amt
+                    Next
+                    value_arraylist(0)(row)(34) = Math.Round(nett, 2)
+                End If
+
+                'sinv.total
+                If value_arraylist(0)(row)(35).Equals("{FORMULA_VALUE}") Then
+                    Dim subtotal = value_arraylist(0)(row)(33)
+                    Dim tax = value_arraylist(0)(row)(31)
+                    Dim total = subtotal + tax
+                    value_arraylist(0)(row)(35) = Math.Round(total, 2)
+                End If
+
+                'sinv.local_gross
+                If value_arraylist(0)(row)(36).Equals("{FORMULA_VALUE}") Then
+                    Dim local_gross = 0
+                    For Each targetRow As Integer In myTarget
+                        Dim local_amt = value_arraylist(1)(targetRow)(36)
+                        local_gross += local_amt
+                    Next
+                    value_arraylist(0)(row)(36) = Math.Round(local_gross, 2)
+                End If
+
+                Dim fx_rate = value_arraylist(0)(row)(18)
+
+                'sinv.local_discount
+                If value_arraylist(0)(row)(37).Equals("{FORMULA_VALUE}") Then
+                    Dim discount = value_arraylist(0)(row)(21)
+                    Dim local_discount = discount * fx_rate
+                    value_arraylist(0)(row)(37) = Math.Round(local_discount, 2)
+                End If
+
+                'sinv.local_nett
+                If value_arraylist(0)(row)(38).Equals("{FORMULA_VALUE}") Then
+                    Dim nett = value_arraylist(0)(row)(34)
+                    Dim local_nett = nett * fx_rate
+                    value_arraylist(0)(row)(38) = Math.Round(local_nett, 2)
+                End If
+
+                'sinv.local_tax1
+                If value_arraylist(0)(row)(39).Equals("{FORMULA_VALUE}") Then
+                    Dim tax1 = value_arraylist(0)(row)(28)
+                    Dim local_tax1 = tax1 * fx_rate
+                    value_arraylist(0)(row)(39) = Math.Round(local_tax1, 2)
+                End If
+
+                'sinv.local_tax2
+                If value_arraylist(0)(row)(40).Equals("{FORMULA_VALUE}") Then
+                    Dim tax2 = value_arraylist(0)(row)(29)
+                    Dim local_tax2 = tax2 * fx_rate
+                    value_arraylist(0)(row)(40) = Math.Round(local_tax2, 2)
+                End If
+
+                'sinv.local_tax
+                If value_arraylist(0)(row)(41).Equals("{FORMULA_VALUE}") Then
+                    Dim tax = value_arraylist(0)(row)(31)
+                    Dim local_tax = tax * fx_rate
+                    value_arraylist(0)(row)(41) = Math.Round(local_tax, 2)
+                End If
+
+                'sinv.local_rndoff
+                If value_arraylist(0)(row)(42).Equals("{FORMULA_VALUE}") Then
+                    Dim rndoff = value_arraylist(0)(row)(32)
+                    Dim local_rndoff = rndoff * fx_rate
+                    value_arraylist(0)(row)(42) = Math.Round(local_rndoff, 2)
+                End If
+
+                'sinv.local_total
+                If value_arraylist(0)(row)(43).Equals("{FORMULA_VALUE}") Then
+                    Dim total = value_arraylist(0)(row)(35)
+                    Dim local_total = total * fx_rate
+                    value_arraylist(0)(row)(43) = Math.Round(local_total, 2)
+                End If
+
+                'sinv.local_totalrp
+                If value_arraylist(0)(row)(44).Equals("{FORMULA_VALUE}") Then
+                    Dim subtotal = value_arraylist(0)(row)(33)
+                    Dim local_totalrp = subtotal * fx_rate
+                    value_arraylist(0)(row)(44) = Math.Round(local_totalrp, 2)
+                End If
+
             End If
         Next
-        'End Hardcore Taxable
+
+        'End Hardcode Formula
+
+        'For i As Integer = 0 To 0
+        '    For row As Integer = 0 To dgvExcel.RowCount - 1
+        '        For g As Integer = 0 To value_arraylist(i)(row).count - 1
+        '            Dim value_temp As String = value_arraylist(i)(row)(g).ToString.Trim
+        '            If value_temp.Equals("{FORMULA_VALUE}") Then
+        '                Dim formula_temp = formula_arraylist(i)(g).ToString.Trim
+        '                Dim finalized_temp = New List(Of String)(formula_temp.Split("?"c))
+        '                Dim cal_result = ""
+        '                Dim cal_type = ""
+        '                For Each local_formula As String In finalized_temp
+        '                    If local_formula.Contains("+") Or local_formula.Contains("-") Or local_formula.Contains("*") Then
+        '                        Dim expression = New List(Of String)(local_formula.Split(New [Char]() {"+"c, "*"c, "-"c}))
+        '                        Dim calculation = local_formula
+        '                        'MsgBox(local_formula)
+        '                        For Each express As String In expression
+        '                            Dim table_name_index = -1
+        '                            Dim table_value_index = -1
+        '                            Dim express_temp = (express.Replace("(", "")).Replace(")", "").Trim
+        '                            Dim cal_value_temp = ""
+        '                            If express_temp.Contains("~") Then
+        '                                Dim table_name = express_temp.Split("~")(0).Trim
+        '                                Dim table_value_name = express_temp.Split("~")(1).Trim
+        '                                For yu = 0 To queryTable.Count - 1
+        '                                    Dim search_table_name = queryTable(yu)(1)
+        '                                    If table_name.Equals(search_table_name) Then
+        '                                        table_name_index = yu
+        '                                    End If
+        '                                Next
+        '                                'table_name_index=找到quo还是quo_desc OUTPUT:0或者1 同辈：query.i value(这里)()()
+        '                                'getDescSource=找到这个desc是属于哪一个quo的(row) 例如：quo1拥有product1,2 quo2拥有product3,4,5 OUTPUT:0或者2 同辈：row value()(这里)()
+        '                                'table_value_index=从sql的0或1找到符合formula express value名字在valuearraylist的位置 value()()(这里)
+        '                                'value_arraylist=(type)(row)(value)
+        '                                table_value_index = sql_format_arraylist(table_name_index).IndexOf(table_value_name)
+
+        '                                Dim myTargets As New List(Of String)
+        '                                For Each target As String In rangeQuo
+        '                                    Dim rangeStart = target.Split(".")(0)
+        '                                    If rangeStart.Equals(row.ToString) Then
+        '                                        myTargets.Add(target.Split(".")(1))
+        '                                        'MsgBox(row.ToString + " is adding " + target.Split(".")(1) + " as its target")
+        '                                    End If
+        '                                Next
+        '                                For Each target As String In myTargets
+        '                                    Dim getValueOfTarget = value_arraylist(table_name_index)(CInt(target))(table_value_index).ToString.Trim
+        '                                    cal_value_temp += getValueOfTarget + "+"
+        '                                Next
+        '                                cal_value_temp = "(" + cal_value_temp.Substring(0, cal_value_temp.Length - 1) + ")"
+
+        '                                If cal_value_temp.Contains("{FORMULA_VALUE}") Then
+        '                                    MsgBox("No way formula_value gonna exists here!")
+        '                                    cal_value_temp = 0
+        '                                End If
+
+        '                                cal_type = "1"
+        '                            Else
+        '                                'valuearraylist(querytable,i)(table_name,0,1 % row)(table_index,values_index)
+        '                                'Dim getDescSource = CInt(rangeQuo(row).ToString.Split(".")(0))
+        '                                'table_name_index = 1
+        '                                table_name_index = i
+        '                                Dim table_value_name = express_temp.Trim
+        '                                table_value_index = sql_format_arraylist(table_name_index).IndexOf(table_value_name)
+        '                                If table_value_index <> -1 Then
+        '                                    cal_value_temp = value_arraylist(table_name_index)(row)(table_value_index).ToString.Trim
+        '                                    If cal_value_temp.Equals("{FORMULA_VALUE}") Then
+        '                                        MsgBox("WHY ARE YOU A FORMULA")
+        '                                        cal_value_temp = 0
+        '                                    End If
+        '                                Else
+        '                                    'MsgBox("404 not found" + vbNewLine + table_name_index.ToString + vbNewLine + row.ToString + vbNewLine + table_value_index.ToString + vbNewLine + table_value_name)
+        '                                End If
+
+        '                                cal_type = "2"
+        '                            End If
+        '                            'MsgBox("From " + express_temp.ToString + " TO " + cal_value_temp.ToString)
+        '                            If Not express_temp.Contains(".") Then
+        '                                calculation = calculation.Replace(express_temp, cal_value_temp)
+        '                            End If
+        '                        Next
+        '                        Try
+        '                            cal_result = New DataTable().Compute(calculation, Nothing)
+        '                            'MsgBox("After calculation and the result: " + cal_result)
+        '                        Catch ex As Exception
+        '                            MsgBox("This calculation has problem -> " + calculation + vbNewLine + local_formula, MsgBoxStyle.Exclamation)
+        '                            MsgBox(value_arraylist(0)(row)(33))
+        '                            'Dim str = ""
+        '                            'For Each temp As String In value_arraylist(0)(row)
+        '                            '    str += temp + vbTab
+        '                            'Next
+        '                            'MsgBox(str)
+        '                        End Try
+
+        '                        'MsgBox("Calculation:" + vbTab + calculation + vbNewLine + local_formula)
+        '                    Else
+        '                        '没有加减乘除的单个value
+        '                        Dim table_name_index = -1
+        '                        Dim table_value_index = -1
+        '                        Dim cal_value_temp = ""
+        '                        Dim calculation = local_formula
+        '                        If calculation.Contains("~") Then
+        '                            Dim table_name = calculation.Split("~")(0).Trim
+        '                            Dim table_value_name = calculation.Split("~")(1).Trim
+        '                            For yu = 0 To queryTable.Count - 1
+        '                                Dim search_table_name = queryTable(yu)(1)
+        '                                If table_name.Equals(search_table_name) Then
+        '                                    table_name_index = yu
+        '                                End If
+        '                            Next
+        '                            'table_name_index=找到quo还是quo_desc OUTPUT:0或者1 同辈：query.i value(这里)()()
+        '                            'getDescSource=找到这个desc是属于哪一个quo的(row) 例如：quo1拥有product1,2 quo2拥有product3,4,5 OUTPUT:0或者2 同辈：row value()(这里)()
+        '                            'table_value_index=从sql的0或1找到符合formula express value名字在valuearraylist的位置 value()()(这里)
+        '                            'value_arraylist=(type)(row)(value)
+        '                            table_value_index = sql_format_arraylist(table_name_index).IndexOf(table_value_name)
+
+        '                            Dim myTargets As New List(Of String)
+        '                            For Each target As String In rangeQuo
+        '                                Dim rangeStart = target.Split(".")(0)
+        '                                If rangeStart.Equals(row.ToString) Then
+        '                                    myTargets.Add(target.Split(".")(1))
+        '                                    'MsgBox(row.ToString + " is adding " + target.Split(".")(1) + " as its target")
+        '                                End If
+        '                            Next
+        '                            For Each target As String In myTargets
+        '                                Dim getValueOfTarget = value_arraylist(table_name_index)(CInt(target))(table_value_index).ToString.Trim
+        '                                cal_value_temp += getValueOfTarget + "+"
+        '                            Next
+        '                            cal_value_temp = "(" + cal_value_temp.Substring(0, cal_value_temp.Length - 1) + ")"
+        '                            'MsgBox("Expresses: " + expresses.Substring(0, expresses.Length - 1) + vbNewLine + local_formula)
+        '                            'Dim getDescSource = CInt(rangeQuo(row).ToString.Split(".")(0))
+
+        '                            'cal_value_temp = value_arraylist(table_name_index)(getDescSource)(table_value_index).ToString.Trim
+        '                            If cal_value_temp.Contains("{FORMULA_VALUE}") Then
+        '                                MsgBox("No way formula_value gonna exists here!")
+        '                                cal_value_temp = 0
+        '                            End If
+        '                            cal_type = "B1"
+        '                        Else
+        '                            'table_name_index=找到quo还是quo_desc OUTPUT:0或者1 同辈：query.i value(这里)()()
+        '                            'getDescSource=找到这个desc是属于哪一个quo的(row) 例如：quo1拥有product1,2 quo2拥有product3,4,5 OUTPUT:0或者2 同辈：row value()(这里)()
+        '                            'table_value_index=从sql的0或1找到符合formula express value名字在valuearraylist的位置 value()()(这里)
+        '                            'value_arraylist=(type)(row)(value)
+        '                            table_name_index = i
+        '                            Dim table_value_name = local_formula.Trim
+        '                            table_value_index = sql_format_arraylist(table_name_index).IndexOf(table_value_name)
+        '                            If table_value_index <> -1 Then
+        '                                cal_value_temp = value_arraylist(table_name_index)(row)(table_value_index).ToString.Trim
+        '                                If cal_value_temp.Equals("{FORMULA_VALUE}") Then
+        '                                    MsgBox("WHY ARE YOU A FORMULA")
+        '                                    cal_value_temp = 0
+        '                                End If
+        '                            Else
+        '                                MsgBox("单品 404 not found" + vbNewLine + table_name_index.ToString + vbNewLine + row.ToString + vbNewLine + table_value_index.ToString + vbNewLine + table_value_name)
+        '                            End If
+        '                            cal_type = "B2"
+        '                        End If
+        '                        If Not calculation.Contains(".") Then
+        '                            calculation = cal_value_temp
+        '                        End If
+        '                        Try
+        '                            cal_result = New DataTable().Compute(calculation, Nothing)
+        '                            'MsgBox("After calculation and the result: " + cal_result)
+        '                        Catch ex As Exception
+        '                            MsgBox("This calculation has problem -> " + calculation + vbNewLine + local_formula, MsgBoxStyle.Exclamation)
+        '                            MsgBox(value_arraylist(0)(row)(33))
+        '                            'Dim str = ""
+        '                            'For Each temp As String In value_arraylist(0)(row)
+        '                            '    str += temp + vbTab
+        '                            'Next
+        '                            'MsgBox(str)
+        '                        End Try
+        '                    End If
+
+        '                Next
+        '                If cal_type = "" Then
+        '                    MsgBox("Empty -> " + formula_temp + vbNewLine + finalized_temp(0).ToString)
+        '                End If
+        '                'MsgBox("Upgrade value: " + value_arraylist(i)(row)(g) + vbNewLine + "This calculation -> " + cal_result + vbNewLine + formula_temp + vbNewLine + "Cal Type: " + cal_type, MsgBoxStyle.Exclamation)
+        '                'value_arraylist(i)(row)(g) = Format(CDec(cal_result), "0.00").ToString
+        '                If CDec(cal_result) <> 0 Then
+        '                    value_arraylist(i)(row)(g) = Format(CDec(cal_result), "0.00").ToString
+        '                Else
+        '                    value_arraylist(i)(row)(g) = cal_result.ToString
+        '                End If
+        '            End If
+        '        Next
+        '    Next
+        'Next
 
         'hardcore exist checker
         Dim execute_valid As Boolean = True
@@ -1049,6 +1167,17 @@ Public Class Sales_Invoice_Form
             Return
         End If
 
+        'For i As Integer = 0 To 1
+        '    For row As Integer = 0 To dgvExcel.RowCount - 1
+        '        Dim strs = ""
+        '        For Each str As String In value_arraylist(i)(row)
+        '            strs += str + vbTab
+        '        Next
+        '        MsgBox("Row " + row.ToString + vbNewLine + strs)
+        '    Next
+        'Next
+
+        Function_Form.printExcelResult("Sales_Invoice", queryTable, value_arraylist, sql_format_arraylist, dgvExcel)
         Dim confirmImport As DialogResult = MsgBox("Are you sure to import data?", MsgBoxStyle.YesNo)
         If confirmImport = DialogResult.No Then
             Return
@@ -1066,26 +1195,68 @@ Public Class Sales_Invoice_Form
                         Exit For
                     End If
                 Next
+
+                Dim query_temp As New ArrayList
+                query_temp.Add("I") 'billtype
+                query_temp.Add(Function_Form.getNull(0)) 'remark1
+                query_temp.Add(Function_Form.getNull(0)) 'remark2
+                query_temp.Add(Function_Form.getNull(0)) 'cheque_no
+                query_temp.Add(Function_Form.getNull(1)) 'chqrc_date
+                query_temp.Add(Function_Form.getNull(1)) 'koff_date
+                query_temp.Add(Function_Form.getNull(1)) 'recon_date
+                query_temp.Add(Function_Form.getNull(3)) 'recon_flag
+                query_temp.Add(value_arraylist(0)(row)(16)) 'accmgr_id
+                query_temp.Add(Function_Form.getNull(0)) 'lkdoc_type
+                query_temp.Add(Function_Form.getNull(0)) 'lkdoc_no
+                query_temp.Add(Function_Form.getNull(3)) 'lkseq
+                query_temp.Add("1") 'lock
+                query_temp.Add(Function_Form.getNull(3)) 'void
+                query_temp.Add(Function_Form.getNull(3)) 'exported
+                query_temp.Add(Function_Form.getNull(0)) 'entry
+                query_temp.Add(Function_Form.getNull(3)) 'fastentry
+                query_temp.Add(Function_Form.getNull(3)) 'followdesp
+                query_temp.Add(Function_Form.getNull(3)) 'tsid
+                query_temp.Add(Function_Form.getNull(0)) 'spcode
+                query_temp.Add(Function_Form.getNull(1)) 'taxdate
+                query_temp.Add(Function_Form.getNull(1)) 'taxdate_bt
+                query_temp.Add(value_arraylist(0)(row)(112)) 'createdby
+                query_temp.Add(value_arraylist(0)(row)(112)) 'updatedby
+                query_temp.Add(Function_Form.getNull(2)) 'createdate
+                query_temp.Add(Function_Form.getNull(2)) 'lastupdate
+                Dim cmd_last = ""
+                For j = 0 To query_temp.Count - 1
+                    cmd_last += "'" + query_temp(j) + "',"
+                Next
+                cmd_last = cmd_last.Substring(0, cmd_last.Length - 1) + ")"
+
                 Dim seq = 1
-                Dim cmd = queryTable(4)(2)
+                Dim queryAL As New ArrayList
+                Dim amount = 0
+                Dim debit = 0
+                Dim credit = 0
+                Dim fx_rate = 0
+                Dim fx_amount = 0
+                Dim fx_debit = 0
+                Dim fx_credit = 0
                 For i = startRange To endRange
-                    Dim queryAL As New ArrayList
+                    queryAL.Clear()
+                    'Product
                     queryAL.Add(value_arraylist(1)(i)(57)) 'accno
                     queryAL.Add("SI") 'doc_type
-                    queryAL.Add(value_arraylist(0)(i)(1)) 'doc_no
+                    queryAL.Add(value_arraylist(0)(row)(1)) 'doc_no
                     queryAL.Add(seq) 'seq
-                    queryAL.Add(value_arraylist(0)(i)(2)) 'doc_date
-                    queryAL.Add(value_arraylist(0)(i)(1)) 'refno
-                    queryAL.Add(Function_Form.getNull(0)) 'refno2
+                    queryAL.Add(Function_Form.convertDateFormat(value_arraylist(0)(row)(2))) 'doc_date
+                    queryAL.Add(value_arraylist(0)(row)(1)) 'refno
+                    queryAL.Add(value_arraylist(0)(row)(9)) 'refno2
                     queryAL.Add(Function_Form.getNull(0)) 'refno3
-                    queryAL.Add(value_arraylist(0)(i)(3)) 'desp
-                    queryAL.Add(value_arraylist(0)(i)(4)) 'desp2
+                    queryAL.Add(value_arraylist(0)(row)(11)) 'desp
+                    queryAL.Add(value_arraylist(0)(row)(4)) 'desp2
                     queryAL.Add(Function_Form.getNull(0)) 'desp3
                     queryAL.Add(Function_Form.getNull(0)) 'desp4
-                    Dim amount = Math.Round(CDbl(value_arraylist(1)(i)(26)) * -1, 2)
+                    amount = Math.Round(CDbl(value_arraylist(1)(i)(26)) * -1, 2)
                     queryAL.Add(amount) 'amount
-                    Dim debit = 0
-                    Dim credit = 0
+                    debit = 0
+                    credit = 0
                     If amount < 0 Then
                         credit = amount * -1
                     Else
@@ -1093,25 +1264,636 @@ Public Class Sales_Invoice_Form
                     End If
                     queryAL.Add(debit) 'debit
                     queryAL.Add(credit) 'credit
-                    Dim fx_rate = CDbl(value_arraylist(0)(i)(18))
-                    Dim fx_amount = Math.Round(amount * fx_rate, 2)
-                    Dim fx_debit = Math.Round(debit * fx_rate, 2)
-                    Dim fx_credit = Math.Round(credit * fx_rate, 2)
+                    fx_rate = CDbl(value_arraylist(0)(row)(18))
+                    fx_amount = Math.Round(amount * fx_rate, 2)
+                    fx_debit = Math.Round(debit * fx_rate, 2)
+                    fx_credit = Math.Round(credit * fx_rate, 2)
                     queryAL.Add(fx_amount) 'fx_amount
                     queryAL.Add(fx_debit) 'fx_debit
                     queryAL.Add(fx_credit) 'fx_credit
                     queryAL.Add(fx_rate) 'fx_rate
-                    queryAL.Add(value_arraylist(0)(i)(17)) 'curr_code
-                    queryAL.Add(value_arraylist(0)(i)(48)) 'batchno
-                    queryAL.Add(value_arraylist(0)(i)(49)) 'projcode
-                    queryAL.Add(value_arraylist(0)(i)(50)) 'deptcode
-                    queryAL.Add(value_arraylist(1)(i)(54)) 'taxcode
-                    Dim taxable = Math.Round(CDbl(value_arraylist(0)(i)(27)) * -1, 2)
-                    Dim fx_taxable = taxable * fx_rate
-                    Dim link_seq = seq
+                    queryAL.Add(value_arraylist(0)(row)(17)) 'curr_code
+                    queryAL.Add(value_arraylist(0)(row)(48)) 'batchno
+                    queryAL.Add(value_arraylist(0)(row)(49)) 'projcode
+                    queryAL.Add(value_arraylist(0)(row)(50)) 'deptcode
+                    queryAL.Add(Function_Form.getNull(0)) 'taxcode
+                    queryAL.Add(Function_Form.getNull(3)) 'taxable
+                    queryAL.Add(Function_Form.getNull(3)) 'fx_taxable
+                    queryAL.Add(Function_Form.getNull(3)) 'link_seq
 
+                    Dim execmd As String = queryTable(4)(2)
+                    For j = 0 To queryAL.Count - 1
+                        Try
+                            execmd += "'" + queryAL(j) + "',"
+                        Catch ex As InvalidCastException
+                            execmd += "'" + queryAL(j).ToString + "',"
+                        End Try
+                    Next
+                    execmd = execmd + cmd_last
+                    'MsgBox("COUNT: " + (queryAL.Count + query_temp.Count).ToString)
+                    'Clipboard.SetText(execmd)
+                    'MsgBox(execmd)
+                    myConn.Open()
+                    Dim cmd1 = New SqlCommand(execmd, myConn)
+                    cmd1.ExecuteNonQuery()
+                    myConn.Close()
                     seq += 1
+
+                    'If product has tax
+                    Dim taxcode = value_arraylist(1)(i)(54).ToString.Trim
+                    If Not taxcode.Equals(String.Empty) Then
+                        queryAL.Clear()
+                        Dim accno = String.Empty
+                        myConn.Open()
+                        Dim gltaxcommand = New SqlCommand("SELECT accno FROM gltax WHERE taxcode ='" + taxcode + "'", myConn)
+                        Dim gltaxreader As SqlDataReader = gltaxcommand.ExecuteReader
+                        While gltaxreader.Read()
+                            accno = gltaxreader.GetValue(0)
+                        End While
+                        myConn.Close()
+                        If accno.Equals(String.Empty) Then
+                            MsgBox("Tax Code '" + taxcode + "' is not found in database!" + vbNewLine + " The operation has been stopped!", MsgBoxStyle.Critical)
+                            Return
+                        Else
+                            queryAL.Add(accno) 'accno
+                        End If
+                        queryAL.Add("SI") 'doc_type
+                        queryAL.Add(value_arraylist(0)(row)(1)) 'doc_no
+                        queryAL.Add(seq) 'seq
+                        queryAL.Add(Function_Form.convertDateFormat(value_arraylist(0)(row)(2))) 'doc_date
+                        queryAL.Add(value_arraylist(0)(row)(1)) 'refno
+                        queryAL.Add(value_arraylist(0)(row)(9)) 'refno2
+                        queryAL.Add(Function_Form.getNull(0)) 'refno3
+                        queryAL.Add(value_arraylist(0)(row)(11)) 'desp
+                        queryAL.Add(value_arraylist(0)(row)(4)) 'desp2
+                        queryAL.Add(Function_Form.getNull(0)) 'desp3
+                        queryAL.Add(Function_Form.getNull(0)) 'desp4
+                        amount = Math.Round(CDbl(value_arraylist(1)(i)(23)) * -1, 2)
+                        queryAL.Add(amount) 'amount
+                        debit = 0
+                        credit = 0
+                        If amount < 0 Then
+                            credit = amount * -1
+                        Else
+                            debit = amount
+                        End If
+                        queryAL.Add(debit) 'debit
+                        queryAL.Add(credit) 'credit
+                        fx_rate = CDbl(value_arraylist(0)(row)(18))
+                        fx_amount = Math.Round(amount * fx_rate, 2)
+                        fx_debit = Math.Round(debit * fx_rate, 2)
+                        fx_credit = Math.Round(credit * fx_rate, 2)
+                        queryAL.Add(fx_amount) 'fx_amount
+                        queryAL.Add(fx_debit) 'fx_debit
+                        queryAL.Add(fx_credit) 'fx_credit
+                        queryAL.Add(fx_rate) 'fx_rate
+                        queryAL.Add(value_arraylist(0)(row)(17)) 'curr_code
+                        queryAL.Add(value_arraylist(0)(row)(48)) 'batchno
+                        queryAL.Add(value_arraylist(0)(row)(49)) 'projcode
+                        queryAL.Add(value_arraylist(0)(row)(50)) 'deptcode
+                        queryAL.Add(taxcode) 'taxcode
+                        Dim taxable = Math.Round(CDbl(value_arraylist(0)(row)(27)) * -1, 2)
+                        queryAL.Add(taxable) 'taxable
+                        queryAL.Add(taxable * fx_rate) 'fx_taxable
+                        queryAL.Add((seq - 1).ToString) 'link_seq
+
+                        Dim execmd2 = queryTable(4)(2)
+                        For j = 0 To queryAL.Count - 1
+                            execmd2 += "'" + queryAL(j).ToString + "',"
+                        Next
+                        execmd2 = execmd2 + cmd_last
+                        myConn.Open()
+                        Dim cmd2 = New SqlCommand(execmd2, myConn)
+                        cmd2.ExecuteNonQuery()
+                        myConn.Close()
+                        seq += 1
+                    End If
                 Next
+
+                queryAL.Clear()
+                'Subtotal of Product
+                queryAL.Add(value_arraylist(0)(row)(10)) 'accno
+                queryAL.Add("SI") 'doc_type
+                queryAL.Add(value_arraylist(0)(row)(1)) 'doc_no
+                queryAL.Add(seq) 'seq
+                queryAL.Add(Function_Form.convertDateFormat(value_arraylist(0)(row)(2))) 'doc_date
+                queryAL.Add(value_arraylist(0)(row)(1)) 'refno
+                queryAL.Add(value_arraylist(0)(row)(9)) 'refno2
+                queryAL.Add(Function_Form.getNull(0)) 'refno3
+                queryAL.Add(value_arraylist(0)(row)(3)) 'desp
+                queryAL.Add(value_arraylist(0)(row)(4)) 'desp2
+                queryAL.Add(Function_Form.getNull(0)) 'desp3
+                queryAL.Add(Function_Form.getNull(0)) 'desp4
+                amount = Math.Round(CDbl(value_arraylist(0)(row)(35)) * -1, 2)
+                queryAL.Add(amount) 'amount
+                debit = 0
+                credit = 0
+                If amount < 0 Then
+                    credit = amount * -1
+                Else
+                    debit = amount
+                End If
+                queryAL.Add(debit) 'debit
+                queryAL.Add(credit) 'credit
+                fx_rate = CDbl(value_arraylist(0)(row)(18))
+                fx_amount = Math.Round(amount * fx_rate, 2)
+                fx_debit = Math.Round(debit * fx_rate, 2)
+                fx_credit = Math.Round(credit * fx_rate, 2)
+                queryAL.Add(fx_amount) 'fx_amount
+                queryAL.Add(fx_debit) 'fx_debit
+                queryAL.Add(fx_credit) 'fx_credit
+                queryAL.Add(fx_rate) 'fx_rate
+                queryAL.Add(value_arraylist(0)(row)(17)) 'curr_code
+                queryAL.Add(value_arraylist(0)(row)(48)) 'batchno
+                queryAL.Add(value_arraylist(0)(row)(49)) 'projcode
+                queryAL.Add(value_arraylist(0)(row)(50)) 'deptcode
+                queryAL.Add(Function_Form.getNull(0)) 'taxcode
+                queryAL.Add(Function_Form.getNull(3)) 'taxable
+                queryAL.Add(Function_Form.getNull(3)) 'fx_taxable
+                queryAL.Add(Function_Form.getNull(3)) 'link_seq
+
+                Dim subtotalcmd As String = queryTable(4)(2)
+                For j = 0 To queryAL.Count - 1
+                    subtotalcmd += "'" + queryAL(j).ToString + "',"
+                Next
+                subtotalcmd = subtotalcmd + cmd_last
+                myConn.Open()
+                Dim cmd3 = New SqlCommand(subtotalcmd, myConn)
+                cmd3.ExecuteNonQuery()
+                myConn.Close()
+                seq += 1
+
+                Dim acc_p1 = dgvExcel.Rows(row).Cells("Mode of Payment 1").Value.ToString.Trim
+                Dim ref_p1 = dgvExcel.Rows(row).Cells("Mode of Payment 1 Ref No").Value.ToString.Trim
+                Dim amt_p1 = dgvExcel.Rows(row).Cells("Mode of Payment 1 Amount").Value.ToString.Trim
+                Dim acc_p2 = dgvExcel.Rows(row).Cells("Mode of Payment 2").Value.ToString.Trim
+                Dim ref_p2 = dgvExcel.Rows(row).Cells("Mode of Payment 2 Ref No").Value.ToString.Trim
+                Dim amt_p2 = dgvExcel.Rows(row).Cells("Mode of Payment 2 Amount").Value.ToString.Trim
+                Dim acc_p3 = dgvExcel.Rows(row).Cells("Mode of Payment 3").Value.ToString.Trim
+                Dim ref_p3 = dgvExcel.Rows(row).Cells("Mode of Payment 3 Ref No").Value.ToString.Trim
+                Dim amt_p3 = dgvExcel.Rows(row).Cells("Mode of Payment 3 Amount").Value.ToString.Trim
+                Dim acc_p4 = dgvExcel.Rows(row).Cells("Mode of Payment 4").Value.ToString.Trim
+                Dim ref_p4 = dgvExcel.Rows(row).Cells("Mode of Payment 4 Ref No").Value.ToString.Trim
+                Dim amt_p4 = dgvExcel.Rows(row).Cells("Mode of Payment 4 Amount").Value.ToString.Trim
+                Dim p_def = -1
+                Dim p_def_accno = ""
+                Dim p_def_refno = ""
+                If Not acc_p1.Equals(String.Empty) Then
+                    p_def = 1
+                    p_def_accno = acc_p1
+                    p_def_refno = ref_p1
+                Else
+                    If Not acc_p2.Equals(String.Empty) Then
+                        p_def = 2
+                        p_def_accno = acc_p2
+                        p_def_refno = ref_p2
+                    Else
+                        If Not acc_p3.Equals(String.Empty) Then
+                            p_def = 3
+                            p_def_accno = acc_p3
+                            p_def_refno = ref_p3
+                        Else
+                            If Not acc_p4.Equals(String.Empty) Then
+                                p_def = 4
+                                p_def_accno = acc_p4
+                                p_def_refno = ref_p4
+                            End If
+                        End If
+                    End If
+                End If
+                If p_def = -1 Then
+                    Continue For
+                End If
+                myConn.Open()
+                Dim gldatacommand = New SqlCommand("SELECT accdesp,accdesp2 FROM gldata WHERE accno ='" + p_def_accno + "'", myConn)
+                Dim gldatareader As SqlDataReader = gldatacommand.ExecuteReader
+                Dim p_def_desp = ""
+                Dim p_def_desp2 = ""
+                While gldatareader.Read()
+                    p_def_desp = gldatareader.GetValue(0)
+                    p_def_desp2 = gldatareader.GetValue(1)
+                End While
+                myConn.Close()
+
+                queryAL.Clear()
+                'Subtotal Of Default Payment
+                queryAL.Add(value_arraylist(0)(row)(10)) 'accno
+                queryAL.Add("SI") 'doc_type
+                queryAL.Add(value_arraylist(0)(row)(1)) 'doc_no
+                queryAL.Add(seq) 'seq
+                queryAL.Add(Function_Form.convertDateFormat(value_arraylist(0)(row)(2))) 'doc_date
+                queryAL.Add(value_arraylist(0)(row)(1)) 'refno
+                queryAL.Add(value_arraylist(0)(row)(9)) 'refno2
+                queryAL.Add(Function_Form.getNull(0)) 'refno3
+                queryAL.Add(p_def_desp) 'desp
+                queryAL.Add(p_def_desp2) 'desp2
+                queryAL.Add(Function_Form.getNull(0)) 'desp3
+                queryAL.Add(Function_Form.getNull(0)) 'desp4
+                If Not amt_p1.Equals(String.Empty) Then
+                    MsgBox(amt_p1)
+                    amt_p1 = Math.Round(CDbl(amt_p1), 2)
+                Else
+                    amt_p1 = 0
+                End If
+                If Not amt_p2.Equals(String.Empty) Then
+                    amt_p2 = Math.Round(CDbl(amt_p2), 2)
+                Else
+                    amt_p2 = 0
+                End If
+                If Not amt_p3.Equals(String.Empty) Then
+                    amt_p3 = Math.Round(CDbl(amt_p3), 2)
+                Else
+                    amt_p3 = 0
+                End If
+                If Not amt_p4.Equals(String.Empty) Then
+                    amt_p4 = Math.Round(CDbl(amt_p4), 2)
+                Else
+                    amt_p4 = 0
+                End If
+                amount = (amt_p1 + amt_p2 + amt_p3 + amt_p4) * -1
+                queryAL.Add(amount) 'amount
+                debit = 0
+                credit = 0
+                If amount < 0 Then
+                    credit = amount * -1
+                Else
+                    debit = amount
+                End If
+                queryAL.Add(debit) 'debit
+                queryAL.Add(credit) 'credit
+                fx_rate = CDbl(value_arraylist(0)(row)(18))
+                fx_amount = Math.Round(amount * fx_rate, 2)
+                fx_debit = Math.Round(debit * fx_rate, 2)
+                fx_credit = Math.Round(credit * fx_rate, 2)
+                queryAL.Add(fx_amount) 'fx_amount
+                queryAL.Add(fx_debit) 'fx_debit
+                queryAL.Add(fx_credit) 'fx_credit
+                queryAL.Add(fx_rate) 'fx_rate
+                queryAL.Add(value_arraylist(0)(row)(17)) 'curr_code
+                queryAL.Add(value_arraylist(0)(row)(48)) 'batchno
+                queryAL.Add(value_arraylist(0)(row)(49)) 'projcode
+                queryAL.Add(value_arraylist(0)(row)(50)) 'deptcode
+                queryAL.Add(Function_Form.getNull(0)) 'taxcode
+                queryAL.Add(Function_Form.getNull(3)) 'taxable
+                queryAL.Add(Function_Form.getNull(3)) 'fx_taxable
+                queryAL.Add(Function_Form.getNull(3)) 'link_seq
+                queryAL.Add("I") 'billtype
+                queryAL.Add(Function_Form.getNull(0)) 'remark1
+                queryAL.Add(Function_Form.getNull(0)) 'remark2
+                queryAL.Add(p_def_refno) 'cheque_no
+                queryAL.Add(value_arraylist(0)(row)(2)) 'chqrc_date
+                queryAL.Add(Function_Form.getNull(1)) 'koff_date
+                queryAL.Add(Function_Form.getNull(1)) 'recon_date
+                queryAL.Add(Function_Form.getNull(3)) 'recon_flag
+                queryAL.Add(value_arraylist(0)(row)(16)) 'accmgr_id
+                queryAL.Add(Function_Form.getNull(0)) 'lkdoc_type
+                queryAL.Add(Function_Form.getNull(0)) 'lkdoc_no
+                queryAL.Add(Function_Form.getNull(3)) 'lkseq
+                queryAL.Add("1") 'lock
+                queryAL.Add(Function_Form.getNull(3)) 'void
+                queryAL.Add(Function_Form.getNull(3)) 'exported
+                queryAL.Add(Function_Form.getNull(0)) 'entry
+                queryAL.Add(Function_Form.getNull(3)) 'fastentry
+                queryAL.Add(Function_Form.getNull(3)) 'followdesp
+                queryAL.Add(Function_Form.getNull(3)) 'tsid
+                queryAL.Add(Function_Form.getNull(0)) 'spcode
+                queryAL.Add(Function_Form.getNull(1)) 'taxdate
+                queryAL.Add(Function_Form.getNull(1)) 'taxdate_bt
+                queryAL.Add(value_arraylist(0)(row)(112)) 'createdby
+                queryAL.Add(value_arraylist(0)(row)(112)) 'updatedby
+                queryAL.Add(Function_Form.getNull(2)) 'createdate
+                queryAL.Add(Function_Form.getNull(2)) 'lastupdate
+
+                Dim subtotalpaycmd As String = queryTable(4)(2)
+                For j = 0 To queryAL.Count - 1
+                    subtotalpaycmd += "'" + queryAL(j).ToString + "',"
+                Next
+                subtotalpaycmd = subtotalpaycmd.Substring(0, subtotalpaycmd.Length - 1) + ")"
+                myConn.Open()
+                Dim cmd4 = New SqlCommand(subtotalpaycmd, myConn)
+                cmd4.ExecuteNonQuery()
+                myConn.Close()
+                seq += 1
+
+                'Subtotal Of Payment1
+                If Not acc_p1.Equals(String.Empty) Then
+                    queryAL.Clear()
+                    queryAL.Add(acc_p1) 'accno
+                    queryAL.Add("SI") 'doc_type
+                    queryAL.Add(value_arraylist(0)(row)(1)) 'doc_no
+                    queryAL.Add(seq) 'seq
+                    queryAL.Add(Function_Form.convertDateFormat(value_arraylist(0)(row)(2))) 'doc_date
+                    queryAL.Add(value_arraylist(0)(row)(1)) 'refno
+                    queryAL.Add(value_arraylist(0)(row)(9)) 'refno2
+                    queryAL.Add(Function_Form.getNull(0)) 'refno3
+                    queryAL.Add(value_arraylist(0)(row)(11)) 'desp
+                    queryAL.Add(Function_Form.getNull(0)) 'desp2
+                    queryAL.Add(Function_Form.getNull(0)) 'desp3
+                    queryAL.Add(Function_Form.getNull(0)) 'desp4
+                    queryAL.Add(amt_p1) 'amount
+                    debit = 0
+                    credit = 0
+                    If amt_p1 < 0 Then
+                        credit = amt_p1 * -1
+                    Else
+                        debit = amt_p1
+                    End If
+                    queryAL.Add(debit) 'debit
+                    queryAL.Add(credit) 'credit
+                    fx_rate = CDbl(value_arraylist(0)(row)(18))
+                    fx_amount = Math.Round(amt_p1 * fx_rate, 2)
+                    fx_debit = Math.Round(debit * fx_rate, 2)
+                    fx_credit = Math.Round(credit * fx_rate, 2)
+                    queryAL.Add(fx_amount) 'fx_amount
+                    queryAL.Add(fx_debit) 'fx_debit
+                    queryAL.Add(fx_credit) 'fx_credit
+                    queryAL.Add(fx_rate) 'fx_rate
+                    queryAL.Add(value_arraylist(0)(row)(17)) 'curr_code
+                    queryAL.Add(value_arraylist(0)(row)(48)) 'batchno
+                    queryAL.Add(value_arraylist(0)(row)(49)) 'projcode
+                    queryAL.Add(value_arraylist(0)(row)(50)) 'deptcode
+                    queryAL.Add(Function_Form.getNull(0)) 'taxcode
+                    queryAL.Add(Function_Form.getNull(3)) 'taxable
+                    queryAL.Add(Function_Form.getNull(3)) 'fx_taxable
+                    queryAL.Add(Function_Form.getNull(3)) 'link_seq
+                    queryAL.Add("I") 'billtype
+                    queryAL.Add(Function_Form.getNull(0)) 'remark1
+                    queryAL.Add(Function_Form.getNull(0)) 'remark2
+                    queryAL.Add(ref_p1) 'cheque_no
+                    queryAL.Add(value_arraylist(0)(row)(2)) 'chqrc_date
+                    queryAL.Add(Function_Form.getNull(1)) 'koff_date
+                    queryAL.Add(Function_Form.getNull(1)) 'recon_date
+                    queryAL.Add(Function_Form.getNull(3)) 'recon_flag
+                    queryAL.Add(value_arraylist(0)(row)(16)) 'accmgr_id
+                    queryAL.Add(Function_Form.getNull(0)) 'lkdoc_type
+                    queryAL.Add(Function_Form.getNull(0)) 'lkdoc_no
+                    queryAL.Add(Function_Form.getNull(3)) 'lkseq
+                    queryAL.Add("1") 'lock
+                    queryAL.Add(Function_Form.getNull(3)) 'void
+                    queryAL.Add(Function_Form.getNull(3)) 'exported
+                    queryAL.Add(Function_Form.getNull(0)) 'entry
+                    queryAL.Add(Function_Form.getNull(3)) 'fastentry
+                    queryAL.Add(Function_Form.getNull(3)) 'followdesp
+                    queryAL.Add(Function_Form.getNull(3)) 'tsid
+                    queryAL.Add(Function_Form.getNull(0)) 'spcode
+                    queryAL.Add(Function_Form.getNull(1)) 'taxdate
+                    queryAL.Add(Function_Form.getNull(1)) 'taxdate_bt
+                    queryAL.Add(value_arraylist(0)(row)(112)) 'createdby
+                    queryAL.Add(value_arraylist(0)(row)(112)) 'updatedby
+                    queryAL.Add(Function_Form.getNull(2)) 'createdate
+                    queryAL.Add(Function_Form.getNull(2)) 'lastupdate
+
+                    Dim pay1cmd As String = queryTable(4)(2)
+                    For j = 0 To queryAL.Count - 1
+                        pay1cmd += "'" + queryAL(j).ToString + "',"
+                    Next
+                    pay1cmd = pay1cmd.Substring(0, pay1cmd.Length - 1) + ")"
+                    myConn.Open()
+                    Dim cmd_p1 = New SqlCommand(pay1cmd, myConn)
+                    cmd_p1.ExecuteNonQuery()
+                    myConn.Close()
+                    seq += 1
+                End If
+
+                'Subtotal Of Payment2
+                If Not acc_p2.Equals(String.Empty) Then
+                    queryAL.Clear()
+                    queryAL.Add(acc_p2) 'accno
+                    queryAL.Add("SI") 'doc_type
+                    queryAL.Add(value_arraylist(0)(row)(1)) 'doc_no
+                    queryAL.Add(seq) 'seq
+                    queryAL.Add(Function_Form.convertDateFormat(value_arraylist(0)(row)(2))) 'doc_date
+                    queryAL.Add(value_arraylist(0)(row)(1)) 'refno
+                    queryAL.Add(value_arraylist(0)(row)(9)) 'refno2
+                    queryAL.Add(Function_Form.getNull(0)) 'refno3
+                    queryAL.Add(value_arraylist(0)(row)(11)) 'desp
+                    queryAL.Add(Function_Form.getNull(0)) 'desp2
+                    queryAL.Add(Function_Form.getNull(0)) 'desp3
+                    queryAL.Add(Function_Form.getNull(0)) 'desp4
+                    queryAL.Add(amt_p2) 'amount
+                    debit = 0
+                    credit = 0
+                    If amt_p2 < 0 Then
+                        credit = amt_p2 * -1
+                    Else
+                        debit = amt_p2
+                    End If
+                    queryAL.Add(debit) 'debit
+                    queryAL.Add(credit) 'credit
+                    fx_rate = CDbl(value_arraylist(0)(row)(18))
+                    fx_amount = Math.Round(amt_p2 * fx_rate, 2)
+                    fx_debit = Math.Round(debit * fx_rate, 2)
+                    fx_credit = Math.Round(credit * fx_rate, 2)
+                    queryAL.Add(fx_amount) 'fx_amount
+                    queryAL.Add(fx_debit) 'fx_debit
+                    queryAL.Add(fx_credit) 'fx_credit
+                    queryAL.Add(fx_rate) 'fx_rate
+                    queryAL.Add(value_arraylist(0)(row)(17)) 'curr_code
+                    queryAL.Add(value_arraylist(0)(row)(48)) 'batchno
+                    queryAL.Add(value_arraylist(0)(row)(49)) 'projcode
+                    queryAL.Add(value_arraylist(0)(row)(50)) 'deptcode
+                    queryAL.Add(Function_Form.getNull(0)) 'taxcode
+                    queryAL.Add(Function_Form.getNull(3)) 'taxable
+                    queryAL.Add(Function_Form.getNull(3)) 'fx_taxable
+                    queryAL.Add(Function_Form.getNull(3)) 'link_seq
+                    queryAL.Add("I") 'billtype
+                    queryAL.Add(Function_Form.getNull(0)) 'remark1
+                    queryAL.Add(Function_Form.getNull(0)) 'remark2
+                    queryAL.Add(ref_p2) 'cheque_no
+                    queryAL.Add(value_arraylist(0)(row)(2)) 'chqrc_date
+                    queryAL.Add(Function_Form.getNull(1)) 'koff_date
+                    queryAL.Add(Function_Form.getNull(1)) 'recon_date
+                    queryAL.Add(Function_Form.getNull(3)) 'recon_flag
+                    queryAL.Add(value_arraylist(0)(row)(16)) 'accmgr_id
+                    queryAL.Add(Function_Form.getNull(0)) 'lkdoc_type
+                    queryAL.Add(Function_Form.getNull(0)) 'lkdoc_no
+                    queryAL.Add(Function_Form.getNull(3)) 'lkseq
+                    queryAL.Add("1") 'lock
+                    queryAL.Add(Function_Form.getNull(3)) 'void
+                    queryAL.Add(Function_Form.getNull(3)) 'exported
+                    queryAL.Add(Function_Form.getNull(0)) 'entry
+                    queryAL.Add(Function_Form.getNull(3)) 'fastentry
+                    queryAL.Add(Function_Form.getNull(3)) 'followdesp
+                    queryAL.Add(Function_Form.getNull(3)) 'tsid
+                    queryAL.Add(Function_Form.getNull(0)) 'spcode
+                    queryAL.Add(Function_Form.getNull(1)) 'taxdate
+                    queryAL.Add(Function_Form.getNull(1)) 'taxdate_bt
+                    queryAL.Add(value_arraylist(0)(row)(112)) 'createdby
+                    queryAL.Add(value_arraylist(0)(row)(112)) 'updatedby
+                    queryAL.Add(Function_Form.getNull(2)) 'createdate
+                    queryAL.Add(Function_Form.getNull(2)) 'lastupdate
+
+                    Dim paycmd As String = queryTable(4)(2)
+                    For j = 0 To queryAL.Count - 1
+                        paycmd += "'" + queryAL(j).ToString + "',"
+                    Next
+                    paycmd = paycmd.Substring(0, paycmd.Length - 1) + ")"
+                    myConn.Open()
+                    Dim cmd_p = New SqlCommand(paycmd, myConn)
+                    cmd_p.ExecuteNonQuery()
+                    myConn.Close()
+                    seq += 1
+                End If
+
+                'Subtotal Of Payment3
+                If Not acc_p3.Equals(String.Empty) Then
+                    queryAL.Clear()
+                    queryAL.Add(acc_p3) 'accno
+                    queryAL.Add("SI") 'doc_type
+                    queryAL.Add(value_arraylist(0)(row)(1)) 'doc_no
+                    queryAL.Add(seq) 'seq
+                    queryAL.Add(Function_Form.convertDateFormat(value_arraylist(0)(row)(2))) 'doc_date
+                    queryAL.Add(value_arraylist(0)(row)(1)) 'refno
+                    queryAL.Add(value_arraylist(0)(row)(9)) 'refno2
+                    queryAL.Add(Function_Form.getNull(0)) 'refno3
+                    queryAL.Add(value_arraylist(0)(row)(11)) 'desp
+                    queryAL.Add(Function_Form.getNull(0)) 'desp2
+                    queryAL.Add(Function_Form.getNull(0)) 'desp3
+                    queryAL.Add(Function_Form.getNull(0)) 'desp4
+                    queryAL.Add(amt_p3) 'amount
+                    debit = 0
+                    credit = 0
+                    If amt_p3 < 0 Then
+                        credit = amt_p3 * -1
+                    Else
+                        debit = amt_p3
+                    End If
+                    queryAL.Add(debit) 'debit
+                    queryAL.Add(credit) 'credit
+                    fx_rate = CDbl(value_arraylist(0)(row)(18))
+                    fx_amount = Math.Round(amt_p3 * fx_rate, 2)
+                    fx_debit = Math.Round(debit * fx_rate, 2)
+                    fx_credit = Math.Round(credit * fx_rate, 2)
+                    queryAL.Add(fx_amount) 'fx_amount
+                    queryAL.Add(fx_debit) 'fx_debit
+                    queryAL.Add(fx_credit) 'fx_credit
+                    queryAL.Add(fx_rate) 'fx_rate
+                    queryAL.Add(value_arraylist(0)(row)(17)) 'curr_code
+                    queryAL.Add(value_arraylist(0)(row)(48)) 'batchno
+                    queryAL.Add(value_arraylist(0)(row)(49)) 'projcode
+                    queryAL.Add(value_arraylist(0)(row)(50)) 'deptcode
+                    queryAL.Add(Function_Form.getNull(0)) 'taxcode
+                    queryAL.Add(Function_Form.getNull(3)) 'taxable
+                    queryAL.Add(Function_Form.getNull(3)) 'fx_taxable
+                    queryAL.Add(Function_Form.getNull(3)) 'link_seq
+                    queryAL.Add("I") 'billtype
+                    queryAL.Add(Function_Form.getNull(0)) 'remark1
+                    queryAL.Add(Function_Form.getNull(0)) 'remark2
+                    queryAL.Add(ref_p3) 'cheque_no
+                    queryAL.Add(value_arraylist(0)(row)(2)) 'chqrc_date
+                    queryAL.Add(Function_Form.getNull(1)) 'koff_date
+                    queryAL.Add(Function_Form.getNull(1)) 'recon_date
+                    queryAL.Add(Function_Form.getNull(3)) 'recon_flag
+                    queryAL.Add(value_arraylist(0)(row)(16)) 'accmgr_id
+                    queryAL.Add(Function_Form.getNull(0)) 'lkdoc_type
+                    queryAL.Add(Function_Form.getNull(0)) 'lkdoc_no
+                    queryAL.Add(Function_Form.getNull(3)) 'lkseq
+                    queryAL.Add("1") 'lock
+                    queryAL.Add(Function_Form.getNull(3)) 'void
+                    queryAL.Add(Function_Form.getNull(3)) 'exported
+                    queryAL.Add(Function_Form.getNull(0)) 'entry
+                    queryAL.Add(Function_Form.getNull(3)) 'fastentry
+                    queryAL.Add(Function_Form.getNull(3)) 'followdesp
+                    queryAL.Add(Function_Form.getNull(3)) 'tsid
+                    queryAL.Add(Function_Form.getNull(0)) 'spcode
+                    queryAL.Add(Function_Form.getNull(1)) 'taxdate
+                    queryAL.Add(Function_Form.getNull(1)) 'taxdate_bt
+                    queryAL.Add(value_arraylist(0)(row)(112)) 'createdby
+                    queryAL.Add(value_arraylist(0)(row)(112)) 'updatedby
+                    queryAL.Add(Function_Form.getNull(2)) 'createdate
+                    queryAL.Add(Function_Form.getNull(2)) 'lastupdate
+
+                    Dim paycmd As String = queryTable(4)(2)
+                    For j = 0 To queryAL.Count - 1
+                        paycmd += "'" + queryAL(j).ToString + "',"
+                    Next
+                    paycmd = paycmd.Substring(0, paycmd.Length - 1) + ")"
+                    myConn.Open()
+                    Dim cmd_p = New SqlCommand(paycmd, myConn)
+                    cmd_p.ExecuteNonQuery()
+                    myConn.Close()
+                    seq += 1
+                End If
+
+                'Subtotal Of Payment4
+                If Not acc_p4.Equals(String.Empty) Then
+                    queryAL.Clear()
+                    queryAL.Add(acc_p4) 'accno
+                    queryAL.Add("SI") 'doc_type
+                    queryAL.Add(value_arraylist(0)(row)(1)) 'doc_no
+                    queryAL.Add(seq) 'seq
+                    queryAL.Add(Function_Form.convertDateFormat(value_arraylist(0)(row)(2))) 'doc_date
+                    queryAL.Add(value_arraylist(0)(row)(1)) 'refno
+                    queryAL.Add(value_arraylist(0)(row)(9)) 'refno2
+                    queryAL.Add(Function_Form.getNull(0)) 'refno3
+                    queryAL.Add(value_arraylist(0)(row)(11)) 'desp
+                    queryAL.Add(Function_Form.getNull(0)) 'desp2
+                    queryAL.Add(Function_Form.getNull(0)) 'desp3
+                    queryAL.Add(Function_Form.getNull(0)) 'desp4
+                    queryAL.Add(amt_p4) 'amount
+                    debit = 0
+                    credit = 0
+                    If amt_p2 < 0 Then
+                        credit = amt_p4 * -1
+                    Else
+                        debit = amt_p4
+                    End If
+                    queryAL.Add(debit) 'debit
+                    queryAL.Add(credit) 'credit
+                    fx_rate = CDbl(value_arraylist(0)(row)(18))
+                    fx_amount = Math.Round(amt_p4 * fx_rate, 2)
+                    fx_debit = Math.Round(debit * fx_rate, 2)
+                    fx_credit = Math.Round(credit * fx_rate, 2)
+                    queryAL.Add(fx_amount) 'fx_amount
+                    queryAL.Add(fx_debit) 'fx_debit
+                    queryAL.Add(fx_credit) 'fx_credit
+                    queryAL.Add(fx_rate) 'fx_rate
+                    queryAL.Add(value_arraylist(0)(row)(17)) 'curr_code
+                    queryAL.Add(value_arraylist(0)(row)(48)) 'batchno
+                    queryAL.Add(value_arraylist(0)(row)(49)) 'projcode
+                    queryAL.Add(value_arraylist(0)(row)(50)) 'deptcode
+                    queryAL.Add(Function_Form.getNull(0)) 'taxcode
+                    queryAL.Add(Function_Form.getNull(3)) 'taxable
+                    queryAL.Add(Function_Form.getNull(3)) 'fx_taxable
+                    queryAL.Add(Function_Form.getNull(3)) 'link_seq
+                    queryAL.Add("I") 'billtype
+                    queryAL.Add(Function_Form.getNull(0)) 'remark1
+                    queryAL.Add(Function_Form.getNull(0)) 'remark2
+                    queryAL.Add(ref_p4) 'cheque_no
+                    queryAL.Add(value_arraylist(0)(row)(2)) 'chqrc_date
+                    queryAL.Add(Function_Form.getNull(1)) 'koff_date
+                    queryAL.Add(Function_Form.getNull(1)) 'recon_date
+                    queryAL.Add(Function_Form.getNull(3)) 'recon_flag
+                    queryAL.Add(value_arraylist(0)(row)(16)) 'accmgr_id
+                    queryAL.Add(Function_Form.getNull(0)) 'lkdoc_type
+                    queryAL.Add(Function_Form.getNull(0)) 'lkdoc_no
+                    queryAL.Add(Function_Form.getNull(3)) 'lkseq
+                    queryAL.Add("1") 'lock
+                    queryAL.Add(Function_Form.getNull(3)) 'void
+                    queryAL.Add(Function_Form.getNull(3)) 'exported
+                    queryAL.Add(Function_Form.getNull(0)) 'entry
+                    queryAL.Add(Function_Form.getNull(3)) 'fastentry
+                    queryAL.Add(Function_Form.getNull(3)) 'followdesp
+                    queryAL.Add(Function_Form.getNull(3)) 'tsid
+                    queryAL.Add(Function_Form.getNull(0)) 'spcode
+                    queryAL.Add(Function_Form.getNull(1)) 'taxdate
+                    queryAL.Add(Function_Form.getNull(1)) 'taxdate_bt
+                    queryAL.Add(value_arraylist(0)(row)(112)) 'createdby
+                    queryAL.Add(value_arraylist(0)(row)(112)) 'updatedby
+                    queryAL.Add(Function_Form.getNull(2)) 'createdate
+                    queryAL.Add(Function_Form.getNull(2)) 'lastupdate
+
+                    Dim paycmd As String = queryTable(4)(2)
+                    For j = 0 To queryAL.Count - 1
+                        paycmd += "'" + queryAL(j).ToString + "',"
+                    Next
+                    paycmd = paycmd.Substring(0, paycmd.Length - 1) + ")"
+                    myConn.Open()
+                    Dim cmd_p = New SqlCommand(paycmd, myConn)
+                    cmd_p.ExecuteNonQuery()
+                    myConn.Close()
+                    seq += 1
+                End If
             End If
         Next
 
