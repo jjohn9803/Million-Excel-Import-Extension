@@ -600,7 +600,7 @@ Public Class Sales_Invoice_Form
 
                 'sinv.tax
                 If value_arraylist(0)(row)(31).Equals("{FORMULA_VALUE}") Then
-                    Dim tax = 0
+                    Dim tax As Double = 0
                     For Each targetRow As Integer In myTarget
                         Dim taxamt1 = value_arraylist(1)(targetRow)(20)
                         Dim taxamt2 = value_arraylist(1)(targetRow)(21)
@@ -611,7 +611,7 @@ Public Class Sales_Invoice_Form
 
                 'sinv.subtotal
                 If value_arraylist(0)(row)(33).Equals("{FORMULA_VALUE}") Then
-                    Dim subtotal = 0
+                    Dim subtotal As Double = 0
                     For Each targetRow As Integer In myTarget
                         Dim amt = value_arraylist(1)(targetRow)(27)
                         subtotal += amt
@@ -621,7 +621,7 @@ Public Class Sales_Invoice_Form
 
                 'sinv.nett
                 If value_arraylist(0)(row)(34).Equals("{FORMULA_VALUE}") Then
-                    Dim nett = 0
+                    Dim nett As Double = 0
                     For Each targetRow As Integer In myTarget
                         Dim nett_amt = value_arraylist(1)(targetRow)(26)
                         nett += nett_amt
@@ -631,8 +631,9 @@ Public Class Sales_Invoice_Form
 
                 'sinv.total
                 If value_arraylist(0)(row)(35).Equals("{FORMULA_VALUE}") Then
-                    Dim subtotal = value_arraylist(0)(row)(33)
-                    Dim tax = value_arraylist(0)(row)(31)
+                    Dim subtotal As Double = value_arraylist(0)(row)(33)
+                    Dim tax As Double = value_arraylist(0)(row)(31)
+                    'MsgBox(subtotal.ToString + vbTab + tax.ToString)
                     Dim total = subtotal + tax
                     value_arraylist(0)(row)(35) = Math.Round(total, 2)
                 End If
@@ -1184,6 +1185,8 @@ Public Class Sales_Invoice_Form
         End If
 
         Dim rowInsertNum = 0
+        Dim arseq As New ArrayList
+        'gl
         For row As Integer = 0 To dgvExcel.RowCount - 1
             If Not value_arraylist(0)(row)(0).Equals("{INVALID ARRAY}") Then
                 Dim startRange As Integer = -1
@@ -1192,7 +1195,6 @@ Public Class Sales_Invoice_Form
                     If range.Split(".")(0).ToString.Trim.Equals(row.ToString.Trim) Then
                         startRange = CInt(range.Split(".")(0).ToString.Trim)
                         endRange = CInt(range.Split(".")(1).ToString.Trim)
-                        Exit For
                     End If
                 Next
 
@@ -1231,13 +1233,13 @@ Public Class Sales_Invoice_Form
 
                 Dim seq = 1
                 Dim queryAL As New ArrayList
-                Dim amount = 0
-                Dim debit = 0
-                Dim credit = 0
-                Dim fx_rate = 0
-                Dim fx_amount = 0
-                Dim fx_debit = 0
-                Dim fx_credit = 0
+                Dim amount As Double = 0
+                Dim debit As Double = 0
+                Dim credit As Double = 0
+                Dim fx_rate As Double = 0
+                Dim fx_amount As Double = 0
+                Dim fx_debit As Double = 0
+                Dim fx_credit As Double = 0
                 For i = startRange To endRange
                     queryAL.Clear()
                     'Product
@@ -1290,12 +1292,10 @@ Public Class Sales_Invoice_Form
                         End Try
                     Next
                     execmd = execmd + cmd_last
-                    'MsgBox("COUNT: " + (queryAL.Count + query_temp.Count).ToString)
-                    'Clipboard.SetText(execmd)
-                    'MsgBox(execmd)
                     myConn.Open()
                     Dim cmd1 = New SqlCommand(execmd, myConn)
                     cmd1.ExecuteNonQuery()
+                    rowInsertNum += 1
                     myConn.Close()
                     seq += 1
 
@@ -1365,6 +1365,7 @@ Public Class Sales_Invoice_Form
                         myConn.Open()
                         Dim cmd2 = New SqlCommand(execmd2, myConn)
                         cmd2.ExecuteNonQuery()
+                        rowInsertNum += 1
                         myConn.Close()
                         seq += 1
                     End If
@@ -1376,6 +1377,7 @@ Public Class Sales_Invoice_Form
                 queryAL.Add("SI") 'doc_type
                 queryAL.Add(value_arraylist(0)(row)(1)) 'doc_no
                 queryAL.Add(seq) 'seq
+                arseq.Add(value_arraylist(0)(row)(1) + "." + seq.ToString + ".0." + row.ToString) 'AR get doc_no,seq,knockoff,row
                 queryAL.Add(Function_Form.convertDateFormat(value_arraylist(0)(row)(2))) 'doc_date
                 queryAL.Add(value_arraylist(0)(row)(1)) 'refno
                 queryAL.Add(value_arraylist(0)(row)(9)) 'refno2
@@ -1384,7 +1386,7 @@ Public Class Sales_Invoice_Form
                 queryAL.Add(value_arraylist(0)(row)(4)) 'desp2
                 queryAL.Add(Function_Form.getNull(0)) 'desp3
                 queryAL.Add(Function_Form.getNull(0)) 'desp4
-                amount = Math.Round(CDbl(value_arraylist(0)(row)(35)) * -1, 2)
+                amount = Math.Round(CDbl(value_arraylist(0)(row)(35)), 2)
                 queryAL.Add(amount) 'amount
                 debit = 0
                 credit = 0
@@ -1420,6 +1422,7 @@ Public Class Sales_Invoice_Form
                 myConn.Open()
                 Dim cmd3 = New SqlCommand(subtotalcmd, myConn)
                 cmd3.ExecuteNonQuery()
+                rowInsertNum += 1
                 myConn.Close()
                 seq += 1
 
@@ -1481,6 +1484,7 @@ Public Class Sales_Invoice_Form
                 queryAL.Add("SI") 'doc_type
                 queryAL.Add(value_arraylist(0)(row)(1)) 'doc_no
                 queryAL.Add(seq) 'seq
+                arseq.Add(value_arraylist(0)(row)(1) + "." + seq.ToString + ".1." + row.ToString) 'AR get doc_no,seq,knockoff,row
                 queryAL.Add(Function_Form.convertDateFormat(value_arraylist(0)(row)(2))) 'doc_date
                 queryAL.Add(value_arraylist(0)(row)(1)) 'refno
                 queryAL.Add(value_arraylist(0)(row)(9)) 'refno2
@@ -1490,7 +1494,6 @@ Public Class Sales_Invoice_Form
                 queryAL.Add(Function_Form.getNull(0)) 'desp3
                 queryAL.Add(Function_Form.getNull(0)) 'desp4
                 If Not amt_p1.Equals(String.Empty) Then
-                    MsgBox(amt_p1)
                     amt_p1 = Math.Round(CDbl(amt_p1), 2)
                 Else
                     amt_p1 = 0
@@ -1510,7 +1513,7 @@ Public Class Sales_Invoice_Form
                 Else
                     amt_p4 = 0
                 End If
-                amount = (amt_p1 + amt_p2 + amt_p3 + amt_p4) * -1
+                amount = (CDbl(amt_p1) + CDbl(amt_p2) + CDbl(amt_p3) + CDbl(amt_p4)) * -1
                 queryAL.Add(amount) 'amount
                 debit = 0
                 credit = 0
@@ -1541,7 +1544,7 @@ Public Class Sales_Invoice_Form
                 queryAL.Add(Function_Form.getNull(0)) 'remark1
                 queryAL.Add(Function_Form.getNull(0)) 'remark2
                 queryAL.Add(p_def_refno) 'cheque_no
-                queryAL.Add(value_arraylist(0)(row)(2)) 'chqrc_date
+                queryAL.Add(Function_Form.convertDateFormat(value_arraylist(0)(row)(2))) 'chqrc_date
                 queryAL.Add(Function_Form.getNull(1)) 'koff_date
                 queryAL.Add(Function_Form.getNull(1)) 'recon_date
                 queryAL.Add(Function_Form.getNull(3)) 'recon_flag
@@ -1572,6 +1575,7 @@ Public Class Sales_Invoice_Form
                 myConn.Open()
                 Dim cmd4 = New SqlCommand(subtotalpaycmd, myConn)
                 cmd4.ExecuteNonQuery()
+                rowInsertNum += 1
                 myConn.Close()
                 seq += 1
 
@@ -1620,7 +1624,7 @@ Public Class Sales_Invoice_Form
                     queryAL.Add(Function_Form.getNull(0)) 'remark1
                     queryAL.Add(Function_Form.getNull(0)) 'remark2
                     queryAL.Add(ref_p1) 'cheque_no
-                    queryAL.Add(value_arraylist(0)(row)(2)) 'chqrc_date
+                    queryAL.Add(Function_Form.convertDateFormat(value_arraylist(0)(row)(2))) 'chqrc_date
                     queryAL.Add(Function_Form.getNull(1)) 'koff_date
                     queryAL.Add(Function_Form.getNull(1)) 'recon_date
                     queryAL.Add(Function_Form.getNull(3)) 'recon_flag
@@ -1651,6 +1655,7 @@ Public Class Sales_Invoice_Form
                     myConn.Open()
                     Dim cmd_p1 = New SqlCommand(pay1cmd, myConn)
                     cmd_p1.ExecuteNonQuery()
+                    rowInsertNum += 1
                     myConn.Close()
                     seq += 1
                 End If
@@ -1700,7 +1705,7 @@ Public Class Sales_Invoice_Form
                     queryAL.Add(Function_Form.getNull(0)) 'remark1
                     queryAL.Add(Function_Form.getNull(0)) 'remark2
                     queryAL.Add(ref_p2) 'cheque_no
-                    queryAL.Add(value_arraylist(0)(row)(2)) 'chqrc_date
+                    queryAL.Add(Function_Form.convertDateFormat(value_arraylist(0)(row)(2))) 'chqrc_date
                     queryAL.Add(Function_Form.getNull(1)) 'koff_date
                     queryAL.Add(Function_Form.getNull(1)) 'recon_date
                     queryAL.Add(Function_Form.getNull(3)) 'recon_flag
@@ -1731,6 +1736,7 @@ Public Class Sales_Invoice_Form
                     myConn.Open()
                     Dim cmd_p = New SqlCommand(paycmd, myConn)
                     cmd_p.ExecuteNonQuery()
+                    rowInsertNum += 1
                     myConn.Close()
                     seq += 1
                 End If
@@ -1780,7 +1786,7 @@ Public Class Sales_Invoice_Form
                     queryAL.Add(Function_Form.getNull(0)) 'remark1
                     queryAL.Add(Function_Form.getNull(0)) 'remark2
                     queryAL.Add(ref_p3) 'cheque_no
-                    queryAL.Add(value_arraylist(0)(row)(2)) 'chqrc_date
+                    queryAL.Add(Function_Form.convertDateFormat(value_arraylist(0)(row)(2))) 'chqrc_date
                     queryAL.Add(Function_Form.getNull(1)) 'koff_date
                     queryAL.Add(Function_Form.getNull(1)) 'recon_date
                     queryAL.Add(Function_Form.getNull(3)) 'recon_flag
@@ -1811,6 +1817,7 @@ Public Class Sales_Invoice_Form
                     myConn.Open()
                     Dim cmd_p = New SqlCommand(paycmd, myConn)
                     cmd_p.ExecuteNonQuery()
+                    rowInsertNum += 1
                     myConn.Close()
                     seq += 1
                 End If
@@ -1860,7 +1867,7 @@ Public Class Sales_Invoice_Form
                     queryAL.Add(Function_Form.getNull(0)) 'remark1
                     queryAL.Add(Function_Form.getNull(0)) 'remark2
                     queryAL.Add(ref_p4) 'cheque_no
-                    queryAL.Add(value_arraylist(0)(row)(2)) 'chqrc_date
+                    queryAL.Add(Function_Form.convertDateFormat(value_arraylist(0)(row)(2))) 'chqrc_date
                     queryAL.Add(Function_Form.getNull(1)) 'koff_date
                     queryAL.Add(Function_Form.getNull(1)) 'recon_date
                     queryAL.Add(Function_Form.getNull(3)) 'recon_flag
@@ -1891,10 +1898,180 @@ Public Class Sales_Invoice_Form
                     myConn.Open()
                     Dim cmd_p = New SqlCommand(paycmd, myConn)
                     cmd_p.ExecuteNonQuery()
+                    rowInsertNum += 1
                     myConn.Close()
                     seq += 1
                 End If
             End If
+        Next
+
+        'ar
+        For Each ar As String In arseq
+            Dim row As String = ar.Split(".")(3)
+            Dim custcode As String = ""
+            Dim doc_type As String = "SI"
+            Dim doc_no As String = ar.Split(".")(0)
+            Dim seq As String = ar.Split(".")(1)
+            Dim doc_date As String = Convert.ToDateTime(dgvExcel.Rows(row).Cells("Date").Value.ToString).ToString("dd-MMM-yy HH:mm:ss")
+
+            'due_date
+            Dim credit_terms As Integer = CInt(value_arraylist(0)(row)(15))
+            Dim due_date As String = Convert.ToDateTime(doc_date).AddDays(credit_terms).ToString("dd-MMM-yy HH:mm:ss") '2
+
+            Dim refno As String = ""
+            Dim refno2 As String = ""
+            Dim refno3 As String = ""
+            Dim desp As String = ""
+            Dim desp2 As String = ""
+            Dim desp3 As String = ""
+            Dim desp4 As String = ""
+            Dim remark1 As String = ""
+            Dim remark2 As String = ""
+            Dim cheque_no As String = ""
+            Dim chqrc_date As String = ""
+            Dim koff_date As String = ""
+            Dim curr_code As String = ""
+            Dim fx_rate As String = value_arraylist(0)(row)(18)
+            Dim fx_gainloss As String = Function_Form.getNull(3)
+            Dim amount As String = ""
+
+            'paid
+            Dim sum_p As Double = 0 '2
+            Dim amt_p1 = dgvExcel.Rows(row).Cells("Mode of Payment 1 Amount").Value.ToString().Trim
+            Dim amt_p2 = dgvExcel.Rows(row).Cells("Mode of Payment 2 Amount").Value.ToString().Trim
+            Dim amt_p3 = dgvExcel.Rows(row).Cells("Mode of Payment 3 Amount").Value.ToString().Trim
+            Dim amt_p4 = dgvExcel.Rows(row).Cells("Mode of Payment 4 Amount").Value.ToString().Trim
+            If Not amt_p1.Equals(String.Empty) Then
+                sum_p += CDbl(amt_p1)
+            End If
+            If Not amt_p2.Equals(String.Empty) Then
+                sum_p += CDbl(amt_p2)
+            End If
+            If Not amt_p3.Equals(String.Empty) Then
+                sum_p += CDbl(amt_p3)
+            End If
+            If Not amt_p4.Equals(String.Empty) Then
+                sum_p += CDbl(amt_p4)
+            End If
+            Dim paid As String = sum_p.ToString
+
+            Dim local_amount As String = ""
+            Dim local_paid As String = (sum_p * CDbl(fx_rate)).ToString '2
+            Dim taxable As String = value_arraylist(0)(row)(27) '2
+            Dim tax As String = value_arraylist(0)(row)(31) '2
+            Dim fx_taxable As String = (CDbl(value_arraylist(0)(row)(27)) * CDbl(fx_rate)).ToString '2
+            Dim fx_tax As String = (CDbl(value_arraylist(0)(row)(31)) * CDbl(fx_rate)).ToString '2
+            Dim knockoff As String = ar.Split(".")(2)
+            Dim accmgr_id As String = ""
+            Dim projcode As String = ""
+            Dim deptcode As String = ""
+            Dim billtype As String = ""
+            Dim spcode As String = ""
+            Dim source As String = Function_Form.getNull(0)
+            Dim taxcode As String = ""
+            Dim taxdate As String = ""
+            Dim taxdate_bt As String = ""
+            Dim taxdate_ds As String = Function_Form.getNull(1)
+            Dim tax_basis As String = "" 'SELECT tax_basis FROM gltaxgrp (If P then P else empty)
+            Dim lkdoc_type As String = ""
+            Dim lkdoc_no As String = ""
+            Dim lkseq As String = ""
+
+            myConn.Open()
+            Dim glcommand = New SqlCommand("SELECT * FROM gl WHERE doc_no ='" + doc_no + "' AND seq='" + seq + "'", myConn)
+            Dim glreader As SqlDataReader = glcommand.ExecuteReader
+            While glreader.Read()
+                custcode = glreader.GetValue(glreader.GetOrdinal("accno")).ToString.Trim
+                doc_type = glreader.GetValue(glreader.GetOrdinal("doc_type")).ToString.Trim
+                doc_date = Function_Form.convertDateFormat(glreader.GetValue(glreader.GetOrdinal("doc_date")))
+                refno = glreader.GetValue(glreader.GetOrdinal("refno")).ToString.Trim
+                refno2 = glreader.GetValue(glreader.GetOrdinal("refno2")).ToString.Trim
+                refno3 = glreader.GetValue(glreader.GetOrdinal("refno3")).ToString.Trim
+                desp = glreader.GetValue(glreader.GetOrdinal("desp")).ToString.Trim
+                desp2 = glreader.GetValue(glreader.GetOrdinal("desp2")).ToString.Trim
+                desp3 = glreader.GetValue(glreader.GetOrdinal("desp3")).ToString.Trim
+                desp4 = glreader.GetValue(glreader.GetOrdinal("desp4")).ToString.Trim
+                remark1 = glreader.GetValue(glreader.GetOrdinal("remark1")).ToString.Trim
+                remark2 = glreader.GetValue(glreader.GetOrdinal("remark2")).ToString.Trim
+                cheque_no = glreader.GetValue(glreader.GetOrdinal("cheque_no")).ToString.Trim
+                chqrc_date = Function_Form.convertDateFormat(glreader.GetValue(glreader.GetOrdinal("chqrc_date")))
+                koff_date = Function_Form.convertDateFormat(glreader.GetValue(glreader.GetOrdinal("koff_date")))
+                curr_code = glreader.GetValue(glreader.GetOrdinal("curr_code")).ToString.Trim
+                refno = glreader.GetValue(glreader.GetOrdinal("refno")).ToString.Trim
+                amount = glreader.GetValue(glreader.GetOrdinal("amount")).ToString.Trim
+                local_amount = glreader.GetValue(glreader.GetOrdinal("fx_amount")).ToString.Trim
+                accmgr_id = glreader.GetValue(glreader.GetOrdinal("accmgr_id")).ToString.Trim
+                projcode = glreader.GetValue(glreader.GetOrdinal("projcode")).ToString.Trim
+                deptcode = glreader.GetValue(glreader.GetOrdinal("deptcode")).ToString.Trim
+                billtype = glreader.GetValue(glreader.GetOrdinal("billtype")).ToString.Trim
+                spcode = glreader.GetValue(glreader.GetOrdinal("spcode")).ToString.Trim
+                taxcode = glreader.GetValue(glreader.GetOrdinal("taxcode")).ToString.Trim
+                taxdate = glreader.GetValue(glreader.GetOrdinal("taxdate")).ToString.Trim
+                taxdate_bt = glreader.GetValue(glreader.GetOrdinal("taxdate_bt")).ToString.Trim
+                lkdoc_type = glreader.GetValue(glreader.GetOrdinal("lkdoc_type")).ToString.Trim
+                lkdoc_no = glreader.GetValue(glreader.GetOrdinal("lkdoc_no")).ToString.Trim
+                lkseq = glreader.GetValue(glreader.GetOrdinal("lkseq")).ToString.Trim
+            End While
+            myConn.Close()
+            myConn.Open()
+            Dim taxgrpcommand = New SqlCommand("SELECT taxgrp FROM gltaxgrp WHERE tax_basis = 'P'", myConn)
+            Dim taxgrpreader As SqlDataReader = taxgrpcommand.ExecuteReader
+            Dim taxgrp As New ArrayList
+            While taxgrpreader.Read()
+                taxgrp.Add(taxgrpreader.GetValue(0).ToString)
+            End While
+            If taxgrp.Count > 0 Then
+                Dim myTarget As New ArrayList
+                For Each range As String In rangeQuo
+                    If range.Split(".")(0).ToString.Trim.Equals(row.ToString.Trim) Then
+                        myTarget.Add(CInt(range.Split(".")(1).ToString.Trim))
+                    End If
+                Next
+                For Each targetRow As Integer In myTarget
+                    Dim targetTax As String = value_arraylist(1)(targetRow)(54)
+                    For Each tax_in_grp In taxgrp
+                        MsgBox(tax_in_grp + vbNewLine + targetTax)
+                        If targetTax.Contains(tax_in_grp) Then
+                            tax_basis = "P"
+                            Exit For
+                        End If
+                    Next
+                Next
+            End If
+            If Not tax_basis.Equals("P") Then
+                tax_basis = Function_Form.getNull(0)
+            End If
+            myConn.Close()
+            myConn.Open()
+            Dim arcmd As String = queryTable(3)(2) + Function_Form.queryValue(custcode) +
+            Function_Form.queryValue(doc_type) + Function_Form.queryValue(doc_no) +
+            Function_Form.queryValue(seq) + Function_Form.queryValue(doc_date) +
+            Function_Form.queryValue(due_date) + Function_Form.queryValue(refno) +
+            Function_Form.queryValue(refno2) + Function_Form.queryValue(refno3) +
+            Function_Form.queryValue(desp) + Function_Form.queryValue(desp2) +
+            Function_Form.queryValue(desp3) + Function_Form.queryValue(desp4) +
+            Function_Form.queryValue(remark1) + Function_Form.queryValue(remark2) +
+            Function_Form.queryValue(cheque_no) + Function_Form.queryValue(chqrc_date) +
+            Function_Form.queryValue(koff_date) + Function_Form.queryValue(curr_code) +
+            Function_Form.queryValue(fx_rate) + Function_Form.queryValue(fx_gainloss) +
+            Function_Form.queryValue(amount) + Function_Form.queryValue(paid) +
+            Function_Form.queryValue(local_amount) + Function_Form.queryValue(local_paid) +
+            Function_Form.queryValue(taxable) + Function_Form.queryValue(tax) +
+            Function_Form.queryValue(fx_taxable) + Function_Form.queryValue(fx_tax) +
+            Function_Form.queryValue(knockoff) + Function_Form.queryValue(accmgr_id) +
+            Function_Form.queryValue(projcode) + Function_Form.queryValue(deptcode) +
+            Function_Form.queryValue(billtype) + Function_Form.queryValue(spcode) +
+            Function_Form.queryValue(source) + Function_Form.queryValue(taxcode) +
+            Function_Form.queryValue(taxdate) + Function_Form.queryValue(taxdate_bt) +
+            Function_Form.queryValue(taxdate_ds) + Function_Form.queryValue(tax_basis) +
+            Function_Form.queryValue(lkdoc_type) + Function_Form.queryValue(lkdoc_no) +
+            Function_Form.queryValue(lkseq)
+            arcmd = arcmd.Substring(0, arcmd.Length - 1) + ")"
+
+            Dim cmd_ar = New SqlCommand(arcmd, myConn)
+            cmd_ar.ExecuteNonQuery()
+            rowInsertNum += 1
+            myConn.Close()
         Next
 
         Return

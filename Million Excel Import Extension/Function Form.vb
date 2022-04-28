@@ -112,4 +112,7 @@ Public Class Function_Form
     Public Shared Function convertDateFormat(ByVal datetime As String) As String
         Return Convert.ToDateTime(datetime).ToString("dd-MMM-yy HH:mm:ss")
     End Function
+    Public Shared Function queryValue(ByVal value) As String
+        Return "'" + value.ToString + "',"
+    End Function
 End Class
