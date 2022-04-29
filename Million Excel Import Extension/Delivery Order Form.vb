@@ -1069,7 +1069,9 @@ Public Class Delivery_Order_Form
         End If
 
         Dim rowInsertNum = 0
+        Dim rowUpdateNum = 0
 
+        'prodsn(3) + stocksn(4)
         For row As Integer = 0 To dgvExcel.RowCount - 1
             If Not value_arraylist(3)(row)(1).ToString.Trim.Equals(String.Empty) Then
                 Dim serialnos As New List(Of String)(value_arraylist(3)(row)(1).ToString.Trim.Split(","c))
@@ -1093,15 +1095,18 @@ Public Class Delivery_Order_Form
                     Dim command = New SqlCommand(serialNoProdCommand, myConn)
                     myConn.Open()
                     command.ExecuteNonQuery()
+                    rowUpdateNum += 1
                     Dim serialNoStockdCommand As String = "INSERT INTO stocksn (prodcode,serialno,doc_type,doc_no,line_no,doc_date,qty,location) VALUES ('"
                     serialNoStockdCommand += procode + "','" + serialno + "','DO','" + doc_no + "','" + line_no + "','" + doc_date + "','" + qty + "','" + location + "')"
                     Dim command2 = New SqlCommand(serialNoStockdCommand, myConn)
                     command2.ExecuteNonQuery()
                     'MsgBox(serialNoStockdCommand)
+                    rowInsertNum += 1
                     myConn.Close()
                 Next
             End If
         Next
+
         'Quotation only end
         For i As Integer = 0 To 2
             init()
@@ -1151,7 +1156,7 @@ Public Class Delivery_Order_Form
                 Next
             End Using
         Next
-        MsgBox("Data Import Sucessfully!" + vbNewLine + "Row Inserted: " + rowInsertNum.ToString, MsgBoxStyle.Information)
+        Function_Form.promptImportSuccess(rowInsertNum, rowUpdateNum)
         Function_Form.printExcelResult("Delivery_Order", queryTable, value_arraylist, sql_format_arraylist, dgvExcel)
     End Sub
 

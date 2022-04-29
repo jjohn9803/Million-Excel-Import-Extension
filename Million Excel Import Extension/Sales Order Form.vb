@@ -1006,7 +1006,7 @@ Public Class Sales_Order_Form
                 Next
             End Using
         Next
-        MsgBox("Data Import Sucessfully!" + vbNewLine + "Row Inserted: " + rowInsertNum.ToString, MsgBoxStyle.Information)
+        Function_Form.promptImportSuccess(rowInsertNum, 0)
         Function_Form.printExcelResult("Sales_Order", queryTable, value_arraylist, sql_format_arraylist, dgvExcel)
     End Sub
 

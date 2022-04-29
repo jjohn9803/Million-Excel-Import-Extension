@@ -999,7 +999,7 @@ Public Class Quotation_Form
                 Next
             End Using
         Next
-        MsgBox("Data Import Sucessfully!" + vbNewLine + "Row Inserted: " + rowInsertNum.ToString, MsgBoxStyle.Information)
+        Function_Form.promptImportSuccess(rowInsertNum, 0)
         'Dim confirmReport As DialogResult = MsgBox("Are you want to save the result as report?", MsgBoxStyle.YesNo)
         'If confirmReport = DialogResult.No Then
         '    Return

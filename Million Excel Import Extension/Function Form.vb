@@ -115,4 +115,14 @@ Public Class Function_Form
     Public Shared Function queryValue(ByVal value) As String
         Return "'" + value.ToString + "',"
     End Function
+    Public Shared Sub promptImportSuccess(ByVal insert As Integer, ByVal update As Integer)
+        Dim result As String = "Data Import Sucessfully!"
+        If insert > 0 Then
+            result += +vbNewLine + "Row Inserted: " + insert.ToString
+        End If
+        If update > 0 Then
+            result += +vbNewLine + "Row Updated: " + update.ToString
+        End If
+        MsgBox(result, MsgBoxStyle.Information)
+    End Sub
 End Class

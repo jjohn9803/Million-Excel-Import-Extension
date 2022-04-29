@@ -190,8 +190,8 @@ Public Class Sales_Invoice_Form
                                     value = "   "
                                     value_arraylist(i)(row).add("   ")
                                 ElseIf data_type_temp.ToString.Contains("date") Or data_type_temp.ToString.Contains("time") Then
-                                    value = New Date.ToString
-                                    value_arraylist(i)(row).add(New Date.ToString)
+                                    value = Function_Form.convertDateFormat(New Date.ToString)
+                                    value_arraylist(i)(row).add(Function_Form.convertDateFormat(New Date.ToString))
                                 Else
                                     value = "0"
                                     value_arraylist(i)(row).add("0")
@@ -254,7 +254,7 @@ Public Class Sales_Invoice_Form
                                             If data_type_temp.ToString.Contains("char") Or data_type_temp.ToString.Contains("text") Then
                                                 value_arraylist(i)(row)(g) = "   "
                                             ElseIf data_type_temp.ToString.Contains("date") Or data_type_temp.ToString.Contains("time") Then
-                                                value_arraylist(i)(row)(g) = New Date.ToString
+                                                value_arraylist(i)(row)(g) = Function_Form.convertDateFormat(New Date.ToString)
                                             Else
                                                 value_arraylist(i)(row)(g) = "0"
                                             End If
@@ -1156,7 +1156,16 @@ Public Class Sales_Invoice_Form
                     Dim sncommand = New SqlCommand("SELECT * FROM stocksn WHERE serialno ='" + serialno + "' AND doc_type ='SI'", myConn)
                     Dim snreader As SqlDataReader = sncommand.ExecuteReader
                     While snreader.Read()
-                        msg_serial += vbTab + snreader.GetValue("serialno") + vbNewLine
+                        msg_serial += vbTab + snreader.GetValue(snreader.GetOrdinal("serialno")).ToString.Trim + vbNewLine
+                        exist_serial = True
+                    End While
+                    myConn.Close()
+                    myConn.Open()
+                    Dim prodsncommand = New SqlCommand("SELECT * FROM prodsn WHERE qty='-1' AND serialno ='" + serialno + "'", myConn)
+                    Dim prodsnreader As SqlDataReader = prodsncommand.ExecuteReader
+                    While prodsnreader.Read()
+                        prodsnreader.GetValue(prodsnreader.GetOrdinal("serialno")).ToString.Trim()
+                        msg_serial += vbTab + prodsnreader.GetValue("serialno") + vbNewLine
                         exist_serial = True
                     End While
                     myConn.Close()
@@ -1178,7 +1187,6 @@ Public Class Sales_Invoice_Form
         '    Next
         'Next
 
-        Function_Form.printExcelResult("Sales_Invoice", queryTable, value_arraylist, sql_format_arraylist, dgvExcel)
         Dim confirmImport As DialogResult = MsgBox("Are you sure to import data?", MsgBoxStyle.YesNo)
         If confirmImport = DialogResult.No Then
             Return
@@ -1186,6 +1194,7 @@ Public Class Sales_Invoice_Form
 
         Dim rowInsertNum = 0
         Dim arseq As New ArrayList
+        Dim gloffseq As New ArrayList
         'gl
         For row As Integer = 0 To dgvExcel.RowCount - 1
             If Not value_arraylist(0)(row)(0).Equals("{INVALID ARRAY}") Then
@@ -1378,6 +1387,7 @@ Public Class Sales_Invoice_Form
                 queryAL.Add(value_arraylist(0)(row)(1)) 'doc_no
                 queryAL.Add(seq) 'seq
                 arseq.Add(value_arraylist(0)(row)(1) + "." + seq.ToString + ".0." + row.ToString) 'AR get doc_no,seq,knockoff,row
+                gloffseq.Add(value_arraylist(0)(row)(1) + "." + seq.ToString + "." + (seq + 1).ToString) 'GLOff get doc_no,seq
                 queryAL.Add(Function_Form.convertDateFormat(value_arraylist(0)(row)(2))) 'doc_date
                 queryAL.Add(value_arraylist(0)(row)(1)) 'refno
                 queryAL.Add(value_arraylist(0)(row)(9)) 'refno2
@@ -2074,7 +2084,112 @@ Public Class Sales_Invoice_Form
             myConn.Close()
         Next
 
-        Return
+        'gloff
+        For row As Integer = 0 To dgvExcel.RowCount - 1
+            If Not value_arraylist(0)(row)(0).Equals("{INVALID ARRAY}") Then
+                Dim queryGLOff As New ArrayList
+                Dim doc_no = ""
+                Dim seq = ""
+                Dim pkseq = ""
+                For Each seq_temp As String In gloffseq
+                    If seq_temp.Split(".")(0).Trim.Equals(value_arraylist(0)(row)(1)) Then
+                        doc_no = seq_temp.Split(".")(0).Trim
+                        seq = seq_temp.Split(".")(2).Trim
+                        pkseq = seq_temp.Split(".")(1).Trim
+                    End If
+                Next
+                queryGLOff.Add(value_arraylist(0)(row)(10)) 'accno
+                queryGLOff.Add(value_arraylist(0)(row)(0)) 'doc_type
+                queryGLOff.Add(doc_no) 'doc_no
+                queryGLOff.Add(seq) 'seq
+                queryGLOff.Add(Function_Form.convertDateFormat(value_arraylist(0)(row)(2))) 'doc_date
+                queryGLOff.Add(value_arraylist(0)(row)(0)) 'pkdoc_type
+                queryGLOff.Add(doc_no) 'pkdoc_no
+                queryGLOff.Add(pkseq) 'pkseq
+                queryGLOff.Add(Function_Form.convertDateFormat(value_arraylist(0)(row)(2))) 'pkdoc_date
+                queryGLOff.Add(1) 'sign
+                queryGLOff.Add(value_arraylist(0)(row)(18)) 'pkfx_rate
+
+                'paid
+                Dim sum_p As Double = 0
+                Dim amt_p1 = dgvExcel.Rows(row).Cells("Mode of Payment 1 Amount").Value.ToString().Trim
+                Dim amt_p2 = dgvExcel.Rows(row).Cells("Mode of Payment 2 Amount").Value.ToString().Trim
+                Dim amt_p3 = dgvExcel.Rows(row).Cells("Mode of Payment 3 Amount").Value.ToString().Trim
+                Dim amt_p4 = dgvExcel.Rows(row).Cells("Mode of Payment 4 Amount").Value.ToString().Trim
+                If Not amt_p1.Equals(String.Empty) Then
+                    sum_p += CDbl(amt_p1)
+                End If
+                If Not amt_p2.Equals(String.Empty) Then
+                    sum_p += CDbl(amt_p2)
+                End If
+                If Not amt_p3.Equals(String.Empty) Then
+                    sum_p += CDbl(amt_p3)
+                End If
+                If Not amt_p4.Equals(String.Empty) Then
+                    sum_p += CDbl(amt_p4)
+                End If
+                Dim paid As String = sum_p.ToString
+                queryGLOff.Add(paid) 'paid
+
+                Dim fx_rate As Double = CDbl(value_arraylist(0)(row)(18))
+                Dim local_paid As Double = sum_p * fx_rate
+                queryGLOff.Add(fx_rate) 'fx_rate
+                queryGLOff.Add(local_paid) 'local_paid
+                queryGLOff.Add(local_paid) 'local_amount
+                queryGLOff.Add(Function_Form.getNull(3)) 'fx_gainloss
+                queryGLOff.Add(Function_Form.getNull(3)) 'v_gainloss
+
+                Dim gloff_cmd As String = queryTable(5)(2)
+                For j = 0 To queryGLOff.Count - 1
+                    gloff_cmd += "'" + queryGLOff(j).ToString + "',"
+                Next
+                gloff_cmd = gloff_cmd.Substring(0, gloff_cmd.Length - 1) + ")"
+
+                myConn.Open()
+                Dim cmd_gloff = New SqlCommand(gloff_cmd, myConn)
+                cmd_gloff.ExecuteNonQuery()
+                rowInsertNum += 1
+                myConn.Close()
+            End If
+        Next
+
+        Dim rowUpdateNum = 0
+        'prodsn(7) + stocksn(8)
+        For row As Integer = 0 To dgvExcel.RowCount - 1
+            If Not value_arraylist(7)(row)(1).ToString.Trim.Equals(String.Empty) Then
+                Dim serialnos As New List(Of String)(value_arraylist(7)(row)(1).ToString.Trim.Split(","c))
+                For sn = 0 To serialnos.Count - 1
+                    Dim serialno As String = serialnos(sn)
+                    Dim qty = "-1"
+                    Dim location = value_arraylist(7)(row)(4)
+                    Dim doc_no = value_arraylist(7)(row)(8)
+                    Dim line_no = value_arraylist(7)(row)(9)
+                    Dim doc_date = Convert.ToDateTime(value_arraylist(7)(row)(10)).ToString("dd-MMM-yy HH:mm:ss")
+                    Dim procode = value_arraylist(7)(row)(0)
+                    Dim serialNoProdCommand As String = "UPDATE prodsn SET "
+                    Dim serialNoColumns = "qty='" + qty + "',"
+                    serialNoColumns += "location='" + location + "',"
+                    serialNoColumns += "doc_type='SI',"
+                    serialNoColumns += "doc_no='" + doc_no + "',"
+                    serialNoColumns += "line_no='" + line_no + "',"
+                    serialNoColumns += "doc_date='" + doc_date + "' "
+                    serialNoColumns += "WHERE prodcode='" + procode + "' AND serialno='" + serialno + "'"
+                    serialNoProdCommand += serialNoColumns
+                    Dim command = New SqlCommand(serialNoProdCommand, myConn)
+                    myConn.Open()
+                    command.ExecuteNonQuery()
+                    rowUpdateNum += 1
+                    Dim serialNoStockdCommand As String = "INSERT INTO stocksn (prodcode,serialno,doc_type,doc_no,line_no,doc_date,qty,location) VALUES ('"
+                    serialNoStockdCommand += procode + "','" + serialno + "','SI','" + doc_no + "','" + line_no + "','" + doc_date + "','" + qty + "','" + location + "')"
+                    Dim command2 = New SqlCommand(serialNoStockdCommand, myConn)
+                    command2.ExecuteNonQuery()
+                    'MsgBox(serialNoStockdCommand)
+                    rowInsertNum += 1
+                    myConn.Close()
+                Next
+            End If
+        Next
+
         For i As Integer = 0 To 2
             init()
             Using command As New SqlCommand("", myConn)
@@ -2085,8 +2200,11 @@ Public Class Sales_Invoice_Form
                             For g As Integer = 0 To value_arraylist(i)(row).count - 1
                                 Dim value_temp As String = value_arraylist(i)(row)(g).ToString
                                 If sql_format_arraylist(i)(g).ToString.Trim.Equals("createdate") Or sql_format_arraylist(i)(g).ToString.Trim.Equals("lastupdate") Then
-                                    query += "'" + Date.Now.ToString + "',"
-                                    value_arraylist(i)(row)(g) = Date.Now.ToString
+                                    query += "'" + Function_Form.convertDateFormat(Date.Now.ToString) + "',"
+                                    value_arraylist(i)(row)(g) = Function_Form.convertDateFormat(Date.Now.ToString)
+                                ElseIf data_type_arraylist(i)(g).ToString.Trim.Contains("date") Then
+                                    query += "'" + Function_Form.convertDateFormat(value_temp) + "',"
+                                    value_arraylist(i)(row)(g) = Function_Form.convertDateFormat(value_temp)
                                 ElseIf i = 2 And g = 3 Then
                                     Dim dkeyFromDO As String = ""
                                     Dim command_temp = New SqlCommand("SELECT TOP 1 dkey FROM sdodet WHERE doc_no ='" + value_arraylist(2)(row)(2) + "' AND line_no ='" + value_arraylist(2)(row)(4) + "'", myConn)
@@ -2109,7 +2227,7 @@ Public Class Sales_Invoice_Form
                             myConn.Open()
                             Try
                                 rowInsertNum += 1
-                                'command.ExecuteNonQuery()
+                                command.ExecuteNonQuery()
                             Catch ex As Exception
                                 MsgBox(ex.Message + vbNewLine + command_text, MsgBoxStyle.Exclamation)
                             End Try
@@ -2120,7 +2238,7 @@ Public Class Sales_Invoice_Form
                 Next
             End Using
         Next
-        MsgBox("Data Import Sucessfully!" + vbNewLine + "Row Inserted: " + rowInsertNum.ToString, MsgBoxStyle.Information)
+        Function_Form.promptImportSuccess(rowInsertNum, rowUpdateNum)
         Function_Form.printExcelResult("Sales_Invoice", queryTable, value_arraylist, sql_format_arraylist, dgvExcel)
     End Sub
     Private Function existed_checker(table As String, sql_value As String, value As String)
