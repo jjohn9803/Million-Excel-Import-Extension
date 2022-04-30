@@ -1140,7 +1140,7 @@ Public Class Sales_Invoice_Form
         init()
         'myConn = New SqlConnection("Data Source=" + serverName + ";" & "Initial Catalog=" + database + ";" + pwd_query)
         Dim exist_serial As Boolean = False
-        Dim msg_serial As String = ""
+        Dim msg_serial As New ArrayList
         For row As Integer = 0 To dgvExcel.RowCount - 1
             If Not value_arraylist(7)(row)(1).ToString.Trim.Equals(String.Empty) Then
                 Dim serialnos As New List(Of String)(value_arraylist(7)(row)(1).ToString.Trim.Split(","c))
@@ -1153,10 +1153,13 @@ Public Class Sales_Invoice_Form
                 For sn = 0 To serialnos.Count - 1
                     Dim serialno As String = serialnos(sn)
                     myConn.Open()
-                    Dim sncommand = New SqlCommand("SELECT * FROM stocksn WHERE serialno ='" + serialno + "' AND doc_type ='SI'", myConn)
+                    Dim sncommand = New SqlCommand("SELECT * FROM stocksn WHERE serialno ='" + serialno + "' AND qty='-1'", myConn)
                     Dim snreader As SqlDataReader = sncommand.ExecuteReader
                     While snreader.Read()
-                        msg_serial += vbTab + snreader.GetValue(snreader.GetOrdinal("serialno")).ToString.Trim + vbNewLine
+                        MsgBox("hey1" + snreader.GetValue(snreader.GetOrdinal("serialno")))
+                        If Not msg_serial.Contains(snreader.GetValue(snreader.GetOrdinal("serialno")).ToString.Trim) Then
+                            msg_serial.Add(snreader.GetValue(snreader.GetOrdinal("serialno")).ToString.Trim)
+                        End If
                         exist_serial = True
                     End While
                     myConn.Close()
@@ -1164,8 +1167,10 @@ Public Class Sales_Invoice_Form
                     Dim prodsncommand = New SqlCommand("SELECT * FROM prodsn WHERE qty='-1' AND serialno ='" + serialno + "'", myConn)
                     Dim prodsnreader As SqlDataReader = prodsncommand.ExecuteReader
                     While prodsnreader.Read()
-                        prodsnreader.GetValue(prodsnreader.GetOrdinal("serialno")).ToString.Trim()
-                        msg_serial += vbTab + prodsnreader.GetValue("serialno") + vbNewLine
+                        MsgBox("hey2" + prodsnreader.GetValue(prodsnreader.GetOrdinal("serialno")))
+                        If Not msg_serial.Contains(prodsnreader.GetValue(prodsnreader.GetOrdinal("serialno")).ToString.Trim) Then
+                            msg_serial.Add(prodsnreader.GetValue(prodsnreader.GetOrdinal("serialno")).ToString.Trim)
+                        End If
                         exist_serial = True
                     End While
                     myConn.Close()
@@ -1173,10 +1178,13 @@ Public Class Sales_Invoice_Form
             End If
         Next
         If exist_serial Then
-            MsgBox("The following serial no has been used:" + vbNewLine + msg_serial + "The operation has been stopped!", MsgBoxStyle.Exclamation)
+            Dim prompt_exist_serial As String = "The following serial no has been used:"
+            For Each serial As String In msg_serial
+                prompt_exist_serial += vbNewLine + serial
+            Next
+            MsgBox(prompt_exist_serial + vbNewLine + "The operation has been stopped!", MsgBoxStyle.Exclamation)
             Return
         End If
-
         'For i As Integer = 0 To 1
         '    For row As Integer = 0 To dgvExcel.RowCount - 1
         '        Dim strs = ""
@@ -1436,18 +1444,18 @@ Public Class Sales_Invoice_Form
                 myConn.Close()
                 seq += 1
 
-                Dim acc_p1 = dgvExcel.Rows(row).Cells("Mode of Payment 1").Value.ToString.Trim
-                Dim ref_p1 = dgvExcel.Rows(row).Cells("Mode of Payment 1 Ref No").Value.ToString.Trim
-                Dim amt_p1 = dgvExcel.Rows(row).Cells("Mode of Payment 1 Amount").Value.ToString.Trim
-                Dim acc_p2 = dgvExcel.Rows(row).Cells("Mode of Payment 2").Value.ToString.Trim
-                Dim ref_p2 = dgvExcel.Rows(row).Cells("Mode of Payment 2 Ref No").Value.ToString.Trim
-                Dim amt_p2 = dgvExcel.Rows(row).Cells("Mode of Payment 2 Amount").Value.ToString.Trim
-                Dim acc_p3 = dgvExcel.Rows(row).Cells("Mode of Payment 3").Value.ToString.Trim
-                Dim ref_p3 = dgvExcel.Rows(row).Cells("Mode of Payment 3 Ref No").Value.ToString.Trim
-                Dim amt_p3 = dgvExcel.Rows(row).Cells("Mode of Payment 3 Amount").Value.ToString.Trim
-                Dim acc_p4 = dgvExcel.Rows(row).Cells("Mode of Payment 4").Value.ToString.Trim
-                Dim ref_p4 = dgvExcel.Rows(row).Cells("Mode of Payment 4 Ref No").Value.ToString.Trim
-                Dim amt_p4 = dgvExcel.Rows(row).Cells("Mode of Payment 4 Amount").Value.ToString.Trim
+                Dim acc_p1 = value_arraylist(0)(row)(73)
+                Dim ref_p1 = value_arraylist(0)(row)(74)
+                Dim amt_p1 = value_arraylist(0)(row)(75)
+                Dim acc_p2 = value_arraylist(0)(row)(78)
+                Dim ref_p2 = value_arraylist(0)(row)(79)
+                Dim amt_p2 = value_arraylist(0)(row)(80)
+                Dim acc_p3 = value_arraylist(0)(row)(83)
+                Dim ref_p3 = value_arraylist(0)(row)(84)
+                Dim amt_p3 = value_arraylist(0)(row)(85)
+                Dim acc_p4 = value_arraylist(0)(row)(86)
+                Dim ref_p4 = value_arraylist(0)(row)(87)
+                Dim amt_p4 = value_arraylist(0)(row)(88)
                 Dim p_def = -1
                 Dim p_def_accno = ""
                 Dim p_def_refno = ""
@@ -1503,22 +1511,22 @@ Public Class Sales_Invoice_Form
                 queryAL.Add(p_def_desp2) 'desp2
                 queryAL.Add(Function_Form.getNull(0)) 'desp3
                 queryAL.Add(Function_Form.getNull(0)) 'desp4
-                If Not amt_p1.Equals(String.Empty) Then
+                If Not acc_p1.Equals(String.Empty) Then
                     amt_p1 = Math.Round(CDbl(amt_p1), 2)
                 Else
                     amt_p1 = 0
                 End If
-                If Not amt_p2.Equals(String.Empty) Then
+                If Not acc_p2.Equals(String.Empty) Then
                     amt_p2 = Math.Round(CDbl(amt_p2), 2)
                 Else
                     amt_p2 = 0
                 End If
-                If Not amt_p3.Equals(String.Empty) Then
+                If Not acc_p3.Equals(String.Empty) Then
                     amt_p3 = Math.Round(CDbl(amt_p3), 2)
                 Else
                     amt_p3 = 0
                 End If
-                If Not amt_p4.Equals(String.Empty) Then
+                If Not acc_p4.Equals(String.Empty) Then
                     amt_p4 = Math.Round(CDbl(amt_p4), 2)
                 Else
                     amt_p4 = 0
@@ -1946,21 +1954,21 @@ Public Class Sales_Invoice_Form
             Dim amount As String = ""
 
             'paid
-            Dim sum_p As Double = 0 '2
-            Dim amt_p1 = dgvExcel.Rows(row).Cells("Mode of Payment 1 Amount").Value.ToString().Trim
-            Dim amt_p2 = dgvExcel.Rows(row).Cells("Mode of Payment 2 Amount").Value.ToString().Trim
-            Dim amt_p3 = dgvExcel.Rows(row).Cells("Mode of Payment 3 Amount").Value.ToString().Trim
-            Dim amt_p4 = dgvExcel.Rows(row).Cells("Mode of Payment 4 Amount").Value.ToString().Trim
-            If Not amt_p1.Equals(String.Empty) Then
+            Dim sum_p As Double = 0
+            Dim amt_p1 = value_arraylist(0)(row)(75)
+            Dim amt_p2 = value_arraylist(0)(row)(80)
+            Dim amt_p3 = value_arraylist(0)(row)(85)
+            Dim amt_p4 = value_arraylist(0)(row)(88)
+            If Not value_arraylist(0)(row)(73).Equals(String.Empty) Then
                 sum_p += CDbl(amt_p1)
             End If
-            If Not amt_p2.Equals(String.Empty) Then
+            If Not value_arraylist(0)(row)(78).Equals(String.Empty) Then
                 sum_p += CDbl(amt_p2)
             End If
-            If Not amt_p3.Equals(String.Empty) Then
+            If Not value_arraylist(0)(row)(83).Equals(String.Empty) Then
                 sum_p += CDbl(amt_p3)
             End If
-            If Not amt_p4.Equals(String.Empty) Then
+            If Not value_arraylist(0)(row)(86).Equals(String.Empty) Then
                 sum_p += CDbl(amt_p4)
             End If
             Dim paid As String = sum_p.ToString
@@ -2112,20 +2120,20 @@ Public Class Sales_Invoice_Form
 
                 'paid
                 Dim sum_p As Double = 0
-                Dim amt_p1 = dgvExcel.Rows(row).Cells("Mode of Payment 1 Amount").Value.ToString().Trim
-                Dim amt_p2 = dgvExcel.Rows(row).Cells("Mode of Payment 2 Amount").Value.ToString().Trim
-                Dim amt_p3 = dgvExcel.Rows(row).Cells("Mode of Payment 3 Amount").Value.ToString().Trim
-                Dim amt_p4 = dgvExcel.Rows(row).Cells("Mode of Payment 4 Amount").Value.ToString().Trim
-                If Not amt_p1.Equals(String.Empty) Then
+                Dim amt_p1 = value_arraylist(0)(row)(75)
+                Dim amt_p2 = value_arraylist(0)(row)(80)
+                Dim amt_p3 = value_arraylist(0)(row)(85)
+                Dim amt_p4 = value_arraylist(0)(row)(88)
+                If Not value_arraylist(0)(row)(73).Equals(String.Empty) Then
                     sum_p += CDbl(amt_p1)
                 End If
-                If Not amt_p2.Equals(String.Empty) Then
+                If Not value_arraylist(0)(row)(78).Equals(String.Empty) Then
                     sum_p += CDbl(amt_p2)
                 End If
-                If Not amt_p3.Equals(String.Empty) Then
+                If Not value_arraylist(0)(row)(83).Equals(String.Empty) Then
                     sum_p += CDbl(amt_p3)
                 End If
-                If Not amt_p4.Equals(String.Empty) Then
+                If Not value_arraylist(0)(row)(86).Equals(String.Empty) Then
                     sum_p += CDbl(amt_p4)
                 End If
                 Dim paid As String = sum_p.ToString

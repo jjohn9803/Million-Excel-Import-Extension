@@ -1048,8 +1048,8 @@ Public Class Delivery_Order_Form
                 For sn = 0 To serialnos.Count - 1
                         Dim serialno As String = serialnos(sn)
                         myConn.Open()
-                        Dim sncommand = New SqlCommand("SELECT * FROM stocksn WHERE serialno ='" + serialno + "' AND doc_type ='DO'", myConn)
-                        Dim snreader As SqlDataReader = sncommand.ExecuteReader
+                    Dim sncommand = New SqlCommand("SELECT * FROM stocksn WHERE serialno ='" + serialno + "' AND qty ='-1'", myConn)
+                    Dim snreader As SqlDataReader = sncommand.ExecuteReader
                         While snreader.Read()
                             msg_serial += vbTab + snreader.GetValue("serialno") + vbNewLine
                             exist_serial = True
