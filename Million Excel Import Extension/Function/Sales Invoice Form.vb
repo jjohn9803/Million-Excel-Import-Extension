@@ -190,8 +190,8 @@ Public Class Sales_Invoice_Form
                                     value = "   "
                                     value_arraylist(i)(row).add("   ")
                                 ElseIf data_type_temp.ToString.Contains("date") Or data_type_temp.ToString.Contains("time") Then
-                                    value = Function_Form.convertDateFormat(New Date.ToString)
-                                    value_arraylist(i)(row).add(Function_Form.convertDateFormat(New Date.ToString))
+                                    value = Function_Form.convertDateFormat(New Date(1900, 1, 1).ToString)
+                                    value_arraylist(i)(row).add(Function_Form.convertDateFormat(New Date(1900, 1, 1).ToString))
                                 Else
                                     value = "0"
                                     value_arraylist(i)(row).add("0")
@@ -254,7 +254,7 @@ Public Class Sales_Invoice_Form
                                             If data_type_temp.ToString.Contains("char") Or data_type_temp.ToString.Contains("text") Then
                                                 value_arraylist(i)(row)(g) = "   "
                                             ElseIf data_type_temp.ToString.Contains("date") Or data_type_temp.ToString.Contains("time") Then
-                                                value_arraylist(i)(row)(g) = Function_Form.convertDateFormat(New Date.ToString)
+                                                value_arraylist(i)(row)(g) = Function_Form.convertDateFormat(New Date(1900, 1, 1).ToString)
                                             Else
                                                 value_arraylist(i)(row)(g) = "0"
                                             End If
@@ -1156,7 +1156,7 @@ Public Class Sales_Invoice_Form
                     Dim sncommand = New SqlCommand("SELECT * FROM stocksn WHERE serialno ='" + serialno + "' AND qty='-1'", myConn)
                     Dim snreader As SqlDataReader = sncommand.ExecuteReader
                     While snreader.Read()
-                        MsgBox("hey1" + snreader.GetValue(snreader.GetOrdinal("serialno")))
+                        'MsgBox("hey1" + snreader.GetValue(snreader.GetOrdinal("serialno")))
                         If Not msg_serial.Contains(snreader.GetValue(snreader.GetOrdinal("serialno")).ToString.Trim) Then
                             msg_serial.Add(snreader.GetValue(snreader.GetOrdinal("serialno")).ToString.Trim)
                         End If
@@ -1167,7 +1167,7 @@ Public Class Sales_Invoice_Form
                     Dim prodsncommand = New SqlCommand("SELECT * FROM prodsn WHERE qty='-1' AND serialno ='" + serialno + "'", myConn)
                     Dim prodsnreader As SqlDataReader = prodsncommand.ExecuteReader
                     While prodsnreader.Read()
-                        MsgBox("hey2" + prodsnreader.GetValue(prodsnreader.GetOrdinal("serialno")))
+                        'MsgBox("hey2" + prodsnreader.GetValue(prodsnreader.GetOrdinal("serialno")))
                         If Not msg_serial.Contains(prodsnreader.GetValue(prodsnreader.GetOrdinal("serialno")).ToString.Trim) Then
                             msg_serial.Add(prodsnreader.GetValue(prodsnreader.GetOrdinal("serialno")).ToString.Trim)
                         End If
@@ -1369,7 +1369,7 @@ Public Class Sales_Invoice_Form
                         queryAL.Add(value_arraylist(0)(row)(49)) 'projcode
                         queryAL.Add(value_arraylist(0)(row)(50)) 'deptcode
                         queryAL.Add(taxcode) 'taxcode
-                        Dim taxable = Math.Round(CDbl(value_arraylist(0)(row)(27)) * -1, 2)
+                        Dim taxable = Math.Round(CDbl(value_arraylist(1)(i)(26)) * -1, 2)
                         queryAL.Add(taxable) 'taxable
                         queryAL.Add(taxable * fx_rate) 'fx_taxable
                         queryAL.Add((seq - 1).ToString) 'link_seq
@@ -1598,7 +1598,7 @@ Public Class Sales_Invoice_Form
                 seq += 1
 
                 'Subtotal Of Payment1
-                If Not acc_p1.Equals(String.Empty) Then
+                If Not acc_p1.ToString.Trim.Equals(String.Empty) Then
                     queryAL.Clear()
                     queryAL.Add(acc_p1) 'accno
                     queryAL.Add("SI") 'doc_type
@@ -1679,7 +1679,7 @@ Public Class Sales_Invoice_Form
                 End If
 
                 'Subtotal Of Payment2
-                If Not acc_p2.Equals(String.Empty) Then
+                If Not acc_p2.ToString.Trim.Equals(String.Empty) Then
                     queryAL.Clear()
                     queryAL.Add(acc_p2) 'accno
                     queryAL.Add("SI") 'doc_type
@@ -1760,7 +1760,7 @@ Public Class Sales_Invoice_Form
                 End If
 
                 'Subtotal Of Payment3
-                If Not acc_p3.Equals(String.Empty) Then
+                If Not acc_p3.ToString.Trim.Equals(String.Empty) Then
                     queryAL.Clear()
                     queryAL.Add(acc_p3) 'accno
                     queryAL.Add("SI") 'doc_type
@@ -1841,7 +1841,7 @@ Public Class Sales_Invoice_Form
                 End If
 
                 'Subtotal Of Payment4
-                If Not acc_p4.Equals(String.Empty) Then
+                If Not acc_p4.ToString.Trim.Equals(String.Empty) Then
                     queryAL.Clear()
                     queryAL.Add(acc_p4) 'accno
                     queryAL.Add("SI") 'doc_type
@@ -1930,6 +1930,7 @@ Public Class Sales_Invoice_Form
             Dim doc_type As String = "SI"
             Dim doc_no As String = ar.Split(".")(0)
             Dim seq As String = ar.Split(".")(1)
+            Dim knockoff As String = ar.Split(".")(2)
             Dim doc_date As String = Convert.ToDateTime(dgvExcel.Rows(row).Cells("Date").Value.ToString).ToString("dd-MMM-yy HH:mm:ss")
 
             'due_date
@@ -1971,15 +1972,35 @@ Public Class Sales_Invoice_Form
             If Not value_arraylist(0)(row)(86).Equals(String.Empty) Then
                 sum_p += CDbl(amt_p4)
             End If
-            Dim paid As String = sum_p.ToString
+            Dim paid As String
+            If knockoff.Equals("0") Then
+                paid = sum_p.ToString
+            Else
+                paid = (sum_p * -1).ToString
+            End If
 
             Dim local_amount As String = ""
-            Dim local_paid As String = (sum_p * CDbl(fx_rate)).ToString '2
-            Dim taxable As String = value_arraylist(0)(row)(27) '2
-            Dim tax As String = value_arraylist(0)(row)(31) '2
-            Dim fx_taxable As String = (CDbl(value_arraylist(0)(row)(27)) * CDbl(fx_rate)).ToString '2
-            Dim fx_tax As String = (CDbl(value_arraylist(0)(row)(31)) * CDbl(fx_rate)).ToString '2
-            Dim knockoff As String = ar.Split(".")(2)
+            Dim local_paid As String
+            If knockoff.Equals("0") Then
+                local_paid = (sum_p * CDbl(fx_rate)).ToString '2
+            Else
+                local_paid = (sum_p * CDbl(fx_rate) * -1).ToString '2
+            End If
+            Dim taxable As String
+            Dim tax As String
+            Dim fx_taxable As String
+            Dim fx_tax As String
+            If knockoff.Equals("0") Then
+                taxable = value_arraylist(0)(row)(27) '2
+                tax = value_arraylist(0)(row)(31) '2
+                fx_taxable = (CDbl(value_arraylist(0)(row)(27)) * CDbl(fx_rate)).ToString '2
+                fx_tax = (CDbl(value_arraylist(0)(row)(31)) * CDbl(fx_rate)).ToString '2
+            Else
+                taxable = Function_Form.getNull(3)
+                tax = Function_Form.getNull(3)
+                fx_taxable = Function_Form.getNull(3)
+                fx_tax = Function_Form.getNull(3)
+            End If
             Dim accmgr_id As String = ""
             Dim projcode As String = ""
             Dim deptcode As String = ""
@@ -2048,7 +2069,7 @@ Public Class Sales_Invoice_Form
                 For Each targetRow As Integer In myTarget
                     Dim targetTax As String = value_arraylist(1)(targetRow)(54)
                     For Each tax_in_grp In taxgrp
-                        MsgBox(tax_in_grp + vbNewLine + targetTax)
+                        'MsgBox(tax_in_grp + vbNewLine + targetTax)
                         If targetTax.Contains(tax_in_grp) Then
                             tax_basis = "P"
                             Exit For
@@ -2215,7 +2236,7 @@ Public Class Sales_Invoice_Form
                                     value_arraylist(i)(row)(g) = Function_Form.convertDateFormat(value_temp)
                                 ElseIf i = 2 And g = 3 Then
                                     Dim dkeyFromDO As String = ""
-                                    Dim command_temp = New SqlCommand("SELECT TOP 1 dkey FROM sdodet WHERE doc_no ='" + value_arraylist(2)(row)(2) + "' AND line_no ='" + value_arraylist(2)(row)(4) + "'", myConn)
+                                    Dim command_temp = New SqlCommand("SELECT TOP 1 dkey FROM sinvdet WHERE doc_no ='" + value_arraylist(2)(row)(2) + "' AND line_no ='" + value_arraylist(2)(row)(4) + "'", myConn)
                                     myConn.Open()
                                     Dim reader_temp As SqlDataReader = command_temp.ExecuteReader
                                     While reader_temp.Read()

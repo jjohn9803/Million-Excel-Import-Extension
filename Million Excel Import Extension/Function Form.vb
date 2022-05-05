@@ -79,7 +79,7 @@ Public Class Function_Form
                     Dim cellText As String = dgvExcel.Rows(row).Cells(cell).Value.ToString.Trim
                     If Not cellText.Equals(String.Empty) Then
                         Try
-                            Dim a = Convert.ToDateTime(cellText).ToString("dd-MMM-yy HH:mm:ss")
+                            Dim a = Convert.ToDateTime(cellText).ToString("yyyy-MM-dd HH:mm:ss")
                         Catch ex As Exception
                             result = False
                         End Try
@@ -101,16 +101,16 @@ Public Class Function_Form
         If type = 0 Then
             result = "   "
         ElseIf type = 1 Then
-            result = New Date.ToString("dd-MMM-yy HH:mm:ss")
+            result = New Date(1900, 1, 1).ToString("yyyy-MM-dd HH:mm:ss")
         ElseIf type = 2 Then
-            result = Date.Now.ToString("dd-MMM-yy HH:mm:ss")
+            result = Date.Now.ToString("yyyy-MM-dd HH:mm:ss")
         ElseIf type = 3 Then
             result = "0"
         End If
         Return result
     End Function
     Public Shared Function convertDateFormat(ByVal datetime As String) As String
-        Return Convert.ToDateTime(datetime).ToString("dd-MMM-yy HH:mm:ss")
+        Return Convert.ToDateTime(datetime).ToString("yyyy-MM-dd HH:mm:ss")
     End Function
     Public Shared Function queryValue(ByVal value) As String
         Return "'" + value.ToString + "',"
@@ -118,10 +118,10 @@ Public Class Function_Form
     Public Shared Sub promptImportSuccess(ByVal insert As Integer, ByVal update As Integer)
         Dim result As String = "Data Import Sucessfully!"
         If insert > 0 Then
-            result += +vbNewLine + "Row Inserted: " + insert.ToString
+            result += vbNewLine + "Row Inserted: " + insert.ToString
         End If
         If update > 0 Then
-            result += +vbNewLine + "Row Updated: " + update.ToString
+            result += vbNewLine + "Row Updated: " + update.ToString
         End If
         MsgBox(result, MsgBoxStyle.Information)
     End Sub

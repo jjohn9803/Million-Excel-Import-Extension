@@ -46,9 +46,10 @@ Partial Class Setting
         '
         Me.Label2.AutoSize = True
         Me.Label2.Font = New System.Drawing.Font("Ebrima", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label2.Location = New System.Drawing.Point(53, 9)
+        Me.Label2.Location = New System.Drawing.Point(71, 11)
+        Me.Label2.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(104, 21)
+        Me.Label2.Size = New System.Drawing.Size(128, 28)
         Me.Label2.TabIndex = 29
         Me.Label2.Text = "Server Name:"
         '
@@ -57,9 +58,10 @@ Partial Class Setting
         Me.cbShowPassword.AutoSize = True
         Me.cbShowPassword.Enabled = False
         Me.cbShowPassword.Font = New System.Drawing.Font("Ebrima", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cbShowPassword.Location = New System.Drawing.Point(389, 113)
+        Me.cbShowPassword.Location = New System.Drawing.Point(519, 139)
+        Me.cbShowPassword.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.cbShowPassword.Name = "cbShowPassword"
-        Me.cbShowPassword.Size = New System.Drawing.Size(139, 25)
+        Me.cbShowPassword.Size = New System.Drawing.Size(170, 32)
         Me.cbShowPassword.TabIndex = 5
         Me.cbShowPassword.Text = "Show password"
         Me.cbShowPassword.UseVisualStyleBackColor = True
@@ -68,27 +70,30 @@ Partial Class Setting
         '
         Me.cbServerList.Font = New System.Drawing.Font("Ebrima", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.cbServerList.FormattingEnabled = True
-        Me.cbServerList.Location = New System.Drawing.Point(163, 6)
+        Me.cbServerList.Location = New System.Drawing.Point(217, 7)
+        Me.cbServerList.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.cbServerList.Name = "cbServerList"
-        Me.cbServerList.Size = New System.Drawing.Size(278, 29)
+        Me.cbServerList.Size = New System.Drawing.Size(369, 36)
         Me.cbServerList.TabIndex = 0
         '
         'Label6
         '
         Me.Label6.AutoSize = True
         Me.Label6.Font = New System.Drawing.Font("Ebrima", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label6.Location = New System.Drawing.Point(77, 114)
+        Me.Label6.Location = New System.Drawing.Point(103, 140)
+        Me.Label6.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label6.Name = "Label6"
-        Me.Label6.Size = New System.Drawing.Size(80, 21)
+        Me.Label6.Size = New System.Drawing.Size(98, 28)
         Me.Label6.TabIndex = 40
         Me.Label6.Text = "Password:"
         '
         'btnSql
         '
         Me.btnSql.Font = New System.Drawing.Font("Ebrima", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnSql.Location = New System.Drawing.Point(197, 147)
+        Me.btnSql.Location = New System.Drawing.Point(263, 181)
+        Me.btnSql.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.btnSql.Name = "btnSql"
-        Me.btnSql.Size = New System.Drawing.Size(150, 35)
+        Me.btnSql.Size = New System.Drawing.Size(200, 43)
         Me.btnSql.TabIndex = 6
         Me.btnSql.Text = "Connect"
         Me.btnSql.UseVisualStyleBackColor = True
@@ -97,9 +102,10 @@ Partial Class Setting
         '
         Me.Label5.AutoSize = True
         Me.Label5.Font = New System.Drawing.Font("Ebrima", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label5.Location = New System.Drawing.Point(91, 79)
+        Me.Label5.Location = New System.Drawing.Point(121, 97)
+        Me.Label5.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label5.Name = "Label5"
-        Me.Label5.Size = New System.Drawing.Size(64, 21)
+        Me.Label5.Size = New System.Drawing.Size(79, 28)
         Me.Label5.TabIndex = 39
         Me.Label5.Text = "User ID:"
         '
@@ -107,19 +113,21 @@ Partial Class Setting
         '
         Me.txtPassword.Enabled = False
         Me.txtPassword.Font = New System.Drawing.Font("Ebrima", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.txtPassword.Location = New System.Drawing.Point(163, 111)
+        Me.txtPassword.Location = New System.Drawing.Point(217, 137)
+        Me.txtPassword.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.txtPassword.Name = "txtPassword"
         Me.txtPassword.PasswordChar = Global.Microsoft.VisualBasic.ChrW(42)
-        Me.txtPassword.Size = New System.Drawing.Size(220, 29)
+        Me.txtPassword.Size = New System.Drawing.Size(292, 35)
         Me.txtPassword.TabIndex = 4
         '
         'txtUserId
         '
         Me.txtUserId.Enabled = False
         Me.txtUserId.Font = New System.Drawing.Font("Ebrima", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.txtUserId.Location = New System.Drawing.Point(163, 76)
+        Me.txtUserId.Location = New System.Drawing.Point(217, 94)
+        Me.txtUserId.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.txtUserId.Name = "txtUserId"
-        Me.txtUserId.Size = New System.Drawing.Size(220, 29)
+        Me.txtUserId.Size = New System.Drawing.Size(292, 35)
         Me.txtUserId.TabIndex = 3
         '
         'cbPasswordOption
@@ -128,18 +136,20 @@ Partial Class Setting
         Me.cbPasswordOption.Font = New System.Drawing.Font("Ebrima", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.cbPasswordOption.FormattingEnabled = True
         Me.cbPasswordOption.Items.AddRange(New Object() {"Window Authentication", "Sql Server Authentication"})
-        Me.cbPasswordOption.Location = New System.Drawing.Point(163, 41)
+        Me.cbPasswordOption.Location = New System.Drawing.Point(217, 50)
+        Me.cbPasswordOption.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.cbPasswordOption.Name = "cbPasswordOption"
-        Me.cbPasswordOption.Size = New System.Drawing.Size(278, 29)
+        Me.cbPasswordOption.Size = New System.Drawing.Size(369, 36)
         Me.cbPasswordOption.TabIndex = 2
         '
         'Label4
         '
         Me.Label4.AutoSize = True
         Me.Label4.Font = New System.Drawing.Font("Ebrima", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label4.Location = New System.Drawing.Point(25, 44)
+        Me.Label4.Location = New System.Drawing.Point(33, 54)
+        Me.Label4.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label4.Name = "Label4"
-        Me.Label4.Size = New System.Drawing.Size(132, 21)
+        Me.Label4.Size = New System.Drawing.Size(165, 28)
         Me.Label4.TabIndex = 36
         Me.Label4.Text = "Password Option:"
         '
@@ -149,18 +159,20 @@ Partial Class Setting
         Me.cbDatabase.Enabled = False
         Me.cbDatabase.Font = New System.Drawing.Font("Ebrima", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.cbDatabase.FormattingEnabled = True
-        Me.cbDatabase.Location = New System.Drawing.Point(163, 188)
+        Me.cbDatabase.Location = New System.Drawing.Point(217, 231)
+        Me.cbDatabase.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.cbDatabase.Name = "cbDatabase"
-        Me.cbDatabase.Size = New System.Drawing.Size(278, 29)
+        Me.cbDatabase.Size = New System.Drawing.Size(369, 36)
         Me.cbDatabase.TabIndex = 7
         '
         'Label3
         '
         Me.Label3.AutoSize = True
         Me.Label3.Font = New System.Drawing.Font("Ebrima", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label3.Location = New System.Drawing.Point(78, 188)
+        Me.Label3.Location = New System.Drawing.Point(104, 231)
+        Me.Label3.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(77, 21)
+        Me.Label3.Size = New System.Drawing.Size(97, 28)
         Me.Label3.TabIndex = 30
         Me.Label3.Text = "Database:"
         '
@@ -168,38 +180,42 @@ Partial Class Setting
         '
         Me.btnTestConnection.Font = New System.Drawing.Font("Ebrima", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btnTestConnection.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.btnTestConnection.Location = New System.Drawing.Point(41, 320)
+        Me.btnTestConnection.Location = New System.Drawing.Point(55, 394)
+        Me.btnTestConnection.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.btnTestConnection.Name = "btnTestConnection"
-        Me.btnTestConnection.Size = New System.Drawing.Size(150, 40)
-        Me.btnTestConnection.TabIndex = 8
+        Me.btnTestConnection.Size = New System.Drawing.Size(200, 49)
+        Me.btnTestConnection.TabIndex = 9
         Me.btnTestConnection.Text = "Test Connection"
         Me.btnTestConnection.UseVisualStyleBackColor = True
         '
         'btnSave
         '
         Me.btnSave.Font = New System.Drawing.Font("Ebrima", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnSave.Location = New System.Drawing.Point(197, 320)
+        Me.btnSave.Location = New System.Drawing.Point(263, 394)
+        Me.btnSave.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.btnSave.Name = "btnSave"
-        Me.btnSave.Size = New System.Drawing.Size(150, 40)
-        Me.btnSave.TabIndex = 9
+        Me.btnSave.Size = New System.Drawing.Size(200, 49)
+        Me.btnSave.TabIndex = 10
         Me.btnSave.Text = "Save"
         Me.btnSave.UseVisualStyleBackColor = True
         '
         'btnClose
         '
         Me.btnClose.Font = New System.Drawing.Font("Ebrima", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnClose.Location = New System.Drawing.Point(353, 320)
+        Me.btnClose.Location = New System.Drawing.Point(471, 394)
+        Me.btnClose.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.btnClose.Name = "btnClose"
-        Me.btnClose.Size = New System.Drawing.Size(150, 40)
-        Me.btnClose.TabIndex = 10
+        Me.btnClose.Size = New System.Drawing.Size(200, 49)
+        Me.btnClose.TabIndex = 11
         Me.btnClose.Text = "Close"
         Me.btnClose.UseVisualStyleBackColor = True
         '
         'btnSearchServer
         '
-        Me.btnSearchServer.Location = New System.Drawing.Point(447, 6)
+        Me.btnSearchServer.Location = New System.Drawing.Point(596, 7)
+        Me.btnSearchServer.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.btnSearchServer.Name = "btnSearchServer"
-        Me.btnSearchServer.Size = New System.Drawing.Size(32, 29)
+        Me.btnSearchServer.Size = New System.Drawing.Size(43, 36)
         Me.btnSearchServer.TabIndex = 1
         Me.btnSearchServer.Text = "..."
         Me.btnSearchServer.UseVisualStyleBackColor = True
@@ -211,19 +227,20 @@ Partial Class Setting
         Me.checkBoxFeature.Font = New System.Drawing.Font("Ebrima", 12.0!)
         Me.checkBoxFeature.FormattingEnabled = True
         Me.checkBoxFeature.Items.AddRange(New Object() {"Quotation", "Sales Order", "Delivery Order", "Sales Invoice"})
-        Me.checkBoxFeature.Location = New System.Drawing.Point(41, 231)
+        Me.checkBoxFeature.Location = New System.Drawing.Point(55, 284)
+        Me.checkBoxFeature.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.checkBoxFeature.MultiColumn = True
         Me.checkBoxFeature.Name = "checkBoxFeature"
-        Me.checkBoxFeature.Size = New System.Drawing.Size(462, 76)
-        Me.checkBoxFeature.TabIndex = 41
+        Me.checkBoxFeature.Size = New System.Drawing.Size(615, 64)
+        Me.checkBoxFeature.TabIndex = 8
         '
         'Setting
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.AutoSize = True
         Me.BackColor = System.Drawing.SystemColors.Control
-        Me.ClientSize = New System.Drawing.Size(545, 379)
+        Me.ClientSize = New System.Drawing.Size(727, 466)
         Me.Controls.Add(Me.checkBoxFeature)
         Me.Controls.Add(Me.btnSearchServer)
         Me.Controls.Add(Me.Label2)
@@ -243,6 +260,7 @@ Partial Class Setting
         Me.Controls.Add(Me.btnClose)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+        Me.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.MaximizeBox = False
         Me.Name = "Setting"
         Me.ShowInTaskbar = False

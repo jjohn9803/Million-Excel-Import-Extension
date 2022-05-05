@@ -180,7 +180,9 @@ Public Class Setting
                 features += item.ToString + ","
                 Main_Form.appendFeature(item.ToString)
             Next
-            features = features.Substring(0, features.Length - 1)
+            If Not features.Equals("") Then
+                features = features.Substring(0, features.Length - 1)
+            End If
             Dim content = "Server Name:" + Main_Form.getServerName +
                         vbNewLine + "Database:" + Main_Form.getDatabase +
                         vbNewLine + "pwd_option:" + pwd_mode.ToString +
@@ -195,13 +197,12 @@ Public Class Setting
 
     End Sub
     Private Sub btnTestConnection_Click(sender As Object, e As EventArgs) Handles btnTestConnection.Click
+        If Main_Form.getServerName.Equals(String.Empty) Or Main_Form.getDatabase.Equals(String.Empty) Or Not Main_Form.getStatusConnection Then
+            MsgBox("Failed to connect the server!", MsgBoxStyle.Critical)
+            Return
+        End If
         Me.Cursor = Cursors.WaitCursor
         Try
-            If Main_Form.getServerName.Equals(String.Empty) Or Main_Form.getDatabase.Equals(String.Empty) Or Not Main_Form.getStatusConnection Then
-                MsgBox("Failed to connect the server!", MsgBoxStyle.Critical)
-                Me.Cursor = Cursors.Default
-                Return
-            End If
             Main_Form.setMyConn(New SqlConnection("Data Source=" + Main_Form.getServerName + ";" &
                                     "Initial Catalog=" + Main_Form.getDatabase + ";" + Main_Form.getPwd_query))
             Main_Form.myConn.Open()
