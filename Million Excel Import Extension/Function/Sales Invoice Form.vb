@@ -1931,11 +1931,11 @@ Public Class Sales_Invoice_Form
             Dim doc_no As String = ar.Split(".")(0)
             Dim seq As String = ar.Split(".")(1)
             Dim knockoff As String = ar.Split(".")(2)
-            Dim doc_date As String = Convert.ToDateTime(dgvExcel.Rows(row).Cells("Date").Value.ToString).ToString("dd-MMM-yy HH:mm:ss")
+            Dim doc_date As String = Convert.ToDateTime(dgvExcel.Rows(row).Cells("Date").Value.ToString).ToString("yyyy-MM-dd HH:mm:ss")
 
             'due_date
             Dim credit_terms As Integer = CInt(value_arraylist(0)(row)(15))
-            Dim due_date As String = Convert.ToDateTime(doc_date).AddDays(credit_terms).ToString("dd-MMM-yy HH:mm:ss") '2
+            Dim due_date As String = Convert.ToDateTime(doc_date).AddDays(credit_terms).ToString("yyyy-MM-dd HH:mm:ss") '2
 
             Dim refno As String = ""
             Dim refno2 As String = ""
@@ -2193,7 +2193,7 @@ Public Class Sales_Invoice_Form
                     Dim location = value_arraylist(7)(row)(4)
                     Dim doc_no = value_arraylist(7)(row)(8)
                     Dim line_no = value_arraylist(7)(row)(9)
-                    Dim doc_date = Convert.ToDateTime(value_arraylist(7)(row)(10)).ToString("dd-MMM-yy HH:mm:ss")
+                    Dim doc_date = Convert.ToDateTime(value_arraylist(7)(row)(10)).ToString("yyyy-MM-dd HH:mm:ss")
                     Dim procode = value_arraylist(7)(row)(0)
                     Dim serialNoProdCommand As String = "UPDATE prodsn SET "
                     Dim serialNoColumns = "qty='" + qty + "',"
