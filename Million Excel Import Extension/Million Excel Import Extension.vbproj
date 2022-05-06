@@ -164,6 +164,12 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Function\Cash Sales.Designer.vb">
+      <DependentUpon>Cash Sales.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Function\Cash Sales.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Function\Delivery Order Form.Designer.vb">
       <DependentUpon>Delivery Order Form.vb</DependentUpon>
     </Compile>
@@ -237,6 +243,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Function\Cash Sales.resx">
+      <DependentUpon>Cash Sales.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Function\Delivery Order Form.resx">
       <DependentUpon>Delivery Order Form.vb</DependentUpon>
     </EmbeddedResource>

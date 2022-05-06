@@ -3,7 +3,7 @@ Imports ClosedXML.Excel
 Imports ExcelDataReader
 
 Public Class Function_Form
-    Private Sub openExcelImport(sender As Object, e As EventArgs) Handles btnQuotation.Click, btnDeliveryOrder.Click, btnSalesOrder.Click, btnSalesInvoice.Click
+    Private Sub openExcelImport(sender As Object, e As EventArgs) Handles btnQuotation.Click, btnDeliveryOrder.Click, btnSalesOrder.Click, btnSalesInvoice.Click, btnCashSales.Click
         Dim formName = sender.text
         If Not Main_Form.getFeatures.Contains(sender.text) Then
             MsgBox("You have not enough privilege to access!", MsgBoxStyle.Critical)
@@ -18,6 +18,8 @@ Public Class Function_Form
             form = New Delivery_Order_Form
         ElseIf formName.Equals("Sales Invoice") Then
             form = New Sales_Invoice_Form
+        ElseIf formName.Equals("Cash Sales") Then
+            form = New Cash_Sales_Form
         End If
         If Main_Form.getStatusConnection And Not Main_Form.getDatabase.Equals(String.Empty) Then
             Main_Form.setImport_type(formName)
@@ -70,7 +72,7 @@ Public Class Function_Form
             End Using
         End Using
     End Sub
-    Public Shared Sub validateExcelDateFormat(dgvExcel As DataGridView, validateDateFormatArray As String())
+    Public Shared Function validateExcelDateFormat(dgvExcel As DataGridView, validateDateFormatArray As String()) As Boolean
         Dim result As Boolean = True
         For cell As Integer = 0 To dgvExcel.Rows(0).Cells.Count - 1
             Dim headerText As String = dgvExcel.Columns(cell).HeaderText.Trim
@@ -93,8 +95,10 @@ Public Class Function_Form
             dgvExcel.DataSource = Nothing
             dgvExcel.Refresh()
             MsgBox("The imported excel format does not correct!", MsgBoxStyle.Critical)
+            Return False
         End If
-    End Sub
+        Return True
+    End Function
     Public Shared Function getNull(ByVal type As Integer) As String
         'type: 0 = " ", 1 = "new Date", 2 = "current Date", 3="0"
         Dim result As String = ""

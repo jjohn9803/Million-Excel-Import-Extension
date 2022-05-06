@@ -27,8 +27,15 @@ Public Class Quotation_Form
     Private Sub cbSheet_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbSheet.SelectedIndexChanged
         Dim dt As DataTable = tables(cbSheet.SelectedItem.ToString())
         dgvExcel.DataSource = dt
-        Function_Form.validateExcelDateFormat(dgvExcel, validateDateFormatArray)
-        btnImport.Enabled = True
+        If Function_Form.validateExcelDateFormat(dgvExcel, validateDateFormatArray) = False Then
+            txtFileName.Text = String.Empty
+            cbSheet.Items.Clear()
+            dgvExcel.DataSource = Nothing
+            dgvExcel.Refresh()
+            btnImport.Enabled = False
+        Else
+            btnImport.Enabled = True
+        End If
     End Sub
     Private Sub txtFileName_MouseClick(sender As Object, e As MouseEventArgs) Handles txtFileName.MouseClick
         Try

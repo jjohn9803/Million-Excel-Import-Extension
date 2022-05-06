@@ -27,6 +27,7 @@ Partial Class Function_Form
         Me.btnSalesOrder = New System.Windows.Forms.Button()
         Me.btnDeliveryOrder = New System.Windows.Forms.Button()
         Me.btnSalesInvoice = New System.Windows.Forms.Button()
+        Me.btnCashSales = New System.Windows.Forms.Button()
         Me.FlowLayoutPanel1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -36,19 +37,21 @@ Partial Class Function_Form
         Me.FlowLayoutPanel1.Controls.Add(Me.btnSalesOrder)
         Me.FlowLayoutPanel1.Controls.Add(Me.btnDeliveryOrder)
         Me.FlowLayoutPanel1.Controls.Add(Me.btnSalesInvoice)
+        Me.FlowLayoutPanel1.Controls.Add(Me.btnCashSales)
         Me.FlowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.FlowLayoutPanel1.Location = New System.Drawing.Point(0, 0)
+        Me.FlowLayoutPanel1.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.FlowLayoutPanel1.Name = "FlowLayoutPanel1"
-        Me.FlowLayoutPanel1.Size = New System.Drawing.Size(654, 268)
+        Me.FlowLayoutPanel1.Size = New System.Drawing.Size(872, 330)
         Me.FlowLayoutPanel1.TabIndex = 3
         '
         'btnQuotation
         '
         Me.btnQuotation.Font = New System.Drawing.Font("Microsoft YaHei", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnQuotation.Location = New System.Drawing.Point(50, 30)
-        Me.btnQuotation.Margin = New System.Windows.Forms.Padding(50, 30, 3, 30)
+        Me.btnQuotation.Location = New System.Drawing.Point(67, 37)
+        Me.btnQuotation.Margin = New System.Windows.Forms.Padding(67, 37, 4, 37)
         Me.btnQuotation.Name = "btnQuotation"
-        Me.btnQuotation.Size = New System.Drawing.Size(131, 59)
+        Me.btnQuotation.Size = New System.Drawing.Size(175, 73)
         Me.btnQuotation.TabIndex = 3
         Me.btnQuotation.TabStop = False
         Me.btnQuotation.Text = "Quotation"
@@ -57,10 +60,10 @@ Partial Class Function_Form
         'btnSalesOrder
         '
         Me.btnSalesOrder.Font = New System.Drawing.Font("Microsoft YaHei", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnSalesOrder.Location = New System.Drawing.Point(234, 30)
-        Me.btnSalesOrder.Margin = New System.Windows.Forms.Padding(50, 30, 3, 30)
+        Me.btnSalesOrder.Location = New System.Drawing.Point(313, 37)
+        Me.btnSalesOrder.Margin = New System.Windows.Forms.Padding(67, 37, 4, 37)
         Me.btnSalesOrder.Name = "btnSalesOrder"
-        Me.btnSalesOrder.Size = New System.Drawing.Size(131, 59)
+        Me.btnSalesOrder.Size = New System.Drawing.Size(175, 73)
         Me.btnSalesOrder.TabIndex = 4
         Me.btnSalesOrder.TabStop = False
         Me.btnSalesOrder.Text = "Sales Order"
@@ -69,10 +72,10 @@ Partial Class Function_Form
         'btnDeliveryOrder
         '
         Me.btnDeliveryOrder.Font = New System.Drawing.Font("Microsoft YaHei", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnDeliveryOrder.Location = New System.Drawing.Point(418, 30)
-        Me.btnDeliveryOrder.Margin = New System.Windows.Forms.Padding(50, 30, 3, 30)
+        Me.btnDeliveryOrder.Location = New System.Drawing.Point(559, 37)
+        Me.btnDeliveryOrder.Margin = New System.Windows.Forms.Padding(67, 37, 4, 37)
         Me.btnDeliveryOrder.Name = "btnDeliveryOrder"
-        Me.btnDeliveryOrder.Size = New System.Drawing.Size(131, 59)
+        Me.btnDeliveryOrder.Size = New System.Drawing.Size(175, 73)
         Me.btnDeliveryOrder.TabIndex = 5
         Me.btnDeliveryOrder.TabStop = False
         Me.btnDeliveryOrder.Text = "Delivery Order"
@@ -81,21 +84,34 @@ Partial Class Function_Form
         'btnSalesInvoice
         '
         Me.btnSalesInvoice.Font = New System.Drawing.Font("Microsoft YaHei", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnSalesInvoice.Location = New System.Drawing.Point(50, 149)
-        Me.btnSalesInvoice.Margin = New System.Windows.Forms.Padding(50, 30, 3, 30)
+        Me.btnSalesInvoice.Location = New System.Drawing.Point(67, 184)
+        Me.btnSalesInvoice.Margin = New System.Windows.Forms.Padding(67, 37, 4, 37)
         Me.btnSalesInvoice.Name = "btnSalesInvoice"
-        Me.btnSalesInvoice.Size = New System.Drawing.Size(131, 59)
+        Me.btnSalesInvoice.Size = New System.Drawing.Size(175, 73)
         Me.btnSalesInvoice.TabIndex = 6
         Me.btnSalesInvoice.TabStop = False
         Me.btnSalesInvoice.Text = "Sales Invoice"
         Me.btnSalesInvoice.UseVisualStyleBackColor = True
         '
+        'btnCashSales
+        '
+        Me.btnCashSales.Font = New System.Drawing.Font("Microsoft YaHei", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.btnCashSales.Location = New System.Drawing.Point(313, 184)
+        Me.btnCashSales.Margin = New System.Windows.Forms.Padding(67, 37, 4, 37)
+        Me.btnCashSales.Name = "btnCashSales"
+        Me.btnCashSales.Size = New System.Drawing.Size(175, 73)
+        Me.btnCashSales.TabIndex = 7
+        Me.btnCashSales.TabStop = False
+        Me.btnCashSales.Text = "Cash Sales"
+        Me.btnCashSales.UseVisualStyleBackColor = True
+        '
         'Function_Form
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(654, 268)
+        Me.ClientSize = New System.Drawing.Size(872, 330)
         Me.Controls.Add(Me.FlowLayoutPanel1)
+        Me.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.Name = "Function_Form"
         Me.Text = "Function_Form"
         Me.FlowLayoutPanel1.ResumeLayout(False)
@@ -108,4 +124,5 @@ Partial Class Function_Form
     Friend WithEvents btnSalesOrder As Button
     Friend WithEvents btnQuotation As Button
     Friend WithEvents btnSalesInvoice As Button
+    Friend WithEvents btnCashSales As Button
 End Class
