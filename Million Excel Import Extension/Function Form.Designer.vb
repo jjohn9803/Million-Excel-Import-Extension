@@ -28,6 +28,8 @@ Partial Class Function_Form
         Me.btnDeliveryOrder = New System.Windows.Forms.Button()
         Me.btnSalesInvoice = New System.Windows.Forms.Button()
         Me.btnCashSales = New System.Windows.Forms.Button()
+        Me.btnDebitNote = New System.Windows.Forms.Button()
+        Me.btnCreditNote = New System.Windows.Forms.Button()
         Me.FlowLayoutPanel1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -38,11 +40,13 @@ Partial Class Function_Form
         Me.FlowLayoutPanel1.Controls.Add(Me.btnDeliveryOrder)
         Me.FlowLayoutPanel1.Controls.Add(Me.btnSalesInvoice)
         Me.FlowLayoutPanel1.Controls.Add(Me.btnCashSales)
+        Me.FlowLayoutPanel1.Controls.Add(Me.btnDebitNote)
+        Me.FlowLayoutPanel1.Controls.Add(Me.btnCreditNote)
         Me.FlowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.FlowLayoutPanel1.Location = New System.Drawing.Point(0, 0)
-        Me.FlowLayoutPanel1.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.FlowLayoutPanel1.Margin = New System.Windows.Forms.Padding(4)
         Me.FlowLayoutPanel1.Name = "FlowLayoutPanel1"
-        Me.FlowLayoutPanel1.Size = New System.Drawing.Size(872, 330)
+        Me.FlowLayoutPanel1.Size = New System.Drawing.Size(872, 445)
         Me.FlowLayoutPanel1.TabIndex = 3
         '
         'btnQuotation
@@ -105,13 +109,37 @@ Partial Class Function_Form
         Me.btnCashSales.Text = "Cash Sales"
         Me.btnCashSales.UseVisualStyleBackColor = True
         '
+        'btnDebitNote
+        '
+        Me.btnDebitNote.Font = New System.Drawing.Font("Microsoft YaHei", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.btnDebitNote.Location = New System.Drawing.Point(559, 184)
+        Me.btnDebitNote.Margin = New System.Windows.Forms.Padding(67, 37, 4, 37)
+        Me.btnDebitNote.Name = "btnDebitNote"
+        Me.btnDebitNote.Size = New System.Drawing.Size(175, 73)
+        Me.btnDebitNote.TabIndex = 8
+        Me.btnDebitNote.TabStop = False
+        Me.btnDebitNote.Text = "Debit Note"
+        Me.btnDebitNote.UseVisualStyleBackColor = True
+        '
+        'btnCreditNote
+        '
+        Me.btnCreditNote.Font = New System.Drawing.Font("Microsoft YaHei", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.btnCreditNote.Location = New System.Drawing.Point(67, 331)
+        Me.btnCreditNote.Margin = New System.Windows.Forms.Padding(67, 37, 4, 37)
+        Me.btnCreditNote.Name = "btnCreditNote"
+        Me.btnCreditNote.Size = New System.Drawing.Size(175, 73)
+        Me.btnCreditNote.TabIndex = 9
+        Me.btnCreditNote.TabStop = False
+        Me.btnCreditNote.Text = "Credit Note"
+        Me.btnCreditNote.UseVisualStyleBackColor = True
+        '
         'Function_Form
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(872, 330)
+        Me.ClientSize = New System.Drawing.Size(872, 445)
         Me.Controls.Add(Me.FlowLayoutPanel1)
-        Me.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.Margin = New System.Windows.Forms.Padding(4)
         Me.Name = "Function_Form"
         Me.Text = "Function_Form"
         Me.FlowLayoutPanel1.ResumeLayout(False)
@@ -125,4 +153,6 @@ Partial Class Function_Form
     Friend WithEvents btnQuotation As Button
     Friend WithEvents btnSalesInvoice As Button
     Friend WithEvents btnCashSales As Button
+    Friend WithEvents btnDebitNote As Button
+    Friend WithEvents btnCreditNote As Button
 End Class

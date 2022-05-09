@@ -24,9 +24,13 @@ Public Class Quotation_Form
         import_type = Main_Form.getImport_type
         txtType.Text = import_type
     End Sub
+
     Private Sub cbSheet_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbSheet.SelectedIndexChanged
         Dim dt As DataTable = tables(cbSheet.SelectedItem.ToString())
         dgvExcel.DataSource = dt
+        For Each column As DataGridViewColumn In dgvExcel.Columns
+            column.SortMode = DataGridViewColumnSortMode.NotSortable
+        Next
         If Function_Form.validateExcelDateFormat(dgvExcel, validateDateFormatArray) = False Then
             txtFileName.Text = String.Empty
             cbSheet.Items.Clear()
@@ -765,6 +769,10 @@ Public Class Quotation_Form
                 value_name = "doc_no"
                 value = value_arraylist(0)(row)(1)
                 If existed_checker(table, value_name, value) Then
+                    If Function_Form.repeatedExcelCell(dgvExcel, 1, value) Then
+                        execute_valid = False
+                        exist_result += excel_format_arraylist(0)(1) + " '" + value + "' is repeated!" + vbNewLine
+                    End If
                     execute_valid = False
                     exist_result += value_name + " '" + value + "' already existed in the database (" + table + ")!" + vbNewLine
                 End If
@@ -869,6 +877,10 @@ Public Class Quotation_Form
                 value = value_arraylist(1)(row)(2)
                 If Not value.Trim.Equals(String.Empty) Then
                     If existed_checker(table, value_name, value) Then
+                        If Function_Form.repeatedExcelCell(dgvExcel, 2, value) Then
+                            execute_valid = False
+                            exist_result += excel_format_arraylist(1)(2) + " '" + value + "' is repeated!" + vbNewLine
+                        End If
                         execute_valid = False
                         exist_result += value_name + " '" + value + "' already existed in the database (" + table + ")!" + vbNewLine
                     End If

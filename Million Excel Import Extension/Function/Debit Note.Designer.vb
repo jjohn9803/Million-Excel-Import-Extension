@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class Quotation_Form
+Partial Class Debit_Note_Form
     Inherits System.Windows.Forms.Form
 
     'Form overrides dispose to clean up the component list.
@@ -25,7 +25,7 @@ Partial Class Quotation_Form
         Dim DataGridViewCellStyle1 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Dim DataGridViewCellStyle2 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Dim DataGridViewCellStyle3 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Quotation_Form))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Debit_Note_Form))
         Me.Panel1 = New System.Windows.Forms.Panel()
         Me.FlowLayoutPanel1 = New System.Windows.Forms.FlowLayoutPanel()
         Me.Label2 = New System.Windows.Forms.Label()
@@ -52,10 +52,10 @@ Partial Class Quotation_Form
         Me.Panel1.Controls.Add(Me.FlowLayoutPanel1)
         Me.Panel1.Dock = System.Windows.Forms.DockStyle.Top
         Me.Panel1.Location = New System.Drawing.Point(0, 0)
-        Me.Panel1.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.Panel1.Margin = New System.Windows.Forms.Padding(4)
         Me.Panel1.Name = "Panel1"
         Me.Panel1.Size = New System.Drawing.Size(1179, 90)
-        Me.Panel1.TabIndex = 13
+        Me.Panel1.TabIndex = 18
         '
         'FlowLayoutPanel1
         '
@@ -65,7 +65,7 @@ Partial Class Quotation_Form
         Me.FlowLayoutPanel1.Controls.Add(Me.cbSheet)
         Me.FlowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.FlowLayoutPanel1.Location = New System.Drawing.Point(0, 0)
-        Me.FlowLayoutPanel1.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.FlowLayoutPanel1.Margin = New System.Windows.Forms.Padding(4)
         Me.FlowLayoutPanel1.Name = "FlowLayoutPanel1"
         Me.FlowLayoutPanel1.Size = New System.Drawing.Size(1179, 90)
         Me.FlowLayoutPanel1.TabIndex = 14
@@ -119,10 +119,10 @@ Partial Class Quotation_Form
         Me.Panel2.Controls.Add(Me.FlowLayoutPanel2)
         Me.Panel2.Dock = System.Windows.Forms.DockStyle.Bottom
         Me.Panel2.Location = New System.Drawing.Point(0, 493)
-        Me.Panel2.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.Panel2.Margin = New System.Windows.Forms.Padding(4)
         Me.Panel2.Name = "Panel2"
         Me.Panel2.Size = New System.Drawing.Size(1179, 74)
-        Me.Panel2.TabIndex = 14
+        Me.Panel2.TabIndex = 19
         '
         'FlowLayoutPanel2
         '
@@ -130,8 +130,9 @@ Partial Class Quotation_Form
         Me.FlowLayoutPanel2.Controls.Add(Me.txtType)
         Me.FlowLayoutPanel2.Controls.Add(Me.btnImport)
         Me.FlowLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.FlowLayoutPanel2.Font = New System.Drawing.Font("Ebrima", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.FlowLayoutPanel2.Location = New System.Drawing.Point(0, 0)
-        Me.FlowLayoutPanel2.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.FlowLayoutPanel2.Margin = New System.Windows.Forms.Padding(4)
         Me.FlowLayoutPanel2.Name = "FlowLayoutPanel2"
         Me.FlowLayoutPanel2.Size = New System.Drawing.Size(1179, 74)
         Me.FlowLayoutPanel2.TabIndex = 18
@@ -175,10 +176,10 @@ Partial Class Quotation_Form
         Me.Panel3.Controls.Add(Me.dgvExcel)
         Me.Panel3.Dock = System.Windows.Forms.DockStyle.Fill
         Me.Panel3.Location = New System.Drawing.Point(0, 90)
-        Me.Panel3.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.Panel3.Margin = New System.Windows.Forms.Padding(4)
         Me.Panel3.Name = "Panel3"
         Me.Panel3.Size = New System.Drawing.Size(1179, 403)
-        Me.Panel3.TabIndex = 16
+        Me.Panel3.TabIndex = 22
         '
         'dgvExcel
         '
@@ -190,7 +191,7 @@ Partial Class Quotation_Form
         Me.dgvExcel.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.AllCells
         DataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
         DataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.ControlLight
-        DataGridViewCellStyle2.Font = New System.Drawing.Font("Ebrima", 12.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        DataGridViewCellStyle2.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         DataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.WindowText
         DataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight
         DataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText
@@ -199,7 +200,7 @@ Partial Class Quotation_Form
         Me.dgvExcel.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         DataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
         DataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Window
-        DataGridViewCellStyle3.Font = New System.Drawing.Font("Ebrima", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        DataGridViewCellStyle3.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         DataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.ControlText
         DataGridViewCellStyle3.NullValue = Nothing
         DataGridViewCellStyle3.Padding = New System.Windows.Forms.Padding(0, 3, 0, 3)
@@ -209,14 +210,14 @@ Partial Class Quotation_Form
         Me.dgvExcel.DefaultCellStyle = DataGridViewCellStyle3
         Me.dgvExcel.Dock = System.Windows.Forms.DockStyle.Fill
         Me.dgvExcel.Location = New System.Drawing.Point(0, 0)
-        Me.dgvExcel.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.dgvExcel.Margin = New System.Windows.Forms.Padding(4)
         Me.dgvExcel.Name = "dgvExcel"
         Me.dgvExcel.ReadOnly = True
         Me.dgvExcel.RowHeadersWidth = 51
         Me.dgvExcel.Size = New System.Drawing.Size(1179, 403)
         Me.dgvExcel.TabIndex = 1
         '
-        'Quotation_Form
+        'Debit_Note_Form
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
@@ -225,9 +226,8 @@ Partial Class Quotation_Form
         Me.Controls.Add(Me.Panel1)
         Me.Controls.Add(Me.Panel2)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
-        Me.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
-        Me.Name = "Quotation_Form"
-        Me.Text = "Quotation_Form"
+        Me.Name = "Debit_Note_Form"
+        Me.Text = "Debit_Note"
         Me.Panel1.ResumeLayout(False)
         Me.FlowLayoutPanel1.ResumeLayout(False)
         Me.FlowLayoutPanel1.PerformLayout()

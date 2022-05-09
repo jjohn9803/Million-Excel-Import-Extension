@@ -226,12 +226,12 @@ Partial Class Setting
         Me.checkBoxFeature.ColumnWidth = 150
         Me.checkBoxFeature.Font = New System.Drawing.Font("Ebrima", 12.0!)
         Me.checkBoxFeature.FormattingEnabled = True
-        Me.checkBoxFeature.Items.AddRange(New Object() {"Quotation", "Sales Order", "Delivery Order", "Sales Invoice", "Cash Sales"})
+        Me.checkBoxFeature.Items.AddRange(New Object() {"Quotation", "Sales Order", "Delivery Order", "Sales Invoice", "Cash Sales", "Debit Note", "Credit Note"})
         Me.checkBoxFeature.Location = New System.Drawing.Point(55, 284)
         Me.checkBoxFeature.Margin = New System.Windows.Forms.Padding(4)
         Me.checkBoxFeature.MultiColumn = True
         Me.checkBoxFeature.Name = "checkBoxFeature"
-        Me.checkBoxFeature.Size = New System.Drawing.Size(615, 64)
+        Me.checkBoxFeature.Size = New System.Drawing.Size(615, 94)
         Me.checkBoxFeature.TabIndex = 8
         '
         'Setting

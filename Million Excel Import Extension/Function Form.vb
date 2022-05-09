@@ -3,7 +3,7 @@ Imports ClosedXML.Excel
 Imports ExcelDataReader
 
 Public Class Function_Form
-    Private Sub openExcelImport(sender As Object, e As EventArgs) Handles btnQuotation.Click, btnDeliveryOrder.Click, btnSalesOrder.Click, btnSalesInvoice.Click, btnCashSales.Click
+    Private Sub openExcelImport(sender As Object, e As EventArgs) Handles btnQuotation.Click, btnDeliveryOrder.Click, btnSalesOrder.Click, btnSalesInvoice.Click, btnCashSales.Click, btnDebitNote.Click, btnCreditNote.Click
         Dim formName = sender.text
         If Not Main_Form.getFeatures.Contains(sender.text) Then
             MsgBox("You have not enough privilege to access!", MsgBoxStyle.Critical)
@@ -20,6 +20,8 @@ Public Class Function_Form
             form = New Sales_Invoice_Form
         ElseIf formName.Equals("Cash Sales") Then
             form = New Cash_Sales_Form
+        ElseIf formName.Equals("Debit Note") Then
+            form = New Debit_Note_Form
         End If
         If Main_Form.getStatusConnection And Not Main_Form.getDatabase.Equals(String.Empty) Then
             Main_Form.setImport_type(formName)
@@ -129,4 +131,15 @@ Public Class Function_Form
         End If
         MsgBox(result, MsgBoxStyle.Information)
     End Sub
+    Public Shared Function repeatedExcelCell(ByVal dgvExcel As DataGridView, ByVal table_at As Integer, ByVal value As String) As Boolean
+        Dim repeat_valid = False
+        For i As Integer = 0 To dgvExcel.RowCount - 1
+            Dim value_in_row As String = dgvExcel.Rows(i).Cells(table_at).Value.ToString.Trim
+            MsgBox("VALUE IN ROW: " + value_in_row + vbNewLine + "value: " + value)
+            If value.ToString.Trim.Equals(value_in_row) Then
+                repeat_valid = True
+            End If
+        Next
+        Return repeat_valid
+    End Function
 End Class
