@@ -131,13 +131,14 @@ Public Class Function_Form
         End If
         MsgBox(result, MsgBoxStyle.Information)
     End Sub
-    Public Shared Function repeatedExcelCell(ByVal dgvExcel As DataGridView, ByVal table_at As Integer, ByVal value As String) As Boolean
+    Public Shared Function repeatedExcelCell(ByVal dgvExcel As DataGridView, ByVal table_at As String, ByVal value As String, ByVal myrow As Integer) As Boolean
         Dim repeat_valid = False
         For i As Integer = 0 To dgvExcel.RowCount - 1
-            Dim value_in_row As String = dgvExcel.Rows(i).Cells(table_at).Value.ToString.Trim
-            MsgBox("VALUE IN ROW: " + value_in_row + vbNewLine + "value: " + value)
-            If value.ToString.Trim.Equals(value_in_row) Then
-                repeat_valid = True
+            If i <> myrow Then
+                Dim value_in_row As String = dgvExcel.Rows(i).Cells(table_at).Value.ToString.Trim
+                If value.ToString.Trim.Equals(value_in_row) Then
+                    repeat_valid = True
+                End If
             End If
         Next
         Return repeat_valid

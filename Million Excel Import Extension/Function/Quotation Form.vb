@@ -768,13 +768,17 @@ Public Class Quotation_Form
                 table = "squote"
                 value_name = "doc_no"
                 value = value_arraylist(0)(row)(1)
-                If existed_checker(table, value_name, value) Then
-                    If Function_Form.repeatedExcelCell(dgvExcel, 1, value) Then
+                If Not value.Trim.Equals(String.Empty) Then
+                    If existed_checker(table, value_name, value) Then
                         execute_valid = False
-                        exist_result += excel_format_arraylist(0)(1) + " '" + value + "' is repeated!" + vbNewLine
+                        exist_result += value_name + " '" + value + "' already existed in the database (" + table + ")!" + vbNewLine
                     End If
-                    execute_valid = False
-                    exist_result += value_name + " '" + value + "' already existed in the database (" + table + ")!" + vbNewLine
+                    If Function_Form.repeatedExcelCell(dgvExcel, excel_format_arraylist(0)(1), value, row) Then
+                        execute_valid = False
+                        If Not exist_result.Contains(excel_format_arraylist(0)(1) + " '" + value + "' is repeated!") Then
+                            exist_result += excel_format_arraylist(0)(1) + " '" + value + "' is repeated!" + vbNewLine
+                        End If
+                    End If
                 End If
 
                 'customer.custcode / exist
@@ -872,19 +876,21 @@ Public Class Quotation_Form
             'squotedet
             If Not value_arraylist(1)(row)(0).Equals(String.Empty) Then
                 'squotedet.doc_no / duplicate
-                table = "squotedet"
-                value_name = "doc_no"
-                value = value_arraylist(1)(row)(2)
-                If Not value.Trim.Equals(String.Empty) Then
-                    If existed_checker(table, value_name, value) Then
-                        If Function_Form.repeatedExcelCell(dgvExcel, 2, value) Then
-                            execute_valid = False
-                            exist_result += excel_format_arraylist(1)(2) + " '" + value + "' is repeated!" + vbNewLine
-                        End If
-                        execute_valid = False
-                        exist_result += value_name + " '" + value + "' already existed in the database (" + table + ")!" + vbNewLine
-                    End If
-                End If
+                'table = "squotedet"
+                'value_name = "doc_no"
+                'value = value_arraylist(1)(row)(2)
+                'If Not value.Trim.Equals(String.Empty) Then
+                '    If existed_checker(table, value_name, value) Then
+                '        execute_valid = False
+                '        exist_result += value_name + " '" + value + "' already existed in the database (" + table + ")!" + vbNewLine
+                '    End If
+                '    If Function_Form.repeatedExcelCell(dgvExcel, excel_format_arraylist(1)(2), value, row) Then
+                '        execute_valid = False
+                '        If Not exist_result.Contains(excel_format_arraylist(1)(2) + " '" + value + "' is repeated!") Then
+                '            exist_result += excel_format_arraylist(1)(2) + " '" + value + "' is repeated!" + vbNewLine
+                '        End If
+                '    End If
+                'End If
 
                 'product.prodcode / exist
                 table = "product"

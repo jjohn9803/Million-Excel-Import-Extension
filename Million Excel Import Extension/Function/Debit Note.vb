@@ -48,8 +48,8 @@ Public Class Debit_Note_Form
                         Try
                             Using reader As IExcelDataReader = ExcelReaderFactory.CreateReader(stream)
                                 Dim result As DataSet = reader.AsDataSet(New ExcelDataSetConfiguration() With {
-                                                                             .ConfigureDataTable = Function(__) New ExcelDataTableConfiguration() With {
-                                                                             .UseHeaderRow = True}})
+                                                                    .ConfigureDataTable = Function(__) New ExcelDataTableConfiguration() With {
+                                                                    .UseHeaderRow = True}})
                                 tables = result.Tables
                                 cbSheet.Items.Clear()
                                 For Each table As DataTable In tables
@@ -89,8 +89,8 @@ Public Class Debit_Note_Form
         Using stream = File.Open(getMaintainSetting, FileMode.Open, FileAccess.Read)
             Using reader As IExcelDataReader = ExcelReaderFactory.CreateReader(stream)
                 Dim result As DataSet = reader.AsDataSet(New ExcelDataSetConfiguration() With {
-                                                                             .ConfigureDataTable = Function(__) New ExcelDataTableConfiguration() With {
-                                                                             .UseHeaderRow = True}})
+                                                                    .ConfigureDataTable = Function(__) New ExcelDataTableConfiguration() With {
+                                                                    .UseHeaderRow = True}})
                 tableExcelSetting = result.Tables
                 Dim queryTable As New ArrayList
                 For i = 0 To 8
@@ -727,14 +727,19 @@ Public Class Debit_Note_Form
                 table = "sinv"
                 value_name = "doc_no"
                 value = value_arraylist(0)(row)(1)
-                If existed_checker(table, value_name, value) Then
-                    If Function_Form.repeatedExcelCell(dgvExcel, 1, value) Then
+                If Not value.Trim.Equals(String.Empty) Then
+                    If existed_checker(table, value_name, value) Then
                         execute_valid = False
-                        exist_result += excel_format_arraylist(0)(1) + " '" + value + "' is repeated!" + vbNewLine
+                        exist_result += value_name + " '" + value + "' already existed in the database (" + table + ")!" + vbNewLine
                     End If
-                    execute_valid = False
-                    exist_result += value_name + " '" + value + "' already existed in the database (" + table + ")!" + vbNewLine
+                    If Function_Form.repeatedExcelCell(dgvExcel, excel_format_arraylist(0)(1), value, row) Then
+                        execute_valid = False
+                        If Not exist_result.Contains(excel_format_arraylist(0)(1) + " '" + value + "' is repeated!") Then
+                            exist_result += excel_format_arraylist(0)(1) + " '" + value + "' is repeated!" + vbNewLine
+                        End If
+                    End If
                 End If
+
 
                 'customer.custcode / exist
                 table = "customer"
@@ -760,6 +765,7 @@ Public Class Debit_Note_Form
                     Dim reader As SqlDataReader = command.ExecuteReader
                     While reader.Read()
                         exist_value = True
+                        value_arraylist(0)(row)(13) = reader.GetValue(0).ToString 'update addrkey
                     End While
                     myConn.Close()
                     If Not exist_value Then
@@ -923,19 +929,21 @@ Public Class Debit_Note_Form
             'Sales Invoice Desc
             If Not value_arraylist(1)(row)(0).Equals(String.Empty) Then
                 'sinvdet.doc_no / duplicate
-                table = "sinvdet"
-                value_name = "doc_no"
-                value = value_arraylist(1)(row)(2)
-                If Not value.Trim.Equals(String.Empty) Then
-                    If existed_checker(table, value_name, value) Then
-                        If Function_Form.repeatedExcelCell(dgvExcel, 2, value) Then
-                            execute_valid = False
-                            exist_result += excel_format_arraylist(1)(2) + " '" + value + "' is repeated!" + vbNewLine
-                        End If
-                        execute_valid = False
-                        exist_result += value_name + " '" + value + "' already existed in the database (" + table + ")!" + vbNewLine
-                    End If
-                End If
+                'table = "sinvdet"
+                'value_name = "doc_no"
+                'value = value_arraylist(1)(row)(2)
+                'If Not value.Trim.Equals(String.Empty) Then
+                '    If existed_checker(table, value_name, value) Then
+                '        execute_valid = False
+                '        exist_result += value_name + " '" + value + "' already existed in the database (" + table + ")!" + vbNewLine
+                '    End If
+                '    If Function_Form.repeatedExcelCell(dgvExcel, excel_format_arraylist(1)(2), value, row) Then
+                '        execute_valid = False
+                '        If Not exist_result.Contains(excel_format_arraylist(1)(2) + " '" + value + "' is repeated!") Then
+                '            exist_result += excel_format_arraylist(1)(2) + " '" + value + "' is repeated!" + vbNewLine
+                '        End If
+                '    End If
+                'End If
 
                 'product.prodcode / exist
                 table = "product"
@@ -1179,7 +1187,8 @@ Public Class Debit_Note_Form
                     queryAL.Add(value_arraylist(0)(row)(4)) 'desp2
                     queryAL.Add(Function_Form.getNull(0)) 'desp3
                     queryAL.Add(Function_Form.getNull(0)) 'desp4
-                    amount = Math.Round(CDbl(value_arraylist(1)(i)(26)) * -1, 2)
+
+                    amount = Math.Round(CDbl(value_arraylist(1)(i)(31)) * -1, 2)
                     queryAL.Add(amount) 'amount
                     debit = 0
                     credit = 0
@@ -1191,9 +1200,17 @@ Public Class Debit_Note_Form
                     queryAL.Add(debit) 'debit
                     queryAL.Add(credit) 'credit
                     fx_rate = CDbl(value_arraylist(0)(row)(18))
-                    fx_amount = Math.Round(amount * fx_rate, 2)
-                    fx_debit = Math.Round(debit * fx_rate, 2)
-                    fx_credit = Math.Round(credit * fx_rate, 2)
+                    fx_amount = Math.Round(CDbl(value_arraylist(1)(i)(26)) * -1, 2)
+                    fx_debit = 0
+                    fx_credit = 0
+                    If fx_amount < 0 Then
+                        fx_credit = fx_amount * -1
+                    Else
+                        fx_debit = fx_amount
+                    End If
+                    fx_debit = fx_debit
+                    fx_credit = fx_credit
+
                     queryAL.Add(fx_amount) 'fx_amount
                     queryAL.Add(fx_debit) 'fx_debit
                     queryAL.Add(fx_credit) 'fx_credit
@@ -1252,7 +1269,8 @@ Public Class Debit_Note_Form
                         queryAL.Add(value_arraylist(0)(row)(4)) 'desp2
                         queryAL.Add(Function_Form.getNull(0)) 'desp3
                         queryAL.Add(Function_Form.getNull(0)) 'desp4
-                        amount = Math.Round(CDbl(value_arraylist(1)(i)(23)) * -1, 2)
+
+                        amount = Math.Round(CDbl(value_arraylist(1)(i)(35)) * -1, 2)
                         queryAL.Add(amount) 'amount
                         debit = 0
                         credit = 0
@@ -1264,21 +1282,29 @@ Public Class Debit_Note_Form
                         queryAL.Add(debit) 'debit
                         queryAL.Add(credit) 'credit
                         fx_rate = CDbl(value_arraylist(0)(row)(18))
-                        fx_amount = Math.Round(amount * fx_rate, 2)
-                        fx_debit = Math.Round(debit * fx_rate, 2)
-                        fx_credit = Math.Round(credit * fx_rate, 2)
+                        fx_amount = Math.Round(CDbl(value_arraylist(1)(i)(23)) * -1, 2)
+                        fx_debit = 0
+                        fx_credit = 0
+                        If fx_amount < 0 Then
+                            fx_credit = fx_amount * -1
+                        Else
+                            fx_debit = fx_amount
+                        End If
+                        fx_debit = fx_debit
+                        fx_credit = fx_credit
                         queryAL.Add(fx_amount) 'fx_amount
                         queryAL.Add(fx_debit) 'fx_debit
                         queryAL.Add(fx_credit) 'fx_credit
                         queryAL.Add(fx_rate) 'fx_rate
+
                         queryAL.Add(value_arraylist(0)(row)(17)) 'curr_code
                         queryAL.Add(value_arraylist(0)(row)(48)) 'batchno
                         queryAL.Add(value_arraylist(0)(row)(49)) 'projcode
                         queryAL.Add(value_arraylist(0)(row)(50)) 'deptcode
                         queryAL.Add(taxcode) 'taxcode
                         Dim taxable = Math.Round(CDbl(value_arraylist(1)(i)(26)) * -1, 2)
-                        queryAL.Add(taxable) 'taxable
-                        queryAL.Add(taxable * fx_rate) 'fx_taxable
+                        queryAL.Add(taxable * fx_rate) 'taxable
+                        queryAL.Add(taxable) 'fx_taxable
                         queryAL.Add((seq - 1).ToString) 'link_seq
 
                         Dim execmd2 = queryTable(4)(2)
@@ -1311,7 +1337,8 @@ Public Class Debit_Note_Form
                 queryAL.Add(value_arraylist(0)(row)(4)) 'desp2
                 queryAL.Add(Function_Form.getNull(0)) 'desp3
                 queryAL.Add(Function_Form.getNull(0)) 'desp4
-                amount = Math.Round(CDbl(value_arraylist(0)(row)(35)), 2)
+
+                amount = Math.Round(CDbl(value_arraylist(0)(row)(43)), 2)
                 queryAL.Add(amount) 'amount
                 debit = 0
                 credit = 0
@@ -1323,13 +1350,21 @@ Public Class Debit_Note_Form
                 queryAL.Add(debit) 'debit
                 queryAL.Add(credit) 'credit
                 fx_rate = CDbl(value_arraylist(0)(row)(18))
-                fx_amount = Math.Round(amount * fx_rate, 2)
-                fx_debit = Math.Round(debit * fx_rate, 2)
-                fx_credit = Math.Round(credit * fx_rate, 2)
+                fx_amount = Math.Round(CDbl(value_arraylist(0)(row)(35)), 2)
+                fx_debit = 0
+                fx_credit = 0
+                If fx_amount < 0 Then
+                    fx_credit = fx_amount * -1
+                Else
+                    fx_debit = fx_amount
+                End If
+                fx_debit = fx_debit
+                fx_credit = fx_credit
                 queryAL.Add(fx_amount) 'fx_amount
                 queryAL.Add(fx_debit) 'fx_debit
                 queryAL.Add(fx_credit) 'fx_credit
                 queryAL.Add(fx_rate) 'fx_rate
+
                 queryAL.Add(value_arraylist(0)(row)(17)) 'curr_code
                 queryAL.Add(value_arraylist(0)(row)(48)) 'batchno
                 queryAL.Add(value_arraylist(0)(row)(49)) 'projcode
@@ -1366,22 +1401,22 @@ Public Class Debit_Note_Form
                 Dim p_def = -1
                 Dim p_def_accno = ""
                 Dim p_def_refno = ""
-                If Not acc_p1.ToString.Trim.Equals(String.Empty) Then
+                If Not acc_p1.ToString.Trim.Equals(String.Empty) And Not amt_p1.ToString.Trim.Equals("0") Then
                     p_def = 1
                     p_def_accno = acc_p1
                     p_def_refno = ref_p1
                 Else
-                    If Not acc_p2.ToString.Trim.Equals(String.Empty) Then
+                    If Not acc_p2.ToString.Trim.Equals(String.Empty) And Not amt_p2.ToString.Trim.Equals("0") Then
                         p_def = 2
                         p_def_accno = acc_p2
                         p_def_refno = ref_p2
                     Else
-                        If Not acc_p3.ToString.Trim.Equals(String.Empty) Then
+                        If Not acc_p3.ToString.Trim.Equals(String.Empty) And Not amt_p3.ToString.Trim.Equals("0") Then
                             p_def = 3
                             p_def_accno = acc_p3
                             p_def_refno = ref_p3
                         Else
-                            If Not acc_p4.ToString.Trim.Equals(String.Empty) Then
+                            If Not acc_p4.ToString.Trim.Equals(String.Empty) And Not amt_p4.ToString.Trim.Equals("0") Then
                                 p_def = 4
                                 p_def_accno = acc_p4
                                 p_def_refno = ref_p4
@@ -1438,14 +1473,16 @@ Public Class Debit_Note_Form
                 Else
                     amt_p4 = 0
                 End If
+
                 Dim amt_debt = value_arraylist(0)(row)(91)
                 If Not amt_debt.ToString.Trim.Equals(String.Empty) Then
                     amt_debt = Math.Round(CDbl(amt_debt), 2)
                 Else
                     amt_debt = 0
                 End If
-                amount = (CDbl(amt_p1) + CDbl(amt_p2) + CDbl(amt_p3) + CDbl(amt_p4) + CDbl(amt_debt)) * -1
-                queryAL.Add(amount) 'amount
+
+                fx_rate = CDbl(value_arraylist(0)(row)(18))
+                amount = ((CDbl(amt_p1) + CDbl(amt_p2) + CDbl(amt_p3) + CDbl(amt_p4)) * -1) * fx_rate
                 debit = 0
                 credit = 0
                 If amount < 0 Then
@@ -1453,16 +1490,22 @@ Public Class Debit_Note_Form
                 Else
                     debit = amount
                 End If
+                fx_amount = (CDbl(amt_p1) + CDbl(amt_p2) + CDbl(amt_p3) + CDbl(amt_p4)) * -1
+                fx_debit = 0
+                fx_credit = 0
+                If fx_amount < 0 Then
+                    fx_credit = fx_amount * -1
+                Else
+                    fx_debit = fx_amount
+                End If
+                queryAL.Add(amount) 'amount
                 queryAL.Add(debit) 'debit
                 queryAL.Add(credit) 'credit
-                fx_rate = CDbl(value_arraylist(0)(row)(18))
-                fx_amount = Math.Round(amount * fx_rate, 2)
-                fx_debit = Math.Round(debit * fx_rate, 2)
-                fx_credit = Math.Round(credit * fx_rate, 2)
                 queryAL.Add(fx_amount) 'fx_amount
                 queryAL.Add(fx_debit) 'fx_debit
                 queryAL.Add(fx_credit) 'fx_credit
                 queryAL.Add(fx_rate) 'fx_rate
+
                 queryAL.Add(value_arraylist(0)(row)(17)) 'curr_code
                 queryAL.Add(value_arraylist(0)(row)(48)) 'batchno
                 queryAL.Add(value_arraylist(0)(row)(49)) 'projcode
@@ -1525,7 +1568,17 @@ Public Class Debit_Note_Form
                     queryAL.Add(Function_Form.getNull(0)) 'desp2
                     queryAL.Add(Function_Form.getNull(0)) 'desp3
                     queryAL.Add(Function_Form.getNull(0)) 'desp4
-                    queryAL.Add(amt_p1) 'amount
+
+                    fx_rate = CDbl(value_arraylist(0)(row)(18))
+                    fx_amount = Math.Round(amt_p1, 2)
+                    fx_debit = 0
+                    fx_credit = 0
+                    If fx_amount < 0 Then
+                        fx_credit = fx_amount * -1
+                    Else
+                        fx_debit = fx_amount
+                    End If
+                    amt_p1 = Math.Round(amt_p1 * fx_rate, 2)
                     debit = 0
                     credit = 0
                     If amt_p1 < 0 Then
@@ -1533,16 +1586,14 @@ Public Class Debit_Note_Form
                     Else
                         debit = amt_p1
                     End If
+                    queryAL.Add(amt_p1) 'amount
                     queryAL.Add(debit) 'debit
                     queryAL.Add(credit) 'credit
-                    fx_rate = CDbl(value_arraylist(0)(row)(18))
-                    fx_amount = Math.Round(amt_p1 * fx_rate, 2)
-                    fx_debit = Math.Round(debit * fx_rate, 2)
-                    fx_credit = Math.Round(credit * fx_rate, 2)
                     queryAL.Add(fx_amount) 'fx_amount
                     queryAL.Add(fx_debit) 'fx_debit
                     queryAL.Add(fx_credit) 'fx_credit
                     queryAL.Add(fx_rate) 'fx_rate
+
                     queryAL.Add(value_arraylist(0)(row)(17)) 'curr_code
                     queryAL.Add(value_arraylist(0)(row)(48)) 'batchno
                     queryAL.Add(value_arraylist(0)(row)(49)) 'projcode
@@ -1606,7 +1657,17 @@ Public Class Debit_Note_Form
                     queryAL.Add(Function_Form.getNull(0)) 'desp2
                     queryAL.Add(Function_Form.getNull(0)) 'desp3
                     queryAL.Add(Function_Form.getNull(0)) 'desp4
-                    queryAL.Add(amt_p2) 'amount
+
+                    fx_rate = CDbl(value_arraylist(0)(row)(18))
+                    fx_amount = Math.Round(amt_p2, 2)
+                    fx_debit = 0
+                    fx_credit = 0
+                    If fx_amount < 0 Then
+                        fx_credit = fx_amount * -1
+                    Else
+                        fx_debit = fx_amount
+                    End If
+                    amt_p2 = Math.Round(amt_p2 * fx_rate, 2)
                     debit = 0
                     credit = 0
                     If amt_p2 < 0 Then
@@ -1614,16 +1675,14 @@ Public Class Debit_Note_Form
                     Else
                         debit = amt_p2
                     End If
+                    queryAL.Add(amt_p2) 'amount
                     queryAL.Add(debit) 'debit
                     queryAL.Add(credit) 'credit
-                    fx_rate = CDbl(value_arraylist(0)(row)(18))
-                    fx_amount = Math.Round(amt_p2 * fx_rate, 2)
-                    fx_debit = Math.Round(debit * fx_rate, 2)
-                    fx_credit = Math.Round(credit * fx_rate, 2)
                     queryAL.Add(fx_amount) 'fx_amount
                     queryAL.Add(fx_debit) 'fx_debit
                     queryAL.Add(fx_credit) 'fx_credit
                     queryAL.Add(fx_rate) 'fx_rate
+
                     queryAL.Add(value_arraylist(0)(row)(17)) 'curr_code
                     queryAL.Add(value_arraylist(0)(row)(48)) 'batchno
                     queryAL.Add(value_arraylist(0)(row)(49)) 'projcode
@@ -1687,7 +1746,17 @@ Public Class Debit_Note_Form
                     queryAL.Add(Function_Form.getNull(0)) 'desp2
                     queryAL.Add(Function_Form.getNull(0)) 'desp3
                     queryAL.Add(Function_Form.getNull(0)) 'desp4
-                    queryAL.Add(amt_p3) 'amount
+
+                    fx_rate = CDbl(value_arraylist(0)(row)(18))
+                    fx_amount = Math.Round(amt_p3, 2)
+                    fx_debit = 0
+                    fx_credit = 0
+                    If fx_amount < 0 Then
+                        fx_credit = fx_amount * -1
+                    Else
+                        fx_debit = fx_amount
+                    End If
+                    amt_p3 = Math.Round(amt_p3 * fx_rate, 2)
                     debit = 0
                     credit = 0
                     If amt_p3 < 0 Then
@@ -1695,16 +1764,14 @@ Public Class Debit_Note_Form
                     Else
                         debit = amt_p3
                     End If
+                    queryAL.Add(amt_p3) 'amount
                     queryAL.Add(debit) 'debit
                     queryAL.Add(credit) 'credit
-                    fx_rate = CDbl(value_arraylist(0)(row)(18))
-                    fx_amount = Math.Round(amt_p3 * fx_rate, 2)
-                    fx_debit = Math.Round(debit * fx_rate, 2)
-                    fx_credit = Math.Round(credit * fx_rate, 2)
                     queryAL.Add(fx_amount) 'fx_amount
                     queryAL.Add(fx_debit) 'fx_debit
                     queryAL.Add(fx_credit) 'fx_credit
                     queryAL.Add(fx_rate) 'fx_rate
+
                     queryAL.Add(value_arraylist(0)(row)(17)) 'curr_code
                     queryAL.Add(value_arraylist(0)(row)(48)) 'batchno
                     queryAL.Add(value_arraylist(0)(row)(49)) 'projcode
@@ -1768,24 +1835,32 @@ Public Class Debit_Note_Form
                     queryAL.Add(Function_Form.getNull(0)) 'desp2
                     queryAL.Add(Function_Form.getNull(0)) 'desp3
                     queryAL.Add(Function_Form.getNull(0)) 'desp4
-                    queryAL.Add(amt_p4) 'amount
+
+                    fx_rate = CDbl(value_arraylist(0)(row)(18))
+                    fx_amount = Math.Round(amt_p4, 2)
+                    fx_debit = 0
+                    fx_credit = 0
+                    If fx_amount < 0 Then
+                        fx_credit = fx_amount * -1
+                    Else
+                        fx_debit = fx_amount
+                    End If
+                    amt_p4 = Math.Round(amt_p4 * fx_rate, 2)
                     debit = 0
                     credit = 0
-                    If amt_p2 < 0 Then
+                    If amt_p4 < 0 Then
                         credit = amt_p4 * -1
                     Else
                         debit = amt_p4
                     End If
+                    queryAL.Add(amt_p4) 'amount
                     queryAL.Add(debit) 'debit
                     queryAL.Add(credit) 'credit
-                    fx_rate = CDbl(value_arraylist(0)(row)(18))
-                    fx_amount = Math.Round(amt_p4 * fx_rate, 2)
-                    fx_debit = Math.Round(debit * fx_rate, 2)
-                    fx_credit = Math.Round(credit * fx_rate, 2)
                     queryAL.Add(fx_amount) 'fx_amount
                     queryAL.Add(fx_debit) 'fx_debit
                     queryAL.Add(fx_credit) 'fx_credit
                     queryAL.Add(fx_rate) 'fx_rate
+
                     queryAL.Add(value_arraylist(0)(row)(17)) 'curr_code
                     queryAL.Add(value_arraylist(0)(row)(48)) 'batchno
                     queryAL.Add(value_arraylist(0)(row)(49)) 'projcode
@@ -1904,10 +1979,10 @@ Public Class Debit_Note_Form
             Dim fx_taxable As String
             Dim fx_tax As String
             If knockoff.Equals("0") Then
-                taxable = value_arraylist(0)(row)(27) '2
-                tax = value_arraylist(0)(row)(31) '2
-                fx_taxable = (CDbl(value_arraylist(0)(row)(27)) * CDbl(fx_rate)).ToString '2
-                fx_tax = (CDbl(value_arraylist(0)(row)(31)) * CDbl(fx_rate)).ToString '2
+                taxable = (CDbl(value_arraylist(0)(row)(27)) * CDbl(fx_rate)).ToString '2
+                tax = (CDbl(value_arraylist(0)(row)(31)) * CDbl(fx_rate)).ToString '2
+                fx_taxable = value_arraylist(0)(row)(27) '2
+                fx_tax = value_arraylist(0)(row)(31) '2
             Else
                 taxable = Function_Form.getNull(3)
                 tax = Function_Form.getNull(3)
@@ -1950,8 +2025,8 @@ Public Class Debit_Note_Form
                 koff_date = Function_Form.convertDateFormat(glreader.GetValue(glreader.GetOrdinal("koff_date")))
                 curr_code = glreader.GetValue(glreader.GetOrdinal("curr_code")).ToString.Trim
                 refno = glreader.GetValue(glreader.GetOrdinal("refno")).ToString.Trim
-                amount = glreader.GetValue(glreader.GetOrdinal("amount")).ToString.Trim
-                local_amount = glreader.GetValue(glreader.GetOrdinal("fx_amount")).ToString.Trim
+                amount = glreader.GetValue(glreader.GetOrdinal("fx_amount")).ToString.Trim
+                local_amount = glreader.GetValue(glreader.GetOrdinal("amount")).ToString.Trim
                 accmgr_id = glreader.GetValue(glreader.GetOrdinal("accmgr_id")).ToString.Trim
                 projcode = glreader.GetValue(glreader.GetOrdinal("projcode")).ToString.Trim
                 deptcode = glreader.GetValue(glreader.GetOrdinal("deptcode")).ToString.Trim
@@ -1965,35 +2040,38 @@ Public Class Debit_Note_Form
                 lkseq = glreader.GetValue(glreader.GetOrdinal("lkseq")).ToString.Trim
             End While
             myConn.Close()
-            myConn.Open()
-            Dim taxgrpcommand = New SqlCommand("SELECT taxgrp FROM gltaxgrp WHERE tax_basis = 'P'", myConn)
-            Dim taxgrpreader As SqlDataReader = taxgrpcommand.ExecuteReader
-            Dim taxgrp As New ArrayList
-            While taxgrpreader.Read()
-                taxgrp.Add(taxgrpreader.GetValue(0).ToString)
-            End While
-            If taxgrp.Count > 0 Then
-                Dim myTarget As New ArrayList
-                For Each range As String In rangeQuo
-                    If range.Split(".")(0).ToString.Trim.Equals(row.ToString.Trim) Then
-                        myTarget.Add(CInt(range.Split(".")(1).ToString.Trim))
-                    End If
-                Next
-                For Each targetRow As Integer In myTarget
-                    Dim targetTax As String = value_arraylist(1)(targetRow)(54)
-                    For Each tax_in_grp In taxgrp
-                        'MsgBox(tax_in_grp + vbNewLine + targetTax)
-                        If targetTax.Contains(tax_in_grp) Then
-                            tax_basis = "P"
-                            Exit For
+
+            If knockoff.Equals("0") Then
+                myConn.Open()
+                Dim taxgrpcommand = New SqlCommand("SELECT taxgrp FROM gltaxgrp WHERE tax_basis = 'P'", myConn)
+                Dim taxgrpreader As SqlDataReader = taxgrpcommand.ExecuteReader
+                Dim taxgrp As New ArrayList
+                While taxgrpreader.Read()
+                    taxgrp.Add(taxgrpreader.GetValue(0).ToString)
+                End While
+                If taxgrp.Count > 0 Then
+                    Dim myTarget As New ArrayList
+                    For Each range As String In rangeQuo
+                        If range.Split(".")(0).ToString.Trim.Equals(row.ToString.Trim) Then
+                            myTarget.Add(CInt(range.Split(".")(1).ToString.Trim))
                         End If
                     Next
-                Next
+                    For Each targetRow As Integer In myTarget
+                        Dim targetTax As String = value_arraylist(1)(targetRow)(54).ToString.Trim
+                        For Each tax_in_grp In taxgrp
+                            If targetTax.Contains(tax_in_grp.ToString.Trim) Then
+                                tax_basis = "P"
+                                Exit For
+                            End If
+                        Next
+                    Next
+                End If
+                If Not tax_basis.Equals("P") Then
+                    tax_basis = Function_Form.getNull(0)
+                End If
+                myConn.Close()
             End If
-            If Not tax_basis.Equals("P") Then
-                tax_basis = Function_Form.getNull(0)
-            End If
-            myConn.Close()
+
             myConn.Open()
             Dim arcmd As String = queryTable(3)(2) + Function_Form.queryValue(custcode) +
                 Function_Form.queryValue(doc_type) + Function_Form.queryValue(doc_no) +
@@ -2080,6 +2158,10 @@ Public Class Debit_Note_Form
                 queryGLOff.Add(local_paid) 'local_amount
                 queryGLOff.Add(Function_Form.getNull(3)) 'fx_gainloss
                 queryGLOff.Add(Function_Form.getNull(3)) 'v_gainloss
+
+                If sum_p = 0 Then
+                    Continue For
+                End If
 
                 Dim gloff_cmd As String = queryTable(5)(2)
                 For j = 0 To queryGLOff.Count - 1
