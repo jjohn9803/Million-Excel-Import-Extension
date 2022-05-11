@@ -63,10 +63,14 @@ Public Class Function_Form
             'C:\Users\RBADM07\Desktop\Generated Result.xlsx
             'workbook.SaveAs(filename)
             Using sfd As SaveFileDialog = New SaveFileDialog() With {.Filter = "Excel Workbook|*.xlsx|Excel 97-2003 Workbook|*.xls"}
-                Dim saveFile As String = Application.StartupPath + "\Report\ReportMELE_" + filename + "_" + Date.Now.Year.ToString + Date.Now.Month.ToString("00") + Date.Now.Day.ToString("00") + "_" + Date.Now.Hour.ToString("00") + Date.Now.Minute.ToString("00") + Date.Now.Second.ToString("00") + ".xlsx"
+                Dim saveFolder As String = Application.StartupPath + "\Report\"
+                Dim saveFile As String = "ReportMELE_" + filename + "_" + Date.Now.Year.ToString + Date.Now.Month.ToString("00") + Date.Now.Day.ToString("00") + "_" + Date.Now.Hour.ToString("00") + Date.Now.Minute.ToString("00") + Date.Now.Second.ToString("00") + ".xlsx"
+                If Not System.IO.Directory.Exists(saveFolder) Then
+                    System.IO.Directory.CreateDirectory(saveFolder)
+                End If
                 sfd.FileName = saveFile
-                workbook.SaveAs(saveFile)
-                MsgBox("The report has been saved in " + saveFile, MsgBoxStyle.Information)
+                workbook.SaveAs(saveFolder + saveFile)
+                MsgBox("The report has been saved in " + saveFolder + saveFile, MsgBoxStyle.Information)
 
                 'If sfd.ShowDialog() = DialogResult.OK Then
 
@@ -74,11 +78,16 @@ Public Class Function_Form
             End Using
         End Using
     End Sub
-    Public Shared Function validateExcelDateFormat(dgvExcel As DataGridView, validateDateFormatArray As String()) As Boolean
+    Public Shared Function validateExcelFormat(dgvExcel As DataGridView) As Boolean
+        Dim integerColumn() As String = {"Credit Terms", "Batch Group", "Batch Code", "Quantity"}
+        Dim doubleColumn() As String = {"Exchange Rate", "Deposit", "Mode of Payment 1 Amount", "Mode of Payment 2 Amount", "Mode of Payment 3 Amount", "Mode of Payment 4 Amount", "Debt Amount", "Price", "Gross Amount", "Discount Percentage 1", "Discount Percentage 2", "Discount Percentage 3", "Discount Amount Total", "Amount", "Tax Amount Adjustment", "Cost"}
+        Dim dateColumn() As String = {"Date", "Delivery Date"}
         Dim result As Boolean = True
+        Dim resultDate As Boolean = True
+        Dim msg As String = ""
         For cell As Integer = 0 To dgvExcel.Rows(0).Cells.Count - 1
             Dim headerText As String = dgvExcel.Columns(cell).HeaderText.Trim
-            If validateDateFormatArray.Contains(headerText) Then
+            If dateColumn.Contains(headerText) Then
                 For row As Integer = 0 To dgvExcel.RowCount - 1
                     Dim cellText As String = dgvExcel.Rows(row).Cells(cell).Value.ToString.Trim
                     If Not cellText.Equals(String.Empty) Then
@@ -86,21 +95,78 @@ Public Class Function_Form
                             Dim a = Convert.ToDateTime(cellText).ToString("yyyy-MM-dd HH:mm:ss")
                         Catch ex As Exception
                             result = False
+                            msg += cellText + " (" + headerText + ")" + vbTab
+                            resultDate = False
                         End Try
-
                     End If
-
+                Next
+            End If
+            If doubleColumn.Contains(headerText) Then
+                For row As Integer = 0 To dgvExcel.RowCount - 1
+                    Dim cellText As String = dgvExcel.Rows(row).Cells(cell).Value.ToString.Trim
+                    If Not cellText.Equals(String.Empty) Then
+                        Try
+                            Dim b = Convert.ToDecimal(cellText)
+                        Catch ex As Exception
+                            result = False
+                            msg += cellText + " (" + headerText + ")" + vbTab
+                        End Try
+                    End If
+                Next
+            End If
+            If integerColumn.Contains(headerText) Then
+                For row As Integer = 0 To dgvExcel.RowCount - 1
+                    Dim cellText As String = dgvExcel.Rows(row).Cells(cell).Value.ToString.Trim
+                    If Not cellText.Equals(String.Empty) Then
+                        Try
+                            Dim c = Convert.ToInt32(cellText)
+                        Catch ex As Exception
+                            result = False
+                            msg += cellText + " (" + headerText + ")" + vbTab
+                        End Try
+                    End If
                 Next
             End If
         Next
         If result = False Then
             dgvExcel.DataSource = Nothing
             dgvExcel.Refresh()
-            MsgBox("The imported excel format does not correct!", MsgBoxStyle.Critical)
+            msg = "The following column(s) in excel files does not match the requirement!" + vbNewLine + msg
+            If resultDate = False Then
+                msg += vbNewLine + vbNewLine + "Tips: If date is not matching requirement, go to excel file, select all columns of date, and change format to Date."
+            End If
+            MsgBox(msg, MsgBoxStyle.Critical)
             Return False
         End If
         Return True
     End Function
+    'Public Shared Function validateExcelDateFormat(dgvExcel As DataGridView, validateDateFormatArray As String()) As Boolean
+    '    Dim result As Boolean = True
+    '    For cell As Integer = 0 To dgvExcel.Rows(0).Cells.Count - 1
+    '        Dim headerText As String = dgvExcel.Columns(cell).HeaderText.Trim
+    '        If validateDateFormatArray.Contains(headerText) Then
+    '            For row As Integer = 0 To dgvExcel.RowCount - 1
+    '                Dim cellText As String = dgvExcel.Rows(row).Cells(cell).Value.ToString.Trim
+    '                If Not cellText.Equals(String.Empty) Then
+    '                    Try
+    '                        Dim a = Convert.ToDateTime(cellText).ToString("yyyy-MM-dd HH:mm:ss")
+    '                    Catch ex As Exception
+    '                        result = False
+    '                    End Try
+
+    '                End If
+
+    '            Next
+    '        End If
+    '    Next
+    '    If result = False Then
+    '        dgvExcel.DataSource = Nothing
+    '        dgvExcel.Refresh()
+    '        MsgBox("The imported excel format does not correct!", MsgBoxStyle.Critical)
+    '        Return False
+    '    End If
+    '    Return True
+    'End Function
     Public Shared Function getNull(ByVal type As Integer) As String
         'type: 0 = " ", 1 = "new Date", 2 = "current Date", 3="0"
         Dim result As String = ""

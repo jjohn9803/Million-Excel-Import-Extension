@@ -281,7 +281,7 @@ Public Class Setting
     Public Sub closeForm()
         Function_Form.Close()
         'ExcelImporter.Close()
-        Maintainance_Form.Close()
+        'Maintainance_Form.Close()
         Me.Close()
     End Sub
     Private Sub btnClose_Click(sender As Object, e As EventArgs) Handles btnClose.Click

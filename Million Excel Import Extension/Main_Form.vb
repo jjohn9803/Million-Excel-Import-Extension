@@ -91,4 +91,37 @@ Public Class Main_Form
         Dim settingForm As New Setting
         settingForm.ShowDialog()
     End Sub
+
+    Private Sub btnBackup_Click(sender As Object, e As EventArgs) Handles btnBackup.Click
+        Dim confirmImport As DialogResult = MsgBox("Are you sure to backup database " + Chr(34) + getDatabase() + Chr(34) + " ?", MsgBoxStyle.YesNo, "")
+        If confirmImport = DialogResult.No Then
+            Return
+        End If
+
+        serverName = getServerName()
+        database = getDatabase()
+        pwd_query = getPwd_query()
+        myConn = New SqlConnection("Data Source=" + serverName + ";" & "Initial Catalog=" + database + ";" + pwd_query)
+        Dim saveFolder As String = Application.StartupPath + "\Backup\"
+        Dim saveFile As String = database + "_" + Date.Now.Year.ToString + Date.Now.Month.ToString("00") + Date.Now.Day.ToString("00") + "_" + Date.Now.Hour.ToString("00") + Date.Now.Minute.ToString("00") + Date.Now.Second.ToString("00") + ".BAK"
+        If Not System.IO.Directory.Exists(saveFolder) Then
+            System.IO.Directory.CreateDirectory(saveFolder)
+        End If
+        Try
+            myConn.Open()
+            Dim cmd As New SqlCommand
+            cmd.CommandType = CommandType.Text
+            cmd.CommandText = "BACKUP DATABASE " + database + " To DISK='" + saveFolder + saveFile + "'"
+            cmd.Connection = myConn
+            cmd.ExecuteNonQuery() '
+            myConn.Close()
+            MsgBox("Database backup file has been saved in " + saveFolder + saveFile, MsgBoxStyle.Information)
+            Dim openFileLocationDialog As DialogResult = MessageBox.Show("Do you want to open file location?", "", MessageBoxButtons.YesNo)
+            If openFileLocationDialog = DialogResult.Yes Then
+                Process.Start("explorer.exe", saveFolder)
+            End If
+        Catch ex As Exception
+            MsgBox(ex.Message, MsgBoxStyle.Critical)
+        End Try
+    End Sub
 End Class

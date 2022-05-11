@@ -11,7 +11,6 @@ Public Class Quotation_Form
     Private statusConnection As Boolean
     Private pwd_query As String
     Private import_type As String
-    Private validateDateFormatArray() As String = {"Date"}
     Private Sub Quotation_Form_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         init()
     End Sub
@@ -31,7 +30,7 @@ Public Class Quotation_Form
         For Each column As DataGridViewColumn In dgvExcel.Columns
             column.SortMode = DataGridViewColumnSortMode.NotSortable
         Next
-        If Function_Form.validateExcelDateFormat(dgvExcel, validateDateFormatArray) = False Then
+        If Function_Form.validateExcelFormat(dgvExcel) = False Then
             txtFileName.Text = String.Empty
             cbSheet.Items.Clear()
             dgvExcel.DataSource = Nothing
@@ -408,7 +407,7 @@ Public Class Quotation_Form
             'taxamt1
             If value_arraylist(1)(row)(19).Equals("{FORMULA_VALUE}") Then
                 Dim nett_amt = CDbl(value_arraylist(1)(row)(25))
-                Dim taxp1 = 0
+                Dim taxp1 As Double = 0
                 If Not value_arraylist(1)(row)(23).Equals(String.Empty) Then
                     taxp1 = CDbl(value_arraylist(1)(row)(23))
                 End If
@@ -980,7 +979,7 @@ Public Class Quotation_Form
         'Return
         'Quotation only end
 
-        Dim confirmImport As DialogResult = MsgBox("Are you sure to import data?", MsgBoxStyle.YesNo)
+        Dim confirmImport As DialogResult = MsgBox("Are you sure to import data?", MsgBoxStyle.YesNo, "")
         If confirmImport = DialogResult.No Then
             Return
         End If

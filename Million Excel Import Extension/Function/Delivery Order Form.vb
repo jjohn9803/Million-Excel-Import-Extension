@@ -11,7 +11,6 @@ Public Class Delivery_Order_Form
     Private statusConnection As Boolean
     Private pwd_query As String
     Private import_type As String
-    Private validateDateFormatArray() As String = {"Date"}
     Private Sub Delivery_Order_Form_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         init()
     End Sub
@@ -30,7 +29,7 @@ Public Class Delivery_Order_Form
         For Each column As DataGridViewColumn In dgvExcel.Columns
             column.SortMode = DataGridViewColumnSortMode.NotSortable
         Next
-        If Function_Form.validateExcelDateFormat(dgvExcel, validateDateFormatArray) = False Then
+        If Function_Form.validateExcelFormat(dgvExcel) = False Then
             txtFileName.Text = String.Empty
             cbSheet.Items.Clear()
             dgvExcel.DataSource = Nothing
@@ -420,7 +419,7 @@ Public Class Delivery_Order_Form
             'taxamt1
             If value_arraylist(1)(row)(20).Equals("{FORMULA_VALUE}") Then
                 Dim nett_amt = CDbl(value_arraylist(1)(row)(26))
-                Dim taxp1 = 0
+                Dim taxp1 As Double = 0
                 If Not value_arraylist(1)(row)(24).Equals(String.Empty) Then
                     taxp1 = CDbl(value_arraylist(1)(row)(24))
                 End If
@@ -1088,7 +1087,7 @@ Public Class Delivery_Order_Form
             Return
         End If
 
-        Dim confirmImport As DialogResult = MsgBox("Are you sure to import data?", MsgBoxStyle.YesNo)
+        Dim confirmImport As DialogResult = MsgBox("Are you sure to import data?", MsgBoxStyle.YesNo, "")
         If confirmImport = DialogResult.No Then
             Return
         End If

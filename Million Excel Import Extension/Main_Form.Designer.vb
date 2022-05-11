@@ -32,6 +32,7 @@ Partial Class Main_Form
         Me.lblSQLStatus = New System.Windows.Forms.Label()
         Me.btnSetting = New System.Windows.Forms.Button()
         Me.panelMain = New System.Windows.Forms.Panel()
+        Me.btnBackup = New System.Windows.Forms.Button()
         Me.FlowLayoutPanel1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -44,10 +45,11 @@ Partial Class Main_Form
         Me.FlowLayoutPanel1.Controls.Add(Me.txtDatabaseName)
         Me.FlowLayoutPanel1.Controls.Add(Me.Label1)
         Me.FlowLayoutPanel1.Controls.Add(Me.lblSQLStatus)
+        Me.FlowLayoutPanel1.Controls.Add(Me.btnBackup)
         Me.FlowLayoutPanel1.Controls.Add(Me.btnSetting)
         Me.FlowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Bottom
         Me.FlowLayoutPanel1.Location = New System.Drawing.Point(0, 447)
-        Me.FlowLayoutPanel1.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.FlowLayoutPanel1.Margin = New System.Windows.Forms.Padding(4)
         Me.FlowLayoutPanel1.Name = "FlowLayoutPanel1"
         Me.FlowLayoutPanel1.Size = New System.Drawing.Size(792, 126)
         Me.FlowLayoutPanel1.TabIndex = 34
@@ -98,8 +100,8 @@ Partial Class Main_Form
         '
         Me.Label1.AutoSize = True
         Me.Label1.Font = New System.Drawing.Font("Yu Gothic Medium", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.Label1.Location = New System.Drawing.Point(67, 53)
-        Me.Label1.Margin = New System.Windows.Forms.Padding(67, 12, 4, 0)
+        Me.Label1.Location = New System.Drawing.Point(67, 66)
+        Me.Label1.Margin = New System.Windows.Forms.Padding(67, 25, 4, 0)
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(79, 22)
         Me.Label1.TabIndex = 37
@@ -111,8 +113,8 @@ Partial Class Main_Form
         Me.lblSQLStatus.BackColor = System.Drawing.Color.Transparent
         Me.lblSQLStatus.Font = New System.Drawing.Font("Yu Gothic Medium", 9.75!, System.Drawing.FontStyle.Bold)
         Me.lblSQLStatus.ForeColor = System.Drawing.Color.DarkRed
-        Me.lblSQLStatus.Location = New System.Drawing.Point(161, 53)
-        Me.lblSQLStatus.Margin = New System.Windows.Forms.Padding(11, 12, 4, 0)
+        Me.lblSQLStatus.Location = New System.Drawing.Point(161, 66)
+        Me.lblSQLStatus.Margin = New System.Windows.Forms.Padding(11, 25, 4, 0)
         Me.lblSQLStatus.Name = "lblSQLStatus"
         Me.lblSQLStatus.Size = New System.Drawing.Size(131, 22)
         Me.lblSQLStatus.TabIndex = 38
@@ -121,8 +123,8 @@ Partial Class Main_Form
         'btnSetting
         '
         Me.btnSetting.Font = New System.Drawing.Font("Yu Gothic Medium", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.btnSetting.Location = New System.Drawing.Point(483, 50)
-        Me.btnSetting.Margin = New System.Windows.Forms.Padding(187, 9, 4, 4)
+        Me.btnSetting.Location = New System.Drawing.Point(560, 57)
+        Me.btnSetting.Margin = New System.Windows.Forms.Padding(50, 16, 4, 4)
         Me.btnSetting.Name = "btnSetting"
         Me.btnSetting.Size = New System.Drawing.Size(160, 37)
         Me.btnSetting.TabIndex = 39
@@ -134,10 +136,22 @@ Partial Class Main_Form
         '
         Me.panelMain.Dock = System.Windows.Forms.DockStyle.Fill
         Me.panelMain.Location = New System.Drawing.Point(0, 0)
-        Me.panelMain.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.panelMain.Margin = New System.Windows.Forms.Padding(4)
         Me.panelMain.Name = "panelMain"
         Me.panelMain.Size = New System.Drawing.Size(792, 447)
         Me.panelMain.TabIndex = 35
+        '
+        'btnBackup
+        '
+        Me.btnBackup.Font = New System.Drawing.Font("Yu Gothic Medium", 9.75!, System.Drawing.FontStyle.Bold)
+        Me.btnBackup.Location = New System.Drawing.Point(346, 57)
+        Me.btnBackup.Margin = New System.Windows.Forms.Padding(50, 16, 4, 4)
+        Me.btnBackup.Name = "btnBackup"
+        Me.btnBackup.Size = New System.Drawing.Size(160, 37)
+        Me.btnBackup.TabIndex = 40
+        Me.btnBackup.TabStop = False
+        Me.btnBackup.Text = "Backup"
+        Me.btnBackup.UseVisualStyleBackColor = True
         '
         'Main_Form
         '
@@ -148,7 +162,7 @@ Partial Class Main_Form
         Me.Controls.Add(Me.FlowLayoutPanel1)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
-        Me.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.Margin = New System.Windows.Forms.Padding(4)
         Me.MaximizeBox = False
         Me.Name = "Main_Form"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
@@ -168,4 +182,5 @@ Partial Class Main_Form
     Friend WithEvents lblSQLStatus As Label
     Friend WithEvents panelMain As Panel
     Friend WithEvents btnSetting As Button
+    Friend WithEvents btnBackup As Button
 End Class

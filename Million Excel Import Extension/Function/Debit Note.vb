@@ -10,7 +10,6 @@ Public Class Debit_Note_Form
     Private statusConnection As Boolean
     Private pwd_query As String
     Private import_type As String
-    Private validateDateFormatArray() As String = {"Date"}
     Private Sub Debit_Note_Form_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         init()
     End Sub
@@ -29,7 +28,7 @@ Public Class Debit_Note_Form
         For Each column As DataGridViewColumn In dgvExcel.Columns
             column.SortMode = DataGridViewColumnSortMode.NotSortable
         Next
-        If Function_Form.validateExcelDateFormat(dgvExcel, validateDateFormatArray) = False Then
+        If Function_Form.validateExcelFormat(dgvExcel) = False Then
             txtFileName.Text = String.Empty
             cbSheet.Items.Clear()
             dgvExcel.DataSource = Nothing
@@ -418,7 +417,7 @@ Public Class Debit_Note_Form
             'taxamt1
             If value_arraylist(1)(row)(20).Equals("{FORMULA_VALUE}") Then
                 Dim nett_amt = CDbl(value_arraylist(1)(row)(26))
-                Dim taxp1 = 0
+                Dim taxp1 As Double = 0
                 If Not value_arraylist(1)(row)(24).Equals(String.Empty) Then
                     taxp1 = CDbl(value_arraylist(1)(row)(24))
                 End If
@@ -641,7 +640,7 @@ Public Class Debit_Note_Form
 
                 'sinv.local_gross
                 If value_arraylist(0)(row)(36).Equals("{FORMULA_VALUE}") Then
-                    Dim local_gross = 0
+                    Dim local_gross As Double = 0
                     For Each targetRow As Integer In myTarget
                         Dim local_amt = value_arraylist(1)(targetRow)(36)
                         local_gross += local_amt
@@ -1110,14 +1109,14 @@ Public Class Debit_Note_Form
             Return
         End If
 
-        Dim confirmImport As DialogResult = MsgBox("Are you sure to import data?", MsgBoxStyle.YesNo)
+        Dim confirmImport As DialogResult = MsgBox("Are you sure to import data?", MsgBoxStyle.YesNo, "")
         If confirmImport = DialogResult.No Then
             Return
         End If
 
         Dim rowInsertNum = 0
         Dim arseq As New ArrayList
-        Dim gloffseq As New ArrayList
+        'Dim gloffseq As New ArrayList
         'gl
         For row As Integer = 0 To dgvExcel.RowCount - 1
             If Not value_arraylist(0)(row)(0).Equals("{INVALID ARRAY}") Then
@@ -1131,7 +1130,7 @@ Public Class Debit_Note_Form
                 Next
 
                 Dim query_temp As New ArrayList
-                query_temp.Add("H") 'billtype
+                query_temp.Add("D") 'billtype
                 query_temp.Add(Function_Form.getNull(0)) 'remark1
                 query_temp.Add(Function_Form.getNull(0)) 'remark2
                 query_temp.Add(Function_Form.getNull(0)) 'cheque_no
@@ -1176,7 +1175,7 @@ Public Class Debit_Note_Form
                     queryAL.Clear()
                     'Product
                     queryAL.Add(value_arraylist(1)(i)(57)) 'accno
-                    queryAL.Add("CS") 'doc_type
+                    queryAL.Add("DN") 'doc_type
                     queryAL.Add(value_arraylist(0)(row)(1)) 'doc_no
                     queryAL.Add(seq) 'seq
                     queryAL.Add(Function_Form.convertDateFormat(value_arraylist(0)(row)(2))) 'doc_date
@@ -1238,6 +1237,7 @@ Public Class Debit_Note_Form
                     cmd1.ExecuteNonQuery()
                     rowInsertNum += 1
                     myConn.Close()
+                    MsgBox("adding prod " + seq.ToString + " " + value_arraylist(0)(row)(1))
                     seq += 1
 
                     'If product has tax
@@ -1258,7 +1258,7 @@ Public Class Debit_Note_Form
                         Else
                             queryAL.Add(accno) 'accno
                         End If
-                        queryAL.Add("CS") 'doc_type
+                        queryAL.Add("DN") 'doc_type
                         queryAL.Add(value_arraylist(0)(row)(1)) 'doc_no
                         queryAL.Add(seq) 'seq
                         queryAL.Add(Function_Form.convertDateFormat(value_arraylist(0)(row)(2))) 'doc_date
@@ -1317,18 +1317,20 @@ Public Class Debit_Note_Form
                         cmd2.ExecuteNonQuery()
                         rowInsertNum += 1
                         myConn.Close()
+                        MsgBox("tax adding prod " + seq.ToString + " " + value_arraylist(0)(row)(1))
                         seq += 1
                     End If
                 Next
-
+                'clear
                 queryAL.Clear()
                 'Subtotal of Product
                 queryAL.Add(value_arraylist(0)(row)(10)) 'accno
-                queryAL.Add("CS") 'doc_type
+                queryAL.Add("DN") 'doc_type
                 queryAL.Add(value_arraylist(0)(row)(1)) 'doc_no
                 queryAL.Add(seq) 'seq
+                MsgBox("final seq: " + seq.ToString)
                 arseq.Add(value_arraylist(0)(row)(1) + "." + seq.ToString + ".0." + row.ToString) 'AR get doc_no,seq,knockoff,row
-                gloffseq.Add(value_arraylist(0)(row)(1) + "." + seq.ToString + "." + (seq + 1).ToString) 'GLOff get doc_no,seq
+                'gloffseq.Add(value_arraylist(0)(row)(1) + "." + seq.ToString + "." + (seq + 1).ToString) 'GLOff get doc_no,seq
                 queryAL.Add(Function_Form.convertDateFormat(value_arraylist(0)(row)(2))) 'doc_date
                 queryAL.Add(value_arraylist(0)(row)(1)) 'refno
                 queryAL.Add(value_arraylist(0)(row)(9)) 'refno2
@@ -1373,151 +1375,10 @@ Public Class Debit_Note_Form
                 queryAL.Add(Function_Form.getNull(3)) 'taxable
                 queryAL.Add(Function_Form.getNull(3)) 'fx_taxable
                 queryAL.Add(Function_Form.getNull(3)) 'link_seq
-
-                Dim subtotalcmd As String = queryTable(4)(2)
-                For j = 0 To queryAL.Count - 1
-                    subtotalcmd += "'" + queryAL(j).ToString + "',"
-                Next
-                subtotalcmd = subtotalcmd + cmd_last
-                myConn.Open()
-                Dim cmd3 = New SqlCommand(subtotalcmd, myConn)
-                cmd3.ExecuteNonQuery()
-                rowInsertNum += 1
-                myConn.Close()
-                seq += 1
-
-                Dim acc_p1 = value_arraylist(0)(row)(73)
-                Dim ref_p1 = value_arraylist(0)(row)(74)
-                Dim amt_p1 = value_arraylist(0)(row)(75)
-                Dim acc_p2 = value_arraylist(0)(row)(78)
-                Dim ref_p2 = value_arraylist(0)(row)(79)
-                Dim amt_p2 = value_arraylist(0)(row)(80)
-                Dim acc_p3 = value_arraylist(0)(row)(83)
-                Dim ref_p3 = value_arraylist(0)(row)(84)
-                Dim amt_p3 = value_arraylist(0)(row)(85)
-                Dim acc_p4 = value_arraylist(0)(row)(86)
-                Dim ref_p4 = value_arraylist(0)(row)(87)
-                Dim amt_p4 = value_arraylist(0)(row)(88)
-                Dim p_def = -1
-                Dim p_def_accno = ""
-                Dim p_def_refno = ""
-                If Not acc_p1.ToString.Trim.Equals(String.Empty) And Not amt_p1.ToString.Trim.Equals("0") Then
-                    p_def = 1
-                    p_def_accno = acc_p1
-                    p_def_refno = ref_p1
-                Else
-                    If Not acc_p2.ToString.Trim.Equals(String.Empty) And Not amt_p2.ToString.Trim.Equals("0") Then
-                        p_def = 2
-                        p_def_accno = acc_p2
-                        p_def_refno = ref_p2
-                    Else
-                        If Not acc_p3.ToString.Trim.Equals(String.Empty) And Not amt_p3.ToString.Trim.Equals("0") Then
-                            p_def = 3
-                            p_def_accno = acc_p3
-                            p_def_refno = ref_p3
-                        Else
-                            If Not acc_p4.ToString.Trim.Equals(String.Empty) And Not amt_p4.ToString.Trim.Equals("0") Then
-                                p_def = 4
-                                p_def_accno = acc_p4
-                                p_def_refno = ref_p4
-                            End If
-                        End If
-                    End If
-                End If
-                If p_def = -1 Then
-                    Continue For
-                End If
-                myConn.Open()
-                Dim gldatacommand = New SqlCommand("SELECT accdesp,accdesp2 FROM gldata WHERE accno ='" + p_def_accno + "'", myConn)
-                Dim gldatareader As SqlDataReader = gldatacommand.ExecuteReader
-                Dim p_def_desp = ""
-                Dim p_def_desp2 = ""
-                While gldatareader.Read()
-                    p_def_desp = gldatareader.GetValue(0)
-                    p_def_desp2 = gldatareader.GetValue(1)
-                End While
-                myConn.Close()
-
-                queryAL.Clear()
-                'Subtotal Of Default Payment
-                queryAL.Add(value_arraylist(0)(row)(10)) 'accno
-                queryAL.Add("CS") 'doc_type
-                queryAL.Add(value_arraylist(0)(row)(1)) 'doc_no
-                queryAL.Add(seq) 'seq
-                arseq.Add(value_arraylist(0)(row)(1) + "." + seq.ToString + ".1." + row.ToString) 'AR get doc_no,seq,knockoff,row
-                queryAL.Add(Function_Form.convertDateFormat(value_arraylist(0)(row)(2))) 'doc_date
-                queryAL.Add(value_arraylist(0)(row)(1)) 'refno
-                queryAL.Add(value_arraylist(0)(row)(9)) 'refno2
-                queryAL.Add(Function_Form.getNull(0)) 'refno3
-                queryAL.Add(p_def_desp) 'desp
-                queryAL.Add(p_def_desp2) 'desp2
-                queryAL.Add(Function_Form.getNull(0)) 'desp3
-                queryAL.Add(Function_Form.getNull(0)) 'desp4
-                If Not acc_p1.ToString.Trim.Equals(String.Empty) Then
-                    amt_p1 = Math.Round(CDbl(amt_p1), 2)
-                Else
-                    amt_p1 = 0
-                End If
-                If Not acc_p2.ToString.Trim.Equals(String.Empty) Then
-                    amt_p2 = Math.Round(CDbl(amt_p2), 2)
-                Else
-                    amt_p2 = 0
-                End If
-                If Not acc_p3.ToString.Trim.Equals(String.Empty) Then
-                    amt_p3 = Math.Round(CDbl(amt_p3), 2)
-                Else
-                    amt_p3 = 0
-                End If
-                If Not acc_p4.ToString.Trim.Equals(String.Empty) Then
-                    amt_p4 = Math.Round(CDbl(amt_p4), 2)
-                Else
-                    amt_p4 = 0
-                End If
-
-                Dim amt_debt = value_arraylist(0)(row)(91)
-                If Not amt_debt.ToString.Trim.Equals(String.Empty) Then
-                    amt_debt = Math.Round(CDbl(amt_debt), 2)
-                Else
-                    amt_debt = 0
-                End If
-
-                fx_rate = CDbl(value_arraylist(0)(row)(18))
-                amount = ((CDbl(amt_p1) + CDbl(amt_p2) + CDbl(amt_p3) + CDbl(amt_p4)) * -1) * fx_rate
-                debit = 0
-                credit = 0
-                If amount < 0 Then
-                    credit = amount * -1
-                Else
-                    debit = amount
-                End If
-                fx_amount = (CDbl(amt_p1) + CDbl(amt_p2) + CDbl(amt_p3) + CDbl(amt_p4)) * -1
-                fx_debit = 0
-                fx_credit = 0
-                If fx_amount < 0 Then
-                    fx_credit = fx_amount * -1
-                Else
-                    fx_debit = fx_amount
-                End If
-                queryAL.Add(amount) 'amount
-                queryAL.Add(debit) 'debit
-                queryAL.Add(credit) 'credit
-                queryAL.Add(fx_amount) 'fx_amount
-                queryAL.Add(fx_debit) 'fx_debit
-                queryAL.Add(fx_credit) 'fx_credit
-                queryAL.Add(fx_rate) 'fx_rate
-
-                queryAL.Add(value_arraylist(0)(row)(17)) 'curr_code
-                queryAL.Add(value_arraylist(0)(row)(48)) 'batchno
-                queryAL.Add(value_arraylist(0)(row)(49)) 'projcode
-                queryAL.Add(value_arraylist(0)(row)(50)) 'deptcode
-                queryAL.Add(Function_Form.getNull(0)) 'taxcode
-                queryAL.Add(Function_Form.getNull(3)) 'taxable
-                queryAL.Add(Function_Form.getNull(3)) 'fx_taxable
-                queryAL.Add(Function_Form.getNull(3)) 'link_seq
-                queryAL.Add("H") 'billtype
-                queryAL.Add(Function_Form.getNull(0)) 'remark1
+                queryAL.Add("D") 'billtype
+                queryAL.Add(value_arraylist(0)(row)(72)) 'remark1
                 queryAL.Add(Function_Form.getNull(0)) 'remark2
-                queryAL.Add(p_def_refno) 'cheque_no
+                queryAL.Add(Function_Form.getNull(0)) 'cheque_no
                 queryAL.Add(Function_Form.convertDateFormat(value_arraylist(0)(row)(2))) 'chqrc_date
                 queryAL.Add(Function_Form.getNull(1)) 'koff_date
                 queryAL.Add(Function_Form.getNull(1)) 'recon_date
@@ -1541,381 +1402,15 @@ Public Class Debit_Note_Form
                 queryAL.Add(Function_Form.getNull(2)) 'createdate
                 queryAL.Add(Function_Form.getNull(2)) 'lastupdate
 
-                Dim subtotalpaycmd As String = queryTable(4)(2)
-                For j = 0 To queryAL.Count - 1
-                    subtotalpaycmd += "'" + queryAL(j).ToString + "',"
-                Next
-                subtotalpaycmd = subtotalpaycmd.Substring(0, subtotalpaycmd.Length - 1) + ")"
-                myConn.Open()
-                Dim cmd4 = New SqlCommand(subtotalpaycmd, myConn)
-                cmd4.ExecuteNonQuery()
-                rowInsertNum += 1
-                myConn.Close()
-                seq += 1
-
-                'Subtotal Of Payment1
-                If Not acc_p1.ToString.Trim.Equals(String.Empty) Then
-                    queryAL.Clear()
-                    queryAL.Add(acc_p1) 'accno
-                    queryAL.Add("CS") 'doc_type
-                    queryAL.Add(value_arraylist(0)(row)(1)) 'doc_no
-                    queryAL.Add(seq) 'seq
-                    queryAL.Add(Function_Form.convertDateFormat(value_arraylist(0)(row)(2))) 'doc_date
-                    queryAL.Add(value_arraylist(0)(row)(1)) 'refno
-                    queryAL.Add(value_arraylist(0)(row)(9)) 'refno2
-                    queryAL.Add(Function_Form.getNull(0)) 'refno3
-                    queryAL.Add(value_arraylist(0)(row)(11)) 'desp
-                    queryAL.Add(Function_Form.getNull(0)) 'desp2
-                    queryAL.Add(Function_Form.getNull(0)) 'desp3
-                    queryAL.Add(Function_Form.getNull(0)) 'desp4
-
-                    fx_rate = CDbl(value_arraylist(0)(row)(18))
-                    fx_amount = Math.Round(amt_p1, 2)
-                    fx_debit = 0
-                    fx_credit = 0
-                    If fx_amount < 0 Then
-                        fx_credit = fx_amount * -1
-                    Else
-                        fx_debit = fx_amount
-                    End If
-                    amt_p1 = Math.Round(amt_p1 * fx_rate, 2)
-                    debit = 0
-                    credit = 0
-                    If amt_p1 < 0 Then
-                        credit = amt_p1 * -1
-                    Else
-                        debit = amt_p1
-                    End If
-                    queryAL.Add(amt_p1) 'amount
-                    queryAL.Add(debit) 'debit
-                    queryAL.Add(credit) 'credit
-                    queryAL.Add(fx_amount) 'fx_amount
-                    queryAL.Add(fx_debit) 'fx_debit
-                    queryAL.Add(fx_credit) 'fx_credit
-                    queryAL.Add(fx_rate) 'fx_rate
-
-                    queryAL.Add(value_arraylist(0)(row)(17)) 'curr_code
-                    queryAL.Add(value_arraylist(0)(row)(48)) 'batchno
-                    queryAL.Add(value_arraylist(0)(row)(49)) 'projcode
-                    queryAL.Add(value_arraylist(0)(row)(50)) 'deptcode
-                    queryAL.Add(Function_Form.getNull(0)) 'taxcode
-                    queryAL.Add(Function_Form.getNull(3)) 'taxable
-                    queryAL.Add(Function_Form.getNull(3)) 'fx_taxable
-                    queryAL.Add(Function_Form.getNull(3)) 'link_seq
-                    queryAL.Add("H") 'billtype
-                    queryAL.Add(Function_Form.getNull(0)) 'remark1
-                    queryAL.Add(Function_Form.getNull(0)) 'remark2
-                    queryAL.Add(ref_p1) 'cheque_no
-                    queryAL.Add(Function_Form.convertDateFormat(value_arraylist(0)(row)(2))) 'chqrc_date
-                    queryAL.Add(Function_Form.getNull(1)) 'koff_date
-                    queryAL.Add(Function_Form.getNull(1)) 'recon_date
-                    queryAL.Add(Function_Form.getNull(3)) 'recon_flag
-                    queryAL.Add(value_arraylist(0)(row)(16)) 'accmgr_id
-                    queryAL.Add(Function_Form.getNull(0)) 'lkdoc_type
-                    queryAL.Add(Function_Form.getNull(0)) 'lkdoc_no
-                    queryAL.Add(Function_Form.getNull(3)) 'lkseq
-                    queryAL.Add("1") 'lock
-                    queryAL.Add(Function_Form.getNull(3)) 'void
-                    queryAL.Add(Function_Form.getNull(3)) 'exported
-                    queryAL.Add(Function_Form.getNull(0)) 'entry
-                    queryAL.Add(Function_Form.getNull(3)) 'fastentry
-                    queryAL.Add(Function_Form.getNull(3)) 'followdesp
-                    queryAL.Add(Function_Form.getNull(3)) 'tsid
-                    queryAL.Add(Function_Form.getNull(0)) 'spcode
-                    queryAL.Add(Function_Form.getNull(1)) 'taxdate
-                    queryAL.Add(Function_Form.getNull(1)) 'taxdate_bt
-                    queryAL.Add(value_arraylist(0)(row)(112)) 'createdby
-                    queryAL.Add(value_arraylist(0)(row)(112)) 'updatedby
-                    queryAL.Add(Function_Form.getNull(2)) 'createdate
-                    queryAL.Add(Function_Form.getNull(2)) 'lastupdate
-
-                    Dim pay1cmd As String = queryTable(4)(2)
-                    For j = 0 To queryAL.Count - 1
-                        pay1cmd += "'" + queryAL(j).ToString + "',"
-                    Next
-                    pay1cmd = pay1cmd.Substring(0, pay1cmd.Length - 1) + ")"
-                    myConn.Open()
-                    Dim cmd_p1 = New SqlCommand(pay1cmd, myConn)
-                    cmd_p1.ExecuteNonQuery()
-                    rowInsertNum += 1
-                    myConn.Close()
-                    seq += 1
-                End If
-
-                'Subtotal Of Payment2
-                If Not acc_p2.ToString.Trim.Equals(String.Empty) Then
-                    queryAL.Clear()
-                    queryAL.Add(acc_p2) 'accno
-                    queryAL.Add("CS") 'doc_type
-                    queryAL.Add(value_arraylist(0)(row)(1)) 'doc_no
-                    queryAL.Add(seq) 'seq
-                    queryAL.Add(Function_Form.convertDateFormat(value_arraylist(0)(row)(2))) 'doc_date
-                    queryAL.Add(value_arraylist(0)(row)(1)) 'refno
-                    queryAL.Add(value_arraylist(0)(row)(9)) 'refno2
-                    queryAL.Add(Function_Form.getNull(0)) 'refno3
-                    queryAL.Add(value_arraylist(0)(row)(11)) 'desp
-                    queryAL.Add(Function_Form.getNull(0)) 'desp2
-                    queryAL.Add(Function_Form.getNull(0)) 'desp3
-                    queryAL.Add(Function_Form.getNull(0)) 'desp4
-
-                    fx_rate = CDbl(value_arraylist(0)(row)(18))
-                    fx_amount = Math.Round(amt_p2, 2)
-                    fx_debit = 0
-                    fx_credit = 0
-                    If fx_amount < 0 Then
-                        fx_credit = fx_amount * -1
-                    Else
-                        fx_debit = fx_amount
-                    End If
-                    amt_p2 = Math.Round(amt_p2 * fx_rate, 2)
-                    debit = 0
-                    credit = 0
-                    If amt_p2 < 0 Then
-                        credit = amt_p2 * -1
-                    Else
-                        debit = amt_p2
-                    End If
-                    queryAL.Add(amt_p2) 'amount
-                    queryAL.Add(debit) 'debit
-                    queryAL.Add(credit) 'credit
-                    queryAL.Add(fx_amount) 'fx_amount
-                    queryAL.Add(fx_debit) 'fx_debit
-                    queryAL.Add(fx_credit) 'fx_credit
-                    queryAL.Add(fx_rate) 'fx_rate
-
-                    queryAL.Add(value_arraylist(0)(row)(17)) 'curr_code
-                    queryAL.Add(value_arraylist(0)(row)(48)) 'batchno
-                    queryAL.Add(value_arraylist(0)(row)(49)) 'projcode
-                    queryAL.Add(value_arraylist(0)(row)(50)) 'deptcode
-                    queryAL.Add(Function_Form.getNull(0)) 'taxcode
-                    queryAL.Add(Function_Form.getNull(3)) 'taxable
-                    queryAL.Add(Function_Form.getNull(3)) 'fx_taxable
-                    queryAL.Add(Function_Form.getNull(3)) 'link_seq
-                    queryAL.Add("H") 'billtype
-                    queryAL.Add(Function_Form.getNull(0)) 'remark1
-                    queryAL.Add(Function_Form.getNull(0)) 'remark2
-                    queryAL.Add(ref_p2) 'cheque_no
-                    queryAL.Add(Function_Form.convertDateFormat(value_arraylist(0)(row)(2))) 'chqrc_date
-                    queryAL.Add(Function_Form.getNull(1)) 'koff_date
-                    queryAL.Add(Function_Form.getNull(1)) 'recon_date
-                    queryAL.Add(Function_Form.getNull(3)) 'recon_flag
-                    queryAL.Add(value_arraylist(0)(row)(16)) 'accmgr_id
-                    queryAL.Add(Function_Form.getNull(0)) 'lkdoc_type
-                    queryAL.Add(Function_Form.getNull(0)) 'lkdoc_no
-                    queryAL.Add(Function_Form.getNull(3)) 'lkseq
-                    queryAL.Add("1") 'lock
-                    queryAL.Add(Function_Form.getNull(3)) 'void
-                    queryAL.Add(Function_Form.getNull(3)) 'exported
-                    queryAL.Add(Function_Form.getNull(0)) 'entry
-                    queryAL.Add(Function_Form.getNull(3)) 'fastentry
-                    queryAL.Add(Function_Form.getNull(3)) 'followdesp
-                    queryAL.Add(Function_Form.getNull(3)) 'tsid
-                    queryAL.Add(Function_Form.getNull(0)) 'spcode
-                    queryAL.Add(Function_Form.getNull(1)) 'taxdate
-                    queryAL.Add(Function_Form.getNull(1)) 'taxdate_bt
-                    queryAL.Add(value_arraylist(0)(row)(112)) 'createdby
-                    queryAL.Add(value_arraylist(0)(row)(112)) 'updatedby
-                    queryAL.Add(Function_Form.getNull(2)) 'createdate
-                    queryAL.Add(Function_Form.getNull(2)) 'lastupdate
-
-                    Dim paycmd As String = queryTable(4)(2)
-                    For j = 0 To queryAL.Count - 1
-                        paycmd += "'" + queryAL(j).ToString + "',"
-                    Next
-                    paycmd = paycmd.Substring(0, paycmd.Length - 1) + ")"
-                    myConn.Open()
-                    Dim cmd_p = New SqlCommand(paycmd, myConn)
-                    cmd_p.ExecuteNonQuery()
-                    rowInsertNum += 1
-                    myConn.Close()
-                    seq += 1
-                End If
-
-                'Subtotal Of Payment3
-                If Not acc_p3.ToString.Trim.Equals(String.Empty) Then
-                    queryAL.Clear()
-                    queryAL.Add(acc_p3) 'accno
-                    queryAL.Add("CS") 'doc_type
-                    queryAL.Add(value_arraylist(0)(row)(1)) 'doc_no
-                    queryAL.Add(seq) 'seq
-                    queryAL.Add(Function_Form.convertDateFormat(value_arraylist(0)(row)(2))) 'doc_date
-                    queryAL.Add(value_arraylist(0)(row)(1)) 'refno
-                    queryAL.Add(value_arraylist(0)(row)(9)) 'refno2
-                    queryAL.Add(Function_Form.getNull(0)) 'refno3
-                    queryAL.Add(value_arraylist(0)(row)(11)) 'desp
-                    queryAL.Add(Function_Form.getNull(0)) 'desp2
-                    queryAL.Add(Function_Form.getNull(0)) 'desp3
-                    queryAL.Add(Function_Form.getNull(0)) 'desp4
-
-                    fx_rate = CDbl(value_arraylist(0)(row)(18))
-                    fx_amount = Math.Round(amt_p3, 2)
-                    fx_debit = 0
-                    fx_credit = 0
-                    If fx_amount < 0 Then
-                        fx_credit = fx_amount * -1
-                    Else
-                        fx_debit = fx_amount
-                    End If
-                    amt_p3 = Math.Round(amt_p3 * fx_rate, 2)
-                    debit = 0
-                    credit = 0
-                    If amt_p3 < 0 Then
-                        credit = amt_p3 * -1
-                    Else
-                        debit = amt_p3
-                    End If
-                    queryAL.Add(amt_p3) 'amount
-                    queryAL.Add(debit) 'debit
-                    queryAL.Add(credit) 'credit
-                    queryAL.Add(fx_amount) 'fx_amount
-                    queryAL.Add(fx_debit) 'fx_debit
-                    queryAL.Add(fx_credit) 'fx_credit
-                    queryAL.Add(fx_rate) 'fx_rate
-
-                    queryAL.Add(value_arraylist(0)(row)(17)) 'curr_code
-                    queryAL.Add(value_arraylist(0)(row)(48)) 'batchno
-                    queryAL.Add(value_arraylist(0)(row)(49)) 'projcode
-                    queryAL.Add(value_arraylist(0)(row)(50)) 'deptcode
-                    queryAL.Add(Function_Form.getNull(0)) 'taxcode
-                    queryAL.Add(Function_Form.getNull(3)) 'taxable
-                    queryAL.Add(Function_Form.getNull(3)) 'fx_taxable
-                    queryAL.Add(Function_Form.getNull(3)) 'link_seq
-                    queryAL.Add("H") 'billtype
-                    queryAL.Add(Function_Form.getNull(0)) 'remark1
-                    queryAL.Add(Function_Form.getNull(0)) 'remark2
-                    queryAL.Add(ref_p3) 'cheque_no
-                    queryAL.Add(Function_Form.convertDateFormat(value_arraylist(0)(row)(2))) 'chqrc_date
-                    queryAL.Add(Function_Form.getNull(1)) 'koff_date
-                    queryAL.Add(Function_Form.getNull(1)) 'recon_date
-                    queryAL.Add(Function_Form.getNull(3)) 'recon_flag
-                    queryAL.Add(value_arraylist(0)(row)(16)) 'accmgr_id
-                    queryAL.Add(Function_Form.getNull(0)) 'lkdoc_type
-                    queryAL.Add(Function_Form.getNull(0)) 'lkdoc_no
-                    queryAL.Add(Function_Form.getNull(3)) 'lkseq
-                    queryAL.Add("1") 'lock
-                    queryAL.Add(Function_Form.getNull(3)) 'void
-                    queryAL.Add(Function_Form.getNull(3)) 'exported
-                    queryAL.Add(Function_Form.getNull(0)) 'entry
-                    queryAL.Add(Function_Form.getNull(3)) 'fastentry
-                    queryAL.Add(Function_Form.getNull(3)) 'followdesp
-                    queryAL.Add(Function_Form.getNull(3)) 'tsid
-                    queryAL.Add(Function_Form.getNull(0)) 'spcode
-                    queryAL.Add(Function_Form.getNull(1)) 'taxdate
-                    queryAL.Add(Function_Form.getNull(1)) 'taxdate_bt
-                    queryAL.Add(value_arraylist(0)(row)(112)) 'createdby
-                    queryAL.Add(value_arraylist(0)(row)(112)) 'updatedby
-                    queryAL.Add(Function_Form.getNull(2)) 'createdate
-                    queryAL.Add(Function_Form.getNull(2)) 'lastupdate
-
-                    Dim paycmd As String = queryTable(4)(2)
-                    For j = 0 To queryAL.Count - 1
-                        paycmd += "'" + queryAL(j).ToString + "',"
-                    Next
-                    paycmd = paycmd.Substring(0, paycmd.Length - 1) + ")"
-                    myConn.Open()
-                    Dim cmd_p = New SqlCommand(paycmd, myConn)
-                    cmd_p.ExecuteNonQuery()
-                    rowInsertNum += 1
-                    myConn.Close()
-                    seq += 1
-                End If
-
-                'Subtotal Of Payment4
-                If Not acc_p4.ToString.Trim.Equals(String.Empty) Then
-                    queryAL.Clear()
-                    queryAL.Add(acc_p4) 'accno
-                    queryAL.Add("CS") 'doc_type
-                    queryAL.Add(value_arraylist(0)(row)(1)) 'doc_no
-                    queryAL.Add(seq) 'seq
-                    queryAL.Add(Function_Form.convertDateFormat(value_arraylist(0)(row)(2))) 'doc_date
-                    queryAL.Add(value_arraylist(0)(row)(1)) 'refno
-                    queryAL.Add(value_arraylist(0)(row)(9)) 'refno2
-                    queryAL.Add(Function_Form.getNull(0)) 'refno3
-                    queryAL.Add(value_arraylist(0)(row)(11)) 'desp
-                    queryAL.Add(Function_Form.getNull(0)) 'desp2
-                    queryAL.Add(Function_Form.getNull(0)) 'desp3
-                    queryAL.Add(Function_Form.getNull(0)) 'desp4
-
-                    fx_rate = CDbl(value_arraylist(0)(row)(18))
-                    fx_amount = Math.Round(amt_p4, 2)
-                    fx_debit = 0
-                    fx_credit = 0
-                    If fx_amount < 0 Then
-                        fx_credit = fx_amount * -1
-                    Else
-                        fx_debit = fx_amount
-                    End If
-                    amt_p4 = Math.Round(amt_p4 * fx_rate, 2)
-                    debit = 0
-                    credit = 0
-                    If amt_p4 < 0 Then
-                        credit = amt_p4 * -1
-                    Else
-                        debit = amt_p4
-                    End If
-                    queryAL.Add(amt_p4) 'amount
-                    queryAL.Add(debit) 'debit
-                    queryAL.Add(credit) 'credit
-                    queryAL.Add(fx_amount) 'fx_amount
-                    queryAL.Add(fx_debit) 'fx_debit
-                    queryAL.Add(fx_credit) 'fx_credit
-                    queryAL.Add(fx_rate) 'fx_rate
-
-                    queryAL.Add(value_arraylist(0)(row)(17)) 'curr_code
-                    queryAL.Add(value_arraylist(0)(row)(48)) 'batchno
-                    queryAL.Add(value_arraylist(0)(row)(49)) 'projcode
-                    queryAL.Add(value_arraylist(0)(row)(50)) 'deptcode
-                    queryAL.Add(Function_Form.getNull(0)) 'taxcode
-                    queryAL.Add(Function_Form.getNull(3)) 'taxable
-                    queryAL.Add(Function_Form.getNull(3)) 'fx_taxable
-                    queryAL.Add(Function_Form.getNull(3)) 'link_seq
-                    queryAL.Add("H") 'billtype
-                    queryAL.Add(Function_Form.getNull(0)) 'remark1
-                    queryAL.Add(Function_Form.getNull(0)) 'remark2
-                    queryAL.Add(ref_p4) 'cheque_no
-                    queryAL.Add(Function_Form.convertDateFormat(value_arraylist(0)(row)(2))) 'chqrc_date
-                    queryAL.Add(Function_Form.getNull(1)) 'koff_date
-                    queryAL.Add(Function_Form.getNull(1)) 'recon_date
-                    queryAL.Add(Function_Form.getNull(3)) 'recon_flag
-                    queryAL.Add(value_arraylist(0)(row)(16)) 'accmgr_id
-                    queryAL.Add(Function_Form.getNull(0)) 'lkdoc_type
-                    queryAL.Add(Function_Form.getNull(0)) 'lkdoc_no
-                    queryAL.Add(Function_Form.getNull(3)) 'lkseq
-                    queryAL.Add("1") 'lock
-                    queryAL.Add(Function_Form.getNull(3)) 'void
-                    queryAL.Add(Function_Form.getNull(3)) 'exported
-                    queryAL.Add(Function_Form.getNull(0)) 'entry
-                    queryAL.Add(Function_Form.getNull(3)) 'fastentry
-                    queryAL.Add(Function_Form.getNull(3)) 'followdesp
-                    queryAL.Add(Function_Form.getNull(3)) 'tsid
-                    queryAL.Add(Function_Form.getNull(0)) 'spcode
-                    queryAL.Add(Function_Form.getNull(1)) 'taxdate
-                    queryAL.Add(Function_Form.getNull(1)) 'taxdate_bt
-                    queryAL.Add(value_arraylist(0)(row)(112)) 'createdby
-                    queryAL.Add(value_arraylist(0)(row)(112)) 'updatedby
-                    queryAL.Add(Function_Form.getNull(2)) 'createdate
-                    queryAL.Add(Function_Form.getNull(2)) 'lastupdate
-
-                    Dim paycmd As String = queryTable(4)(2)
-                    For j = 0 To queryAL.Count - 1
-                        paycmd += "'" + queryAL(j).ToString + "',"
-                    Next
-                    paycmd = paycmd.Substring(0, paycmd.Length - 1) + ")"
-                    myConn.Open()
-                    Dim cmd_p = New SqlCommand(paycmd, myConn)
-                    cmd_p.ExecuteNonQuery()
-                    rowInsertNum += 1
-                    myConn.Close()
-                    seq += 1
-                End If
             End If
         Next
 
         'ar
         For Each ar As String In arseq
+            MsgBox(ar.Split(".")(0) + vbTab + ar.Split(".")(1) + vbTab + ar.Split(".")(2) + vbTab + ar.Split(".")(3))
             Dim row As String = ar.Split(".")(3)
             Dim custcode As String = ""
-            Dim doc_type As String = "CS"
+            Dim doc_type As String = "DN"
             Dim doc_no As String = ar.Split(".")(0)
             Dim seq As String = ar.Split(".")(1)
             Dim knockoff As String = ar.Split(".")(2)
@@ -1941,39 +1436,9 @@ Public Class Debit_Note_Form
             Dim fx_rate As String = value_arraylist(0)(row)(18)
             Dim fx_gainloss As String = Function_Form.getNull(3)
             Dim amount As String = ""
-
-            'paid
-            Dim sum_p As Double = 0
-            Dim amt_p1 = value_arraylist(0)(row)(75)
-            Dim amt_p2 = value_arraylist(0)(row)(80)
-            Dim amt_p3 = value_arraylist(0)(row)(85)
-            Dim amt_p4 = value_arraylist(0)(row)(88)
-            If Not value_arraylist(0)(row)(73).Equals(String.Empty) Then
-                sum_p += CDbl(amt_p1)
-            End If
-            If Not value_arraylist(0)(row)(78).Equals(String.Empty) Then
-                sum_p += CDbl(amt_p2)
-            End If
-            If Not value_arraylist(0)(row)(83).Equals(String.Empty) Then
-                sum_p += CDbl(amt_p3)
-            End If
-            If Not value_arraylist(0)(row)(86).Equals(String.Empty) Then
-                sum_p += CDbl(amt_p4)
-            End If
-            Dim paid As String
-            If knockoff.Equals("0") Then
-                paid = sum_p.ToString
-            Else
-                paid = (sum_p * -1).ToString
-            End If
-
+            Dim paid As String = Function_Form.getNull(3)
             Dim local_amount As String = ""
-            Dim local_paid As String
-            If knockoff.Equals("0") Then
-                local_paid = (sum_p * CDbl(fx_rate)).ToString '2
-            Else
-                local_paid = (sum_p * CDbl(fx_rate) * -1).ToString '2
-            End If
+            Dim local_paid As String = Function_Form.getNull(3)
             Dim taxable As String
             Dim tax As String
             Dim fx_taxable As String
@@ -2005,6 +1470,8 @@ Public Class Debit_Note_Form
             Dim lkseq As String = ""
 
             myConn.Open()
+            Clipboard.SetText("SELECT * FROM gl WHERE doc_no ='" + doc_no + "' AND seq='" + seq + "'")
+            MsgBox("SELECT * FROM gl WHERE doc_no ='" + doc_no + "' AND seq='" + seq + "'")
             Dim glcommand = New SqlCommand("SELECT * FROM gl WHERE doc_no ='" + doc_no + "' AND seq='" + seq + "'", myConn)
             Dim glreader As SqlDataReader = glcommand.ExecuteReader
             While glreader.Read()
@@ -2021,6 +1488,7 @@ Public Class Debit_Note_Form
                 remark1 = glreader.GetValue(glreader.GetOrdinal("remark1")).ToString.Trim
                 remark2 = glreader.GetValue(glreader.GetOrdinal("remark2")).ToString.Trim
                 cheque_no = glreader.GetValue(glreader.GetOrdinal("cheque_no")).ToString.Trim
+                'MsgBox("chqrc_Date: " + Function_Form.convertDateFormat(glreader.GetValue(glreader.GetOrdinal("chqrc_date"))).ToString)
                 chqrc_date = Function_Form.convertDateFormat(glreader.GetValue(glreader.GetOrdinal("chqrc_date")))
                 koff_date = Function_Form.convertDateFormat(glreader.GetValue(glreader.GetOrdinal("koff_date")))
                 curr_code = glreader.GetValue(glreader.GetOrdinal("curr_code")).ToString.Trim
@@ -2099,82 +1567,11 @@ Public Class Debit_Note_Form
             arcmd = arcmd.Substring(0, arcmd.Length - 1) + ")"
 
             Dim cmd_ar = New SqlCommand(arcmd, myConn)
+            Clipboard.SetText(arcmd)
+            MsgBox(arcmd)
             cmd_ar.ExecuteNonQuery()
             rowInsertNum += 1
             myConn.Close()
-        Next
-
-        'gloff
-        For row As Integer = 0 To dgvExcel.RowCount - 1
-            If Not value_arraylist(0)(row)(0).Equals("{INVALID ARRAY}") Then
-                Dim queryGLOff As New ArrayList
-                Dim doc_no = ""
-                Dim seq = ""
-                Dim pkseq = ""
-                For Each seq_temp As String In gloffseq
-                    If seq_temp.Split(".")(0).Trim.Equals(value_arraylist(0)(row)(1)) Then
-                        doc_no = seq_temp.Split(".")(0).Trim
-                        seq = seq_temp.Split(".")(2).Trim
-                        pkseq = seq_temp.Split(".")(1).Trim
-                    End If
-                Next
-                queryGLOff.Add(value_arraylist(0)(row)(10)) 'accno
-                queryGLOff.Add(value_arraylist(0)(row)(0)) 'doc_type
-                queryGLOff.Add(doc_no) 'doc_no
-                queryGLOff.Add(seq) 'seq
-                queryGLOff.Add(Function_Form.convertDateFormat(value_arraylist(0)(row)(2))) 'doc_date
-                queryGLOff.Add(value_arraylist(0)(row)(0)) 'pkdoc_type
-                queryGLOff.Add(doc_no) 'pkdoc_no
-                queryGLOff.Add(pkseq) 'pkseq
-                queryGLOff.Add(Function_Form.convertDateFormat(value_arraylist(0)(row)(2))) 'pkdoc_date
-                queryGLOff.Add(1) 'sign
-                queryGLOff.Add(value_arraylist(0)(row)(18)) 'pkfx_rate
-
-                'paid
-                Dim sum_p As Double = 0
-                Dim amt_p1 = value_arraylist(0)(row)(75)
-                Dim amt_p2 = value_arraylist(0)(row)(80)
-                Dim amt_p3 = value_arraylist(0)(row)(85)
-                Dim amt_p4 = value_arraylist(0)(row)(88)
-                If Not value_arraylist(0)(row)(73).Equals(String.Empty) Then
-                    sum_p += CDbl(amt_p1)
-                End If
-                If Not value_arraylist(0)(row)(78).Equals(String.Empty) Then
-                    sum_p += CDbl(amt_p2)
-                End If
-                If Not value_arraylist(0)(row)(83).Equals(String.Empty) Then
-                    sum_p += CDbl(amt_p3)
-                End If
-                If Not value_arraylist(0)(row)(86).Equals(String.Empty) Then
-                    sum_p += CDbl(amt_p4)
-                End If
-                Dim paid As String = sum_p.ToString
-                queryGLOff.Add(paid) 'paid
-
-                Dim fx_rate As Double = CDbl(value_arraylist(0)(row)(18))
-                Dim local_paid As Double = sum_p * fx_rate
-                queryGLOff.Add(fx_rate) 'fx_rate
-                queryGLOff.Add(local_paid) 'local_paid
-                queryGLOff.Add(local_paid) 'local_amount
-                queryGLOff.Add(Function_Form.getNull(3)) 'fx_gainloss
-                queryGLOff.Add(Function_Form.getNull(3)) 'v_gainloss
-
-                If sum_p = 0 Then
-                    Continue For
-                End If
-
-                Dim gloff_cmd As String = queryTable(5)(2)
-                For j = 0 To queryGLOff.Count - 1
-                    gloff_cmd += "'" + queryGLOff(j).ToString + "',"
-                Next
-                gloff_cmd = gloff_cmd.Substring(0, gloff_cmd.Length - 1) + ")"
-
-                myConn.Open()
-                Dim cmd_gloff = New SqlCommand(gloff_cmd, myConn)
-                cmd_gloff.ExecuteNonQuery()
-                rowInsertNum += 1
-                myConn.Close()
-            End If
         Next
 
         Dim rowUpdateNum = 0
@@ -2193,7 +1590,7 @@ Public Class Debit_Note_Form
                     Dim serialNoProdCommand As String = "UPDATE prodsn SET "
                     Dim serialNoColumns = "qty='" + qty + "',"
                     serialNoColumns += "location='" + location + "',"
-                    serialNoColumns += "doc_type='CS',"
+                    serialNoColumns += "doc_type='DN',"
                     serialNoColumns += "doc_no='" + doc_no + "',"
                     serialNoColumns += "line_no='" + line_no + "',"
                     serialNoColumns += "doc_date='" + doc_date + "' "
@@ -2204,7 +1601,7 @@ Public Class Debit_Note_Form
                     command.ExecuteNonQuery()
                     rowUpdateNum += 1
                     Dim serialNoStockdCommand As String = "INSERT INTO stocksn (prodcode,serialno,doc_type,doc_no,line_no,doc_date,qty,location) VALUES ('"
-                    serialNoStockdCommand += procode + "','" + serialno + "','CS','" + doc_no + "','" + line_no + "','" + doc_date + "','" + qty + "','" + location + "')"
+                    serialNoStockdCommand += procode + "','" + serialno + "','DN','" + doc_no + "','" + line_no + "','" + doc_date + "','" + qty + "','" + location + "')"
                     Dim command2 = New SqlCommand(serialNoStockdCommand, myConn)
                     command2.ExecuteNonQuery()
                     'MsgBox(serialNoStockdCommand)
@@ -2299,8 +1696,8 @@ Public Class Debit_Note_Form
                 stockCommand = stockCommand.Substring(0, stockCommand.Length - 1) + ")"
                 Dim command = New SqlCommand(stockCommand, myConn)
                 myConn.Open()
-                Clipboard.SetText(stockCommand)
-                MsgBox(stockCommand)
+                'Clipboard.SetText(stockCommand)
+                'MsgBox(stockCommand)
                 command.ExecuteNonQuery()
                 rowInsertNum += 1
                 myConn.Close()
@@ -2308,7 +1705,7 @@ Public Class Debit_Note_Form
         Next
 
         Function_Form.promptImportSuccess(rowInsertNum, rowUpdateNum)
-        Function_Form.printExcelResult("Cash_Sales", queryTable, value_arraylist, sql_format_arraylist, dgvExcel)
+        Function_Form.printExcelResult("Debit_Note", queryTable, value_arraylist, sql_format_arraylist, dgvExcel)
     End Sub
     Private Function existed_checker(table As String, sql_value As String, value As String)
         myConn.Open()

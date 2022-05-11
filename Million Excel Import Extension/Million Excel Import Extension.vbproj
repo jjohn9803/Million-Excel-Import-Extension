@@ -164,6 +164,12 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Form1.Designer.vb">
+      <DependentUpon>Form1.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Form1.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Function\Cash Sales.Designer.vb">
       <DependentUpon>Cash Sales.vb</DependentUpon>
     </Compile>
@@ -193,12 +199,6 @@
       <DependentUpon>Login.vb</DependentUpon>
     </Compile>
     <Compile Include="Login.vb">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Maintainance Form.Designer.vb">
-      <DependentUpon>Maintainance Form.vb</DependentUpon>
-    </Compile>
-    <Compile Include="Maintainance Form.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="My Project\AssemblyInfo.vb" />
@@ -249,6 +249,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Form1.resx">
+      <DependentUpon>Form1.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Function\Cash Sales.resx">
       <DependentUpon>Cash Sales.vb</DependentUpon>
     </EmbeddedResource>
@@ -263,9 +266,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Login.resx">
       <DependentUpon>Login.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Maintainance Form.resx">
-      <DependentUpon>Maintainance Form.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
