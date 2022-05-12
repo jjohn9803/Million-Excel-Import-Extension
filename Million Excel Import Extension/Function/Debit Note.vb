@@ -1181,7 +1181,7 @@ Public Class Debit_Note_Form
                     queryAL.Add(Function_Form.convertDateFormat(value_arraylist(0)(row)(2))) 'doc_date
                     queryAL.Add(value_arraylist(0)(row)(1)) 'refno
                     queryAL.Add(value_arraylist(0)(row)(9)) 'refno2
-                    queryAL.Add(Function_Form.getNull(0)) 'refno3
+                    queryAL.Add(value_arraylist(0)(row)(71)) 'refno3
                     queryAL.Add(value_arraylist(0)(row)(11)) 'desp
                     queryAL.Add(value_arraylist(0)(row)(4)) 'desp2
                     queryAL.Add(Function_Form.getNull(0)) 'desp3
@@ -1237,7 +1237,6 @@ Public Class Debit_Note_Form
                     cmd1.ExecuteNonQuery()
                     rowInsertNum += 1
                     myConn.Close()
-                    MsgBox("adding prod " + seq.ToString + " " + value_arraylist(0)(row)(1))
                     seq += 1
 
                     'If product has tax
@@ -1264,7 +1263,7 @@ Public Class Debit_Note_Form
                         queryAL.Add(Function_Form.convertDateFormat(value_arraylist(0)(row)(2))) 'doc_date
                         queryAL.Add(value_arraylist(0)(row)(1)) 'refno
                         queryAL.Add(value_arraylist(0)(row)(9)) 'refno2
-                        queryAL.Add(Function_Form.getNull(0)) 'refno3
+                        queryAL.Add(value_arraylist(0)(row)(71)) 'refno3
                         queryAL.Add(value_arraylist(0)(row)(11)) 'desp
                         queryAL.Add(value_arraylist(0)(row)(4)) 'desp2
                         queryAL.Add(Function_Form.getNull(0)) 'desp3
@@ -1317,7 +1316,6 @@ Public Class Debit_Note_Form
                         cmd2.ExecuteNonQuery()
                         rowInsertNum += 1
                         myConn.Close()
-                        MsgBox("tax adding prod " + seq.ToString + " " + value_arraylist(0)(row)(1))
                         seq += 1
                     End If
                 Next
@@ -1328,13 +1326,12 @@ Public Class Debit_Note_Form
                 queryAL.Add("DN") 'doc_type
                 queryAL.Add(value_arraylist(0)(row)(1)) 'doc_no
                 queryAL.Add(seq) 'seq
-                MsgBox("final seq: " + seq.ToString)
                 arseq.Add(value_arraylist(0)(row)(1) + "." + seq.ToString + ".0." + row.ToString) 'AR get doc_no,seq,knockoff,row
                 'gloffseq.Add(value_arraylist(0)(row)(1) + "." + seq.ToString + "." + (seq + 1).ToString) 'GLOff get doc_no,seq
                 queryAL.Add(Function_Form.convertDateFormat(value_arraylist(0)(row)(2))) 'doc_date
                 queryAL.Add(value_arraylist(0)(row)(1)) 'refno
                 queryAL.Add(value_arraylist(0)(row)(9)) 'refno2
-                queryAL.Add(Function_Form.getNull(0)) 'refno3
+                queryAL.Add(value_arraylist(0)(row)(71)) 'refno3
                 queryAL.Add(value_arraylist(0)(row)(3)) 'desp
                 queryAL.Add(value_arraylist(0)(row)(4)) 'desp2
                 queryAL.Add(Function_Form.getNull(0)) 'desp3
@@ -1379,7 +1376,7 @@ Public Class Debit_Note_Form
                 queryAL.Add(value_arraylist(0)(row)(72)) 'remark1
                 queryAL.Add(Function_Form.getNull(0)) 'remark2
                 queryAL.Add(Function_Form.getNull(0)) 'cheque_no
-                queryAL.Add(Function_Form.convertDateFormat(value_arraylist(0)(row)(2))) 'chqrc_date
+                queryAL.Add(Function_Form.getNull(1)) 'chqrc_date
                 queryAL.Add(Function_Form.getNull(1)) 'koff_date
                 queryAL.Add(Function_Form.getNull(1)) 'recon_date
                 queryAL.Add(Function_Form.getNull(3)) 'recon_flag
@@ -1402,12 +1399,21 @@ Public Class Debit_Note_Form
                 queryAL.Add(Function_Form.getNull(2)) 'createdate
                 queryAL.Add(Function_Form.getNull(2)) 'lastupdate
 
+                Dim subtotalcmd As String = queryTable(4)(2)
+                For j = 0 To queryAL.Count - 1
+                    subtotalcmd += "'" + queryAL(j).ToString + "',"
+                Next
+                subtotalcmd = subtotalcmd.Substring(0, subtotalcmd.Length - 1) + ")"
+                myConn.Open()
+                Dim cmd3 = New SqlCommand(subtotalcmd, myConn)
+                cmd3.ExecuteNonQuery()
+                rowInsertNum += 1
+                myConn.Close()
             End If
         Next
 
         'ar
         For Each ar As String In arseq
-            MsgBox(ar.Split(".")(0) + vbTab + ar.Split(".")(1) + vbTab + ar.Split(".")(2) + vbTab + ar.Split(".")(3))
             Dim row As String = ar.Split(".")(3)
             Dim custcode As String = ""
             Dim doc_type As String = "DN"
@@ -1470,8 +1476,8 @@ Public Class Debit_Note_Form
             Dim lkseq As String = ""
 
             myConn.Open()
-            Clipboard.SetText("SELECT * FROM gl WHERE doc_no ='" + doc_no + "' AND seq='" + seq + "'")
-            MsgBox("SELECT * FROM gl WHERE doc_no ='" + doc_no + "' AND seq='" + seq + "'")
+            'Clipboard.SetText("SELECT * FROM gl WHERE doc_no ='" + doc_no + "' AND seq='" + seq + "'")
+            'MsgBox("SELECT * FROM gl WHERE doc_no ='" + doc_no + "' AND seq='" + seq + "'")
             Dim glcommand = New SqlCommand("SELECT * FROM gl WHERE doc_no ='" + doc_no + "' AND seq='" + seq + "'", myConn)
             Dim glreader As SqlDataReader = glcommand.ExecuteReader
             While glreader.Read()
@@ -1567,8 +1573,8 @@ Public Class Debit_Note_Form
             arcmd = arcmd.Substring(0, arcmd.Length - 1) + ")"
 
             Dim cmd_ar = New SqlCommand(arcmd, myConn)
-            Clipboard.SetText(arcmd)
-            MsgBox(arcmd)
+            'Clipboard.SetText(arcmd)
+            'MsgBox(arcmd)
             cmd_ar.ExecuteNonQuery()
             rowInsertNum += 1
             myConn.Close()
