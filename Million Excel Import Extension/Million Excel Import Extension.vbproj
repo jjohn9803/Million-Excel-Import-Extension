@@ -176,6 +176,12 @@
     <Compile Include="Function\Cash Sales.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Function\Credit Note.Designer.vb">
+      <DependentUpon>Credit Note.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Function\Credit Note.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Function\Debit Note.Designer.vb">
       <DependentUpon>Debit Note.vb</DependentUpon>
     </Compile>
@@ -254,6 +260,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Function\Cash Sales.resx">
       <DependentUpon>Cash Sales.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Function\Credit Note.resx">
+      <DependentUpon>Credit Note.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Function\Debit Note.resx">
       <DependentUpon>Debit Note.vb</DependentUpon>
