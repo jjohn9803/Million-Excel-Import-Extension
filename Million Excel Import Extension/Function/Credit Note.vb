@@ -82,7 +82,7 @@ Public Class Credit_Note_Form
         Return "maintain.xls"
     End Function
     Private Sub btnImport_Click(sender As Object, e As EventArgs) Handles btnImport.Click
-        Dim importType = "Debit Note"
+        Dim importType = "Credit Note"
         Dim tableExcelSetting As DataTableCollection
         'Try
         Using stream = File.Open(getMaintainSetting, FileMode.Open, FileAccess.Read)
@@ -95,23 +95,23 @@ Public Class Credit_Note_Form
                 For i = 0 To 8
                     queryTable.Add(New ArrayList)
                 Next
-                queryTable(0).add("Debit Note") '0
+                queryTable(0).add("Credit Note") '0
                 queryTable(0).add("sinv") '1
-                queryTable(1).add("Debit Note Desc")
+                queryTable(1).add("Credit Note Desc")
                 queryTable(1).add("sinvdet")
-                queryTable(2).add("Debit Note Stock")
+                queryTable(2).add("Credit Note Stock")
                 queryTable(2).add("stock")
-                queryTable(3).add("Debit Note AR") '0
+                queryTable(3).add("Credit Note AR") '0
                 queryTable(3).add("ar") '1
-                queryTable(4).add("Debit Note GL")
+                queryTable(4).add("Credit Note GL")
                 queryTable(4).add("gl")
-                queryTable(5).add("Debit Note GL Off")
+                queryTable(5).add("Credit Note GL Off")
                 queryTable(5).add("gloff")
-                queryTable(6).add("Debit Note GL Audit")
+                queryTable(6).add("Credit Note GL Audit")
                 queryTable(6).add("glaudit")
-                queryTable(7).add("DN Product Serial No")
+                queryTable(7).add("CN Product Serial No")
                 queryTable(7).add("prodsn")
-                queryTable(8).add("DN Stock Serial No")
+                queryTable(8).add("CN Stock Serial No")
                 queryTable(8).add("stocksn")
                 quotationWriteIntoSQL(tableExcelSetting, queryTable)
             End Using
@@ -199,8 +199,8 @@ Public Class Credit_Note_Form
                                     value = "   "
                                     value_arraylist(i)(row).add("   ")
                                 ElseIf data_type_temp.ToString.Contains("date") Or data_type_temp.ToString.Contains("time") Then
-                                    value = Function_Form.convertDateFormat(New Date(1900, 1, 1).ToString)
-                                    value_arraylist(i)(row).add(Function_Form.convertDateFormat(New Date(1900, 1, 1).ToString))
+                                    value = Function_Form.getNull(1)
+                                    value_arraylist(i)(row).add(Function_Form.getNull(1))
                                 Else
                                     value = "0"
                                     value_arraylist(i)(row).add("0")
@@ -254,7 +254,7 @@ Public Class Credit_Note_Form
                                             If data_type_temp.ToString.Contains("char") Or data_type_temp.ToString.Contains("text") Then
                                                 value_arraylist(i)(row)(g) = "   "
                                             ElseIf data_type_temp.ToString.Contains("date") Or data_type_temp.ToString.Contains("time") Then
-                                                value_arraylist(i)(row)(g) = Function_Form.convertDateFormat(New Date(1900, 1, 1).ToString)
+                                                value_arraylist(i)(row)(g) = Function_Form.getNull(1)
                                             Else
                                                 value_arraylist(i)(row)(g) = "0"
                                             End If
@@ -828,122 +828,35 @@ Public Class Credit_Note_Form
                     End If
                 End If
 
-                'gldata.accno / exist (Cash, Bank) Acc_No1
-                If Not value_arraylist(0)(row)(73).ToString.Trim.Equals(String.Empty) Then
-                    table = "gldata"
-                    value_name = "accno"
-                    value = value_arraylist(0)(row)(73)
-                    myConn.Open()
-                    Dim sncommand = New SqlCommand("select * from " + table + " WHERE (classify = 'C' OR classify = 'B') AND accno='" + value + "'", myConn)
-                    Dim snreader As SqlDataReader = sncommand.ExecuteReader
-                    Dim exist_acc = False
-                    While snreader.Read()
-                        exist_acc = True
-                    End While
-                    If exist_acc = False Then
-                        execute_valid = False
-                        exist_result += value_name + " '" + value + "' is not found in the database (" + table + ")!" + vbNewLine
-                    End If
-                    myConn.Close()
-                Else
-                    'payment set empty
-                    value_arraylist(0)(row)(73) = Function_Form.getNull(0)
-                    value_arraylist(0)(row)(74) = Function_Form.getNull(0)
-                    value_arraylist(0)(row)(75) = Function_Form.getNull(3)
+                'Empty Section
+                'sinv.no / not empty
+                value = value_arraylist(0)(row)(1)
+                If value.Trim.Equals(String.Empty) Then
+                    Dim doc_no = value_arraylist(0)(row)(1)
+                    execute_valid = False
+                    exist_result += "Document No '" + doc_no + "' cannot be empty!" + vbNewLine
                 End If
 
-                'gldata.accno / exist (Cash, Bank) Acc_No2
-                If Not value_arraylist(0)(row)(78).ToString.Trim.Equals(String.Empty) Then
-                    table = "gldata"
-                    value_name = "accno"
-                    value = value_arraylist(0)(row)(78)
-                    myConn.Open()
-                    Dim sncommand = New SqlCommand("select * from " + table + " WHERE (classify = 'C' OR classify = 'B') AND accno='" + value + "'", myConn)
-                    Dim snreader As SqlDataReader = sncommand.ExecuteReader
-                    Dim exist_acc = False
-                    While snreader.Read()
-                        exist_acc = True
-                    End While
-                    If exist_acc = False Then
-                        execute_valid = False
-                        exist_result += value_name + " '" + value + "' is not found in the database (" + table + ")!" + vbNewLine
-                    End If
-                    myConn.Close()
-                Else
-                    'payment set empty
-                    value_arraylist(0)(row)(78) = Function_Form.getNull(0)
-                    value_arraylist(0)(row)(79) = Function_Form.getNull(0)
-                    value_arraylist(0)(row)(80) = Function_Form.getNull(3)
+                'sinv.custcode / not empty
+                value = value_arraylist(0)(row)(10)
+                If value.Trim.Equals(String.Empty) Then
+                    Dim doc_no = value_arraylist(0)(row)(1)
+                    execute_valid = False
+                    exist_result += "Customer Code '" + doc_no + "' cannot be empty!" + vbNewLine
                 End If
 
-                'gldata.accno / exist (Cash, Bank) Acc_No3
-                If Not value_arraylist(0)(row)(83).ToString.Trim.Equals(String.Empty) Then
-                    table = "gldata"
-                    value_name = "accno"
-                    value = value_arraylist(0)(row)(83)
-                    myConn.Open()
-                    Dim sncommand = New SqlCommand("select * from " + table + " WHERE (classify = 'C' OR classify = 'B') AND accno='" + value + "'", myConn)
-                    Dim snreader As SqlDataReader = sncommand.ExecuteReader
-                    Dim exist_acc = False
-                    While snreader.Read()
-                        exist_acc = True
-                    End While
-                    If exist_acc = False Then
-                        execute_valid = False
-                        exist_result += value_name + " '" + value + "' is not found in the database (" + table + ")!" + vbNewLine
-                    End If
-                    myConn.Close()
-                Else
-                    'payment set empty
-                    value_arraylist(0)(row)(83) = Function_Form.getNull(0)
-                    value_arraylist(0)(row)(84) = Function_Form.getNull(0)
-                    value_arraylist(0)(row)(85) = Function_Form.getNull(3)
+                'sinv.reason / not empty
+                value = value_arraylist(0)(row)(72)
+                If value.Trim.Equals(String.Empty) Then
+                    Dim doc_no = value_arraylist(0)(row)(1)
+                    execute_valid = False
+                    exist_result += "Reason '" + doc_no + "' cannot be empty!" + vbNewLine
                 End If
 
-                'gldata.accno / exist (Cash, Bank) Acc_No4
-                If Not value_arraylist(0)(row)(86).ToString.Trim.Equals(String.Empty) Then
-                    table = "gldata"
-                    value_name = "accno"
-                    value = value_arraylist(0)(row)(86)
-                    myConn.Open()
-                    Dim sncommand = New SqlCommand("select * from " + table + " WHERE (classify = 'C' OR classify = 'B') AND accno='" + value + "'", myConn)
-                    Dim snreader As SqlDataReader = sncommand.ExecuteReader
-                    Dim exist_acc = False
-                    While snreader.Read()
-                        exist_acc = True
-                    End While
-                    If exist_acc = False Then
-                        execute_valid = False
-                        exist_result += value_name + " '" + value + "' is not found in the database (" + table + ")!" + vbNewLine
-                    End If
-                    myConn.Close()
-                Else
-                    'payment set empty
-                    value_arraylist(0)(row)(86) = Function_Form.getNull(0)
-                    value_arraylist(0)(row)(87) = Function_Form.getNull(0)
-                    value_arraylist(0)(row)(88) = Function_Form.getNull(3)
-                End If
             End If
 
             'Sales Invoice Desc
             If Not value_arraylist(1)(row)(0).Equals(String.Empty) Then
-                'sinvdet.doc_no / duplicate
-                'table = "sinvdet"
-                'value_name = "doc_no"
-                'value = value_arraylist(1)(row)(2)
-                'If Not value.Trim.Equals(String.Empty) Then
-                '    If existed_checker(table, value_name, value) Then
-                '        execute_valid = False
-                '        exist_result += value_name + " '" + value + "' already existed in the database (" + table + ")!" + vbNewLine
-                '    End If
-                '    If Function_Form.repeatedExcelCell(dgvExcel, excel_format_arraylist(1)(2), value, row) Then
-                '        execute_valid = False
-                '        If Not exist_result.Contains(excel_format_arraylist(1)(2) + " '" + value + "' is repeated!") Then
-                '            exist_result += excel_format_arraylist(1)(2) + " '" + value + "' is repeated!" + vbNewLine
-                '        End If
-                '    End If
-                'End If
-
                 'product.prodcode / exist
                 table = "product"
                 value_name = "prodcode"
@@ -1130,7 +1043,7 @@ Public Class Credit_Note_Form
                 Next
 
                 Dim query_temp As New ArrayList
-                query_temp.Add("D") 'billtype
+                query_temp.Add("C") 'billtype
                 query_temp.Add(Function_Form.getNull(0)) 'remark1
                 query_temp.Add(Function_Form.getNull(0)) 'remark2
                 query_temp.Add(Function_Form.getNull(0)) 'cheque_no
@@ -1175,7 +1088,7 @@ Public Class Credit_Note_Form
                     queryAL.Clear()
                     'Product
                     queryAL.Add(value_arraylist(1)(i)(57)) 'accno
-                    queryAL.Add("DN") 'doc_type
+                    queryAL.Add("CN") 'doc_type
                     queryAL.Add(value_arraylist(0)(row)(1)) 'doc_no
                     queryAL.Add(seq) 'seq
                     queryAL.Add(Function_Form.convertDateFormat(value_arraylist(0)(row)(2))) 'doc_date
@@ -1187,7 +1100,7 @@ Public Class Credit_Note_Form
                     queryAL.Add(Function_Form.getNull(0)) 'desp3
                     queryAL.Add(Function_Form.getNull(0)) 'desp4
 
-                    amount = Math.Round(CDbl(value_arraylist(1)(i)(31)) * -1, 2)
+                    amount = Math.Round(CDbl(value_arraylist(1)(i)(31)), 2)
                     queryAL.Add(amount) 'amount
                     debit = 0
                     credit = 0
@@ -1199,7 +1112,7 @@ Public Class Credit_Note_Form
                     queryAL.Add(debit) 'debit
                     queryAL.Add(credit) 'credit
                     fx_rate = CDbl(value_arraylist(0)(row)(18))
-                    fx_amount = Math.Round(CDbl(value_arraylist(1)(i)(26)) * -1, 2)
+                    fx_amount = Math.Round(CDbl(value_arraylist(1)(i)(26)), 2)
                     fx_debit = 0
                     fx_credit = 0
                     If fx_amount < 0 Then
@@ -1257,7 +1170,7 @@ Public Class Credit_Note_Form
                         Else
                             queryAL.Add(accno) 'accno
                         End If
-                        queryAL.Add("DN") 'doc_type
+                        queryAL.Add("CN") 'doc_type
                         queryAL.Add(value_arraylist(0)(row)(1)) 'doc_no
                         queryAL.Add(seq) 'seq
                         queryAL.Add(Function_Form.convertDateFormat(value_arraylist(0)(row)(2))) 'doc_date
@@ -1269,7 +1182,7 @@ Public Class Credit_Note_Form
                         queryAL.Add(Function_Form.getNull(0)) 'desp3
                         queryAL.Add(Function_Form.getNull(0)) 'desp4
 
-                        amount = Math.Round(CDbl(value_arraylist(1)(i)(35)) * -1, 2)
+                        amount = Math.Round(CDbl(value_arraylist(1)(i)(35)), 2)
                         queryAL.Add(amount) 'amount
                         debit = 0
                         credit = 0
@@ -1281,7 +1194,7 @@ Public Class Credit_Note_Form
                         queryAL.Add(debit) 'debit
                         queryAL.Add(credit) 'credit
                         fx_rate = CDbl(value_arraylist(0)(row)(18))
-                        fx_amount = Math.Round(CDbl(value_arraylist(1)(i)(23)) * -1, 2)
+                        fx_amount = Math.Round(CDbl(value_arraylist(1)(i)(23)), 2)
                         fx_debit = 0
                         fx_credit = 0
                         If fx_amount < 0 Then
@@ -1301,7 +1214,7 @@ Public Class Credit_Note_Form
                         queryAL.Add(value_arraylist(0)(row)(49)) 'projcode
                         queryAL.Add(value_arraylist(0)(row)(50)) 'deptcode
                         queryAL.Add(taxcode) 'taxcode
-                        Dim taxable = Math.Round(CDbl(value_arraylist(1)(i)(26)) * -1, 2)
+                        Dim taxable = Math.Round(CDbl(value_arraylist(1)(i)(26)), 2)
                         queryAL.Add(taxable * fx_rate) 'taxable
                         queryAL.Add(taxable) 'fx_taxable
                         queryAL.Add((seq - 1).ToString) 'link_seq
@@ -1323,7 +1236,7 @@ Public Class Credit_Note_Form
                 queryAL.Clear()
                 'Subtotal of Product
                 queryAL.Add(value_arraylist(0)(row)(10)) 'accno
-                queryAL.Add("DN") 'doc_type
+                queryAL.Add("CN") 'doc_type
                 queryAL.Add(value_arraylist(0)(row)(1)) 'doc_no
                 queryAL.Add(seq) 'seq
                 arseq.Add(value_arraylist(0)(row)(1) + "." + seq.ToString + ".0." + row.ToString) 'AR get doc_no,seq,knockoff,row
@@ -1337,7 +1250,7 @@ Public Class Credit_Note_Form
                 queryAL.Add(Function_Form.getNull(0)) 'desp3
                 queryAL.Add(Function_Form.getNull(0)) 'desp4
 
-                amount = Math.Round(CDbl(value_arraylist(0)(row)(43)), 2)
+                amount = Math.Round(CDbl(value_arraylist(0)(row)(43)) * -1, 2)
                 queryAL.Add(amount) 'amount
                 debit = 0
                 credit = 0
@@ -1349,7 +1262,7 @@ Public Class Credit_Note_Form
                 queryAL.Add(debit) 'debit
                 queryAL.Add(credit) 'credit
                 fx_rate = CDbl(value_arraylist(0)(row)(18))
-                fx_amount = Math.Round(CDbl(value_arraylist(0)(row)(35)), 2)
+                fx_amount = Math.Round(CDbl(value_arraylist(0)(row)(35)) * -1, 2)
                 fx_debit = 0
                 fx_credit = 0
                 If fx_amount < 0 Then
@@ -1372,7 +1285,7 @@ Public Class Credit_Note_Form
                 queryAL.Add(Function_Form.getNull(3)) 'taxable
                 queryAL.Add(Function_Form.getNull(3)) 'fx_taxable
                 queryAL.Add(Function_Form.getNull(3)) 'link_seq
-                queryAL.Add("D") 'billtype
+                queryAL.Add("C") 'billtype
                 queryAL.Add(value_arraylist(0)(row)(72)) 'remark1
                 queryAL.Add(Function_Form.getNull(0)) 'remark2
                 queryAL.Add(Function_Form.getNull(0)) 'cheque_no
@@ -1416,7 +1329,7 @@ Public Class Credit_Note_Form
         For Each ar As String In arseq
             Dim row As String = ar.Split(".")(3)
             Dim custcode As String = ""
-            Dim doc_type As String = "DN"
+            Dim doc_type As String = "CN"
             Dim doc_no As String = ar.Split(".")(0)
             Dim seq As String = ar.Split(".")(1)
             Dim knockoff As String = ar.Split(".")(2)
@@ -1450,10 +1363,10 @@ Public Class Credit_Note_Form
             Dim fx_taxable As String
             Dim fx_tax As String
             If knockoff.Equals("0") Then
-                taxable = (CDbl(value_arraylist(0)(row)(27)) * CDbl(fx_rate)).ToString '2
-                tax = (CDbl(value_arraylist(0)(row)(31)) * CDbl(fx_rate)).ToString '2
-                fx_taxable = value_arraylist(0)(row)(27) '2
-                fx_tax = value_arraylist(0)(row)(31) '2
+                taxable = (CDbl(value_arraylist(0)(row)(27)) * CDbl(fx_rate) * -1).ToString '2
+                tax = (CDbl(value_arraylist(0)(row)(31)) * CDbl(fx_rate) * -1).ToString '2
+                fx_taxable = (value_arraylist(0)(row)(27) * -1) '2
+                fx_tax = (value_arraylist(0)(row)(31) * -1) '2
             Else
                 taxable = Function_Form.getNull(3)
                 tax = Function_Form.getNull(3)
@@ -1494,7 +1407,6 @@ Public Class Credit_Note_Form
                 remark1 = glreader.GetValue(glreader.GetOrdinal("remark1")).ToString.Trim
                 remark2 = glreader.GetValue(glreader.GetOrdinal("remark2")).ToString.Trim
                 cheque_no = glreader.GetValue(glreader.GetOrdinal("cheque_no")).ToString.Trim
-                'MsgBox("chqrc_Date: " + Function_Form.convertDateFormat(glreader.GetValue(glreader.GetOrdinal("chqrc_date"))).ToString)
                 chqrc_date = Function_Form.convertDateFormat(glreader.GetValue(glreader.GetOrdinal("chqrc_date")))
                 koff_date = Function_Form.convertDateFormat(glreader.GetValue(glreader.GetOrdinal("koff_date")))
                 curr_code = glreader.GetValue(glreader.GetOrdinal("curr_code")).ToString.Trim
@@ -1507,8 +1419,8 @@ Public Class Credit_Note_Form
                 billtype = glreader.GetValue(glreader.GetOrdinal("billtype")).ToString.Trim
                 spcode = glreader.GetValue(glreader.GetOrdinal("spcode")).ToString.Trim
                 taxcode = glreader.GetValue(glreader.GetOrdinal("taxcode")).ToString.Trim
-                taxdate = glreader.GetValue(glreader.GetOrdinal("taxdate")).ToString.Trim
-                taxdate_bt = glreader.GetValue(glreader.GetOrdinal("taxdate_bt")).ToString.Trim
+                taxdate = Function_Form.convertDateFormat(glreader.GetValue(glreader.GetOrdinal("taxdate")))
+                taxdate_bt = Function_Form.convertDateFormat(glreader.GetValue(glreader.GetOrdinal("taxdate_bt")))
                 lkdoc_type = glreader.GetValue(glreader.GetOrdinal("lkdoc_type")).ToString.Trim
                 lkdoc_no = glreader.GetValue(glreader.GetOrdinal("lkdoc_no")).ToString.Trim
                 lkseq = glreader.GetValue(glreader.GetOrdinal("lkseq")).ToString.Trim
@@ -1587,7 +1499,7 @@ Public Class Credit_Note_Form
                 Dim serialnos As New List(Of String)(value_arraylist(7)(row)(1).ToString.Trim.Split(","c))
                 For sn = 0 To serialnos.Count - 1
                     Dim serialno As String = serialnos(sn)
-                    Dim qty = "-1"
+                    Dim qty = "1"
                     Dim location = value_arraylist(7)(row)(4)
                     Dim doc_no = value_arraylist(7)(row)(8)
                     Dim line_no = value_arraylist(7)(row)(9)
@@ -1596,7 +1508,7 @@ Public Class Credit_Note_Form
                     Dim serialNoProdCommand As String = "UPDATE prodsn SET "
                     Dim serialNoColumns = "qty='" + qty + "',"
                     serialNoColumns += "location='" + location + "',"
-                    serialNoColumns += "doc_type='DN',"
+                    serialNoColumns += "doc_type='CN',"
                     serialNoColumns += "doc_no='" + doc_no + "',"
                     serialNoColumns += "line_no='" + line_no + "',"
                     serialNoColumns += "doc_date='" + doc_date + "' "
@@ -1607,7 +1519,7 @@ Public Class Credit_Note_Form
                     command.ExecuteNonQuery()
                     rowUpdateNum += 1
                     Dim serialNoStockdCommand As String = "INSERT INTO stocksn (prodcode,serialno,doc_type,doc_no,line_no,doc_date,qty,location) VALUES ('"
-                    serialNoStockdCommand += procode + "','" + serialno + "','DN','" + doc_no + "','" + line_no + "','" + doc_date + "','" + qty + "','" + location + "')"
+                    serialNoStockdCommand += procode + "','" + serialno + "','CN','" + doc_no + "','" + line_no + "','" + doc_date + "','" + qty + "','" + location + "')"
                     Dim command2 = New SqlCommand(serialNoStockdCommand, myConn)
                     command2.ExecuteNonQuery()
                     'MsgBox(serialNoStockdCommand)
@@ -1711,7 +1623,7 @@ Public Class Credit_Note_Form
         Next
 
         Function_Form.promptImportSuccess(rowInsertNum, rowUpdateNum)
-        Function_Form.printExcelResult("Debit_Note", queryTable, value_arraylist, sql_format_arraylist, dgvExcel)
+        Function_Form.printExcelResult("Credit_Note", queryTable, value_arraylist, sql_format_arraylist, dgvExcel)
     End Sub
     Private Function existed_checker(table As String, sql_value As String, value As String)
         myConn.Open()

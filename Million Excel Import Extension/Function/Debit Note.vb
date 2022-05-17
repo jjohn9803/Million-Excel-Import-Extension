@@ -199,8 +199,8 @@ Public Class Debit_Note_Form
                                     value = "   "
                                     value_arraylist(i)(row).add("   ")
                                 ElseIf data_type_temp.ToString.Contains("date") Or data_type_temp.ToString.Contains("time") Then
-                                    value = Function_Form.convertDateFormat(New Date(1900, 1, 1).ToString)
-                                    value_arraylist(i)(row).add(Function_Form.convertDateFormat(New Date(1900, 1, 1).ToString))
+                                    value = Function_Form.getNull(1)
+                                    value_arraylist(i)(row).add(Function_Form.getNull(1))
                                 Else
                                     value = "0"
                                     value_arraylist(i)(row).add("0")
@@ -254,7 +254,7 @@ Public Class Debit_Note_Form
                                             If data_type_temp.ToString.Contains("char") Or data_type_temp.ToString.Contains("text") Then
                                                 value_arraylist(i)(row)(g) = "   "
                                             ElseIf data_type_temp.ToString.Contains("date") Or data_type_temp.ToString.Contains("time") Then
-                                                value_arraylist(i)(row)(g) = Function_Form.convertDateFormat(New Date(1900, 1, 1).ToString)
+                                                value_arraylist(i)(row)(g) = Function_Form.getNull(1)
                                             Else
                                                 value_arraylist(i)(row)(g) = "0"
                                             End If
@@ -828,122 +828,35 @@ Public Class Debit_Note_Form
                     End If
                 End If
 
-                'gldata.accno / exist (Cash, Bank) Acc_No1
-                If Not value_arraylist(0)(row)(73).ToString.Trim.Equals(String.Empty) Then
-                    table = "gldata"
-                    value_name = "accno"
-                    value = value_arraylist(0)(row)(73)
-                    myConn.Open()
-                    Dim sncommand = New SqlCommand("select * from " + table + " WHERE (classify = 'C' OR classify = 'B') AND accno='" + value + "'", myConn)
-                    Dim snreader As SqlDataReader = sncommand.ExecuteReader
-                    Dim exist_acc = False
-                    While snreader.Read()
-                        exist_acc = True
-                    End While
-                    If exist_acc = False Then
-                        execute_valid = False
-                        exist_result += value_name + " '" + value + "' is not found in the database (" + table + ")!" + vbNewLine
-                    End If
-                    myConn.Close()
-                Else
-                    'payment set empty
-                    value_arraylist(0)(row)(73) = Function_Form.getNull(0)
-                    value_arraylist(0)(row)(74) = Function_Form.getNull(0)
-                    value_arraylist(0)(row)(75) = Function_Form.getNull(3)
+                'Empty Section
+                'sinv.no / not empty
+                value = value_arraylist(0)(row)(1)
+                If value.Trim.Equals(String.Empty) Then
+                    Dim doc_no = value_arraylist(0)(row)(1)
+                    execute_valid = False
+                    exist_result += "Document No '" + doc_no + "' cannot be empty!" + vbNewLine
                 End If
 
-                'gldata.accno / exist (Cash, Bank) Acc_No2
-                If Not value_arraylist(0)(row)(78).ToString.Trim.Equals(String.Empty) Then
-                    table = "gldata"
-                    value_name = "accno"
-                    value = value_arraylist(0)(row)(78)
-                    myConn.Open()
-                    Dim sncommand = New SqlCommand("select * from " + table + " WHERE (classify = 'C' OR classify = 'B') AND accno='" + value + "'", myConn)
-                    Dim snreader As SqlDataReader = sncommand.ExecuteReader
-                    Dim exist_acc = False
-                    While snreader.Read()
-                        exist_acc = True
-                    End While
-                    If exist_acc = False Then
-                        execute_valid = False
-                        exist_result += value_name + " '" + value + "' is not found in the database (" + table + ")!" + vbNewLine
-                    End If
-                    myConn.Close()
-                Else
-                    'payment set empty
-                    value_arraylist(0)(row)(78) = Function_Form.getNull(0)
-                    value_arraylist(0)(row)(79) = Function_Form.getNull(0)
-                    value_arraylist(0)(row)(80) = Function_Form.getNull(3)
+                'sinv.custcode / not empty
+                value = value_arraylist(0)(row)(10)
+                If value.Trim.Equals(String.Empty) Then
+                    Dim doc_no = value_arraylist(0)(row)(1)
+                    execute_valid = False
+                    exist_result += "Customer Code '" + doc_no + "' cannot be empty!" + vbNewLine
                 End If
 
-                'gldata.accno / exist (Cash, Bank) Acc_No3
-                If Not value_arraylist(0)(row)(83).ToString.Trim.Equals(String.Empty) Then
-                    table = "gldata"
-                    value_name = "accno"
-                    value = value_arraylist(0)(row)(83)
-                    myConn.Open()
-                    Dim sncommand = New SqlCommand("select * from " + table + " WHERE (classify = 'C' OR classify = 'B') AND accno='" + value + "'", myConn)
-                    Dim snreader As SqlDataReader = sncommand.ExecuteReader
-                    Dim exist_acc = False
-                    While snreader.Read()
-                        exist_acc = True
-                    End While
-                    If exist_acc = False Then
-                        execute_valid = False
-                        exist_result += value_name + " '" + value + "' is not found in the database (" + table + ")!" + vbNewLine
-                    End If
-                    myConn.Close()
-                Else
-                    'payment set empty
-                    value_arraylist(0)(row)(83) = Function_Form.getNull(0)
-                    value_arraylist(0)(row)(84) = Function_Form.getNull(0)
-                    value_arraylist(0)(row)(85) = Function_Form.getNull(3)
+                'sinv.reason / not empty
+                value = value_arraylist(0)(row)(72)
+                If value.Trim.Equals(String.Empty) Then
+                    Dim doc_no = value_arraylist(0)(row)(1)
+                    execute_valid = False
+                    exist_result += "Reason '" + doc_no + "' cannot be empty!" + vbNewLine
                 End If
 
-                'gldata.accno / exist (Cash, Bank) Acc_No4
-                If Not value_arraylist(0)(row)(86).ToString.Trim.Equals(String.Empty) Then
-                    table = "gldata"
-                    value_name = "accno"
-                    value = value_arraylist(0)(row)(86)
-                    myConn.Open()
-                    Dim sncommand = New SqlCommand("select * from " + table + " WHERE (classify = 'C' OR classify = 'B') AND accno='" + value + "'", myConn)
-                    Dim snreader As SqlDataReader = sncommand.ExecuteReader
-                    Dim exist_acc = False
-                    While snreader.Read()
-                        exist_acc = True
-                    End While
-                    If exist_acc = False Then
-                        execute_valid = False
-                        exist_result += value_name + " '" + value + "' is not found in the database (" + table + ")!" + vbNewLine
-                    End If
-                    myConn.Close()
-                Else
-                    'payment set empty
-                    value_arraylist(0)(row)(86) = Function_Form.getNull(0)
-                    value_arraylist(0)(row)(87) = Function_Form.getNull(0)
-                    value_arraylist(0)(row)(88) = Function_Form.getNull(3)
-                End If
             End If
 
             'Sales Invoice Desc
             If Not value_arraylist(1)(row)(0).Equals(String.Empty) Then
-                'sinvdet.doc_no / duplicate
-                'table = "sinvdet"
-                'value_name = "doc_no"
-                'value = value_arraylist(1)(row)(2)
-                'If Not value.Trim.Equals(String.Empty) Then
-                '    If existed_checker(table, value_name, value) Then
-                '        execute_valid = False
-                '        exist_result += value_name + " '" + value + "' already existed in the database (" + table + ")!" + vbNewLine
-                '    End If
-                '    If Function_Form.repeatedExcelCell(dgvExcel, excel_format_arraylist(1)(2), value, row) Then
-                '        execute_valid = False
-                '        If Not exist_result.Contains(excel_format_arraylist(1)(2) + " '" + value + "' is repeated!") Then
-                '            exist_result += excel_format_arraylist(1)(2) + " '" + value + "' is repeated!" + vbNewLine
-                '        End If
-                '    End If
-                'End If
-
                 'product.prodcode / exist
                 table = "product"
                 value_name = "prodcode"

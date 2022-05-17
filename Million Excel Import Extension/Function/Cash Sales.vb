@@ -199,8 +199,8 @@ Public Class Cash_Sales_Form
                                     value = "   "
                                     value_arraylist(i)(row).add("   ")
                                 ElseIf data_type_temp.ToString.Contains("date") Or data_type_temp.ToString.Contains("time") Then
-                                    value = Function_Form.convertDateFormat(New Date(1900, 1, 1).ToString)
-                                    value_arraylist(i)(row).add(Function_Form.convertDateFormat(New Date(1900, 1, 1).ToString))
+                                    value = Function_Form.getNull(1)
+                                    value_arraylist(i)(row).add(Function_Form.getNull(1))
                                 Else
                                     value = "0"
                                     value_arraylist(i)(row).add("0")
@@ -263,7 +263,7 @@ Public Class Cash_Sales_Form
                                             If data_type_temp.ToString.Contains("char") Or data_type_temp.ToString.Contains("text") Then
                                                 value_arraylist(i)(row)(g) = "   "
                                             ElseIf data_type_temp.ToString.Contains("date") Or data_type_temp.ToString.Contains("time") Then
-                                                value_arraylist(i)(row)(g) = Function_Form.convertDateFormat(New Date(1900, 1, 1).ToString)
+                                                value_arraylist(i)(row)(g) = Function_Form.getNull(1)
                                             Else
                                                 value_arraylist(i)(row)(g) = "0"
                                             End If

@@ -186,8 +186,8 @@ Public Class Quotation_Form
                                     value = "   "
                                     value_arraylist(i)(row).add("   ")
                                 ElseIf data_type_temp.ToString.Contains("date") Or data_type_temp.ToString.Contains("time") Then
-                                    value = New Date(1900, 1, 1).ToString
-                                    value_arraylist(i)(row).add(New Date(1900, 1, 1).ToString("yyyy-MM-dd HH:mm:ss"))
+                                    value = Function_Form.getNull(1)
+                                    value_arraylist(i)(row).add(Function_Form.getNull(1))
                                 Else
                                     value = "0"
                                     value_arraylist(i)(row).add("0")
@@ -250,7 +250,7 @@ Public Class Quotation_Form
                                             If data_type_temp.ToString.Contains("char") Or data_type_temp.ToString.Contains("text") Then
                                                 value_arraylist(i)(row)(g) = "   "
                                             ElseIf data_type_temp.ToString.Contains("date") Or data_type_temp.ToString.Contains("time") Then
-                                                value_arraylist(i)(row)(g) = New Date(1900, 1, 1).ToString("yyyy-MM-dd HH:mm:ss")
+                                                value_arraylist(i)(row)(g) = Function_Form.getNull(1)
                                             Else
                                                 value_arraylist(i)(row)(g) = "0"
                                             End If

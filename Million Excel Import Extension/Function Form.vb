@@ -1,8 +1,15 @@
 ﻿Imports System.IO
 Imports ClosedXML.Excel
 Imports ExcelDataReader
+Imports System.Data.SqlClient
 
 Public Class Function_Form
+    Private Shared serverName As String
+    Private Shared database As String
+    Private Shared myConn As SqlConnection
+    Private Shared statusConnection As Boolean
+    Private Shared pwd_query As String
+    Private Shared import_type As String
     Private Sub openExcelImport(sender As Object, e As EventArgs) Handles btnQuotation.Click, btnDeliveryOrder.Click, btnSalesOrder.Click, btnSalesInvoice.Click, btnCashSales.Click, btnDebitNote.Click, btnCreditNote.Click
         Dim formName = sender.text
         If Not Main_Form.getFeatures.Contains(sender.text) Then
@@ -22,6 +29,8 @@ Public Class Function_Form
             form = New Cash_Sales_Form
         ElseIf formName.Equals("Debit Note") Then
             form = New Debit_Note_Form
+        ElseIf formName.Equals("Credit Note") Then
+            form = New Credit_Note_Form
         End If
         If Main_Form.getStatusConnection And Not Main_Form.getDatabase.Equals(String.Empty) Then
             Main_Form.setImport_type(formName)
@@ -182,7 +191,11 @@ Public Class Function_Form
         Return result
     End Function
     Public Shared Function convertDateFormat(ByVal datetime As String) As String
-        Return Convert.ToDateTime(datetime).ToString("yyyy-MM-dd HH:mm:ss")
+        Dim convertedDate As String = Convert.ToDateTime(datetime).ToString("yyyy-MM-dd HH:mm:ss")
+        If convertedDate.Equals("2000-01-01 00:00:00") Then
+            convertedDate = Convert.ToDateTime(New Date(1900, 1, 1)).ToString("yyyy-MM-dd HH:mm:ss")
+        End If
+        Return convertedDate
     End Function
     Public Shared Function queryValue(ByVal value) As String
         Return "'" + value.ToString + "',"
@@ -208,5 +221,28 @@ Public Class Function_Form
             End If
         Next
         Return repeat_valid
+    End Function
+    Public Shared Function getCurrDoc(prefix As String, curr_no As Integer, doc_width As Integer) As String
+        Dim prefix_temp As String = prefix
+        Dim curr_no_temp As Integer = curr_no
+        Dim doc_width_temp As Integer = doc_width
+
+        serverName = Main_Form.getServerName
+        database = Main_Form.getDatabase
+        pwd_query = Main_Form.getPwd_query
+        myConn = New SqlConnection("Data Source=" + serverName + ";" & "Initial Catalog=" + database + ";" + pwd_query)
+
+        Try
+            myConn.Open()
+            Dim cmd As New SqlCommand
+            cmd.CommandType = CommandType.Text
+            cmd.CommandText = "UPDATE defdocno SET curr_no='" + (curr_no + 1) + "' WHERE prefix='" + prefix_temp + "'"
+            cmd.Connection = myConn
+            cmd.ExecuteNonQuery() '
+            myConn.Close()
+        Catch ex As Exception
+            MsgBox(ex.Message, MsgBoxStyle.Critical)
+        End Try
+        Return prefix_temp + curr_no_temp.ToString("D" + doc_width_temp.ToString)
     End Function
 End Class
