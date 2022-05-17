@@ -1420,8 +1420,8 @@ Public Class Debit_Note_Form
                 billtype = glreader.GetValue(glreader.GetOrdinal("billtype")).ToString.Trim
                 spcode = glreader.GetValue(glreader.GetOrdinal("spcode")).ToString.Trim
                 taxcode = glreader.GetValue(glreader.GetOrdinal("taxcode")).ToString.Trim
-                taxdate = glreader.GetValue(glreader.GetOrdinal("taxdate")).ToString.Trim
-                taxdate_bt = glreader.GetValue(glreader.GetOrdinal("taxdate_bt")).ToString.Trim
+                taxdate = Function_Form.convertDateFormat(glreader.GetValue(glreader.GetOrdinal("taxdate")))
+                taxdate_bt = Function_Form.convertDateFormat(glreader.GetValue(glreader.GetOrdinal("taxdate_bt")))
                 lkdoc_type = glreader.GetValue(glreader.GetOrdinal("lkdoc_type")).ToString.Trim
                 lkdoc_no = glreader.GetValue(glreader.GetOrdinal("lkdoc_no")).ToString.Trim
                 lkseq = glreader.GetValue(glreader.GetOrdinal("lkseq")).ToString.Trim
