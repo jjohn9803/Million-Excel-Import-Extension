@@ -1029,7 +1029,9 @@ Public Class Delivery_Return_Form
                     Dim sncommand = New SqlCommand("select stocksn.serialno from stocksn LEFT JOIN prodsn ON stocksn.serialno = prodsn.serialno WHERE (stocksn.serialno = '" + serialno + "' AND stocksn.qty='-1') OR (prodsn.serialno = '" + serialno + "' AND prodsn.qty='-1')", myConn)
                     Dim snreader As SqlDataReader = sncommand.ExecuteReader
                     While snreader.Read()
-                        msg_serial += snreader.GetValue(0).ToString.Trim + vbTab
+                        If Not msg_serial.Contains(snreader.GetValue(0).ToString.Trim) Then
+                            msg_serial += snreader.GetValue(0).ToString.Trim + vbTab
+                        End If
                         exist_serial = True
                     End While
                     myConn.Close()
@@ -1037,7 +1039,7 @@ Public Class Delivery_Return_Form
             End If
         Next
         If exist_serial Then
-            MsgBox("The following serial no has been used:" + vbNewLine + msg_serial + "The operation has been stopped!", MsgBoxStyle.Exclamation)
+            MsgBox("The following serial no has been used:" + vbNewLine + msg_serial + vbNewLine + "The operation has been stopped!", MsgBoxStyle.Exclamation)
             Return
         End If
 

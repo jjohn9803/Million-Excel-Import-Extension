@@ -437,7 +437,7 @@ Public Class Delivery_Order_Form
 
             'amt
             If value_arraylist(1)(row)(27).Equals("{FORMULA_VALUE}") Then
-                Dim taxcode = dgvExcel.Rows(row).Cells("Tax Code").Value.ToString.Trim
+                Dim taxcode = value_arraylist(1)(row)(54)
                 Dim taxinclude As Boolean = False
                 If Not taxcode.Equals(String.Empty) Then
                     init()
@@ -1029,7 +1029,9 @@ Public Class Delivery_Order_Form
                     Dim sncommand = New SqlCommand("select stocksn.serialno from stocksn LEFT JOIN prodsn ON stocksn.serialno = prodsn.serialno WHERE (stocksn.serialno = '" + serialno + "' AND stocksn.qty='-1') OR (prodsn.serialno = '" + serialno + "' AND prodsn.qty='-1')", myConn)
                     Dim snreader As SqlDataReader = sncommand.ExecuteReader
                     While snreader.Read()
-                        msg_serial += vbTab + snreader.GetValue(0) + vbNewLine
+                        If Not msg_serial.Contains(snreader.GetValue(0).ToString.Trim) Then
+                            msg_serial += snreader.GetValue(0).ToString.Trim + vbTab
+                        End If
                         exist_serial = True
                     End While
                     myConn.Close()
@@ -1037,7 +1039,7 @@ Public Class Delivery_Order_Form
             End If
         Next
         If exist_serial Then
-            MsgBox("The following serial no has been used:" + vbNewLine + msg_serial + "The operation has been stopped!", MsgBoxStyle.Exclamation)
+            MsgBox("The following serial no has been used:" + vbNewLine + msg_serial + vbNewLine + "The operation has been stopped!", MsgBoxStyle.Exclamation)
             Return
         End If
 
