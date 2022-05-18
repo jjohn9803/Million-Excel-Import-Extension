@@ -2223,7 +2223,7 @@ Public Class Sales_Invoice_Form
             End If
         Next
 
-        For i As Integer = 0 To 2
+        For i As Integer = 0 To 1
             init()
             Using command As New SqlCommand("", myConn)
                 For row As Integer = 0 To dgvExcel.RowCount - 1
@@ -2238,17 +2238,6 @@ Public Class Sales_Invoice_Form
                                 ElseIf data_type_arraylist(i)(g).ToString.Trim.Contains("date") Then
                                     query += "'" + Function_Form.convertDateFormat(value_temp) + "',"
                                     value_arraylist(i)(row)(g) = Function_Form.convertDateFormat(value_temp)
-                                ElseIf i = 2 And g = 3 Then
-                                    Dim dkeyFromDO As String = ""
-                                    Dim command_temp = New SqlCommand("SELECT TOP 1 dkey FROM sinvdet WHERE doc_no ='" + value_arraylist(2)(row)(2) + "' AND line_no ='" + value_arraylist(2)(row)(4) + "'", myConn)
-                                    myConn.Open()
-                                    Dim reader_temp As SqlDataReader = command_temp.ExecuteReader
-                                    While reader_temp.Read()
-                                        dkeyFromDO = reader_temp.GetValue(0).ToString
-                                    End While
-                                    myConn.Close()
-                                    query += "'" + dkeyFromDO + "',"
-                                    value_arraylist(2)(row)(3) = dkeyFromDO
                                 ElseIf Not (value_temp.Equals("{._!@#$%^&*()}")) Then
                                     query += "'" + value_temp + "',"
                                 End If
@@ -2271,6 +2260,70 @@ Public Class Sales_Invoice_Form
                 Next
             End Using
         Next
+
+        'stock
+        For row As Integer = 0 To dgvExcel.RowCount - 1
+            If Not value_arraylist(1)(row)(4).ToString.Trim.Equals(String.Empty) Then
+                Dim mySource As Integer = -1
+                For Each target In rangeQuo
+                    If target.ToString.Split(".")(1).Equals(row.ToString) Then
+                        Dim sourceRow = CInt(target.ToString.Split(".")(0))
+                        mySource = sourceRow
+                    End If
+                Next
+
+                Dim insertArray As New ArrayList
+                insertArray.Add(value_arraylist(1)(row)(4)) 'prodcode
+                insertArray.Add(value_arraylist(1)(row)(1)) 'doc_type
+                insertArray.Add(value_arraylist(1)(row)(2)) 'doc_no
+
+                Dim dkeyFromDO As String = ""
+                Dim command_temp = New SqlCommand("SELECT TOP 1 dkey FROM sinvdet WHERE doc_no ='" + value_arraylist(2)(row)(2) + "' AND line_no ='" + value_arraylist(2)(row)(4) + "'", myConn)
+                myConn.Open()
+                Dim reader_temp As SqlDataReader = command_temp.ExecuteReader
+                While reader_temp.Read()
+                    dkeyFromDO = reader_temp.GetValue(0).ToString
+                End While
+                myConn.Close()
+                value_arraylist(2)(row)(3) = dkeyFromDO
+                insertArray.Add(dkeyFromDO) 'dkey
+
+                insertArray.Add(value_arraylist(1)(row)(3)) 'line_no
+                insertArray.Add(value_arraylist(0)(mySource)(2)) 'doc_date
+                insertArray.Add(value_arraylist(0)(mySource)(10)) 'doc_desp
+                insertArray.Add(Function_Form.getNull(0)) 'doc_desp2
+                insertArray.Add(value_arraylist(0)(mySource)(10)) 'custcode
+                insertArray.Add(Function_Form.getNull(0)) 'suppcode
+                insertArray.Add(value_arraylist(0)(mySource)(8)) 'refno
+                insertArray.Add(value_arraylist(0)(mySource)(9)) 'refno2
+                insertArray.Add(value_arraylist(1)(row)(9)) 'qty
+                insertArray.Add(Function_Form.getNull(3)) 'cost
+                insertArray.Add(value_arraylist(1)(row)(12)) 'price
+                insertArray.Add(Function_Form.getNull(3)) 'local_amount
+                insertArray.Add(Function_Form.getNull(3)) 'utd_cost
+                insertArray.Add(value_arraylist(1)(row)(55)) 'location
+                insertArray.Add(value_arraylist(1)(row)(56)) 'batchcode
+                insertArray.Add(value_arraylist(1)(row)(58)) 'projcode
+                insertArray.Add(value_arraylist(1)(row)(59)) 'deptcode
+                insertArray.Add(Function_Form.getNull(0)) 'pkdoc_type
+                insertArray.Add(Function_Form.getNull(0)) 'pkdoc_no
+                insertArray.Add(Function_Form.getNull(3)) 'pkdkey
+                insertArray.Add(Function_Form.getNull(3)) 'bfseq
+                Dim stockCommand As String = queryTable(2)(2)
+                For Each query In insertArray
+                    stockCommand += "'" + query.ToString + "',"
+                Next
+                stockCommand = stockCommand.Substring(0, stockCommand.Length - 1) + ")"
+                Dim command = New SqlCommand(stockCommand, myConn)
+                myConn.Open()
+                'Clipboard.SetText(stockCommand)
+                'MsgBox(stockCommand)
+                command.ExecuteNonQuery()
+                rowInsertNum += 1
+                myConn.Close()
+            End If
+        Next
+
         Function_Form.promptImportSuccess(rowInsertNum, rowUpdateNum)
         Function_Form.printExcelResult("Sales_Invoice", queryTable, value_arraylist, sql_format_arraylist, dgvExcel)
     End Sub

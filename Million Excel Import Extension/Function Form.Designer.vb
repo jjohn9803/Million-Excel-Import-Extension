@@ -30,6 +30,7 @@ Partial Class Function_Form
         Me.btnCashSales = New System.Windows.Forms.Button()
         Me.btnDebitNote = New System.Windows.Forms.Button()
         Me.btnCreditNote = New System.Windows.Forms.Button()
+        Me.btnDeliveryReturn = New System.Windows.Forms.Button()
         Me.FlowLayoutPanel1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -42,6 +43,7 @@ Partial Class Function_Form
         Me.FlowLayoutPanel1.Controls.Add(Me.btnCashSales)
         Me.FlowLayoutPanel1.Controls.Add(Me.btnDebitNote)
         Me.FlowLayoutPanel1.Controls.Add(Me.btnCreditNote)
+        Me.FlowLayoutPanel1.Controls.Add(Me.btnDeliveryReturn)
         Me.FlowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.FlowLayoutPanel1.Location = New System.Drawing.Point(0, 0)
         Me.FlowLayoutPanel1.Margin = New System.Windows.Forms.Padding(4)
@@ -133,6 +135,18 @@ Partial Class Function_Form
         Me.btnCreditNote.Text = "Credit Note"
         Me.btnCreditNote.UseVisualStyleBackColor = True
         '
+        'btnDeliveryReturn
+        '
+        Me.btnDeliveryReturn.Font = New System.Drawing.Font("Microsoft YaHei", 12.0!)
+        Me.btnDeliveryReturn.Location = New System.Drawing.Point(313, 331)
+        Me.btnDeliveryReturn.Margin = New System.Windows.Forms.Padding(67, 37, 4, 37)
+        Me.btnDeliveryReturn.Name = "btnDeliveryReturn"
+        Me.btnDeliveryReturn.Size = New System.Drawing.Size(175, 73)
+        Me.btnDeliveryReturn.TabIndex = 10
+        Me.btnDeliveryReturn.TabStop = False
+        Me.btnDeliveryReturn.Text = "Delivery Return"
+        Me.btnDeliveryReturn.UseVisualStyleBackColor = True
+        '
         'Function_Form
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
@@ -155,4 +169,5 @@ Partial Class Function_Form
     Friend WithEvents btnCashSales As Button
     Friend WithEvents btnDebitNote As Button
     Friend WithEvents btnCreditNote As Button
+    Friend WithEvents btnDeliveryReturn As Button
 End Class

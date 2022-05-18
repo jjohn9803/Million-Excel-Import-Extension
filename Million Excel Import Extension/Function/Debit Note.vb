@@ -1570,7 +1570,15 @@ Public Class Debit_Note_Form
 
         'stock
         For row As Integer = 0 To dgvExcel.RowCount - 1
-            If Not value_arraylist(7)(row)(1).ToString.Trim.Equals(String.Empty) Then
+            If Not value_arraylist(1)(row)(4).ToString.Trim.Equals(String.Empty) Then
+                Dim mySource As Integer = -1
+                For Each target In rangeQuo
+                    If target.ToString.Split(".")(1).Equals(row.ToString) Then
+                        Dim sourceRow = CInt(target.ToString.Split(".")(0))
+                        mySource = sourceRow
+                    End If
+                Next
+
                 Dim insertArray As New ArrayList
                 insertArray.Add(value_arraylist(1)(row)(4)) 'prodcode
                 insertArray.Add(value_arraylist(1)(row)(1)) 'doc_type
@@ -1588,13 +1596,13 @@ Public Class Debit_Note_Form
                 insertArray.Add(dkeyFromDO) 'dkey
 
                 insertArray.Add(value_arraylist(1)(row)(3)) 'line_no
-                insertArray.Add(value_arraylist(0)(row)(2)) 'doc_date
-                insertArray.Add(value_arraylist(0)(row)(3)) 'doc_desp
-                insertArray.Add(value_arraylist(0)(row)(4)) 'doc_desp2
-                insertArray.Add(value_arraylist(0)(row)(10)) 'custcode
+                insertArray.Add(value_arraylist(0)(mySource)(2)) 'doc_date
+                insertArray.Add(value_arraylist(0)(mySource)(10)) 'doc_desp
+                insertArray.Add(Function_Form.getNull(0)) 'doc_desp2
+                insertArray.Add(value_arraylist(0)(mySource)(10)) 'custcode
                 insertArray.Add(Function_Form.getNull(0)) 'suppcode
-                insertArray.Add(value_arraylist(0)(row)(8)) 'refno
-                insertArray.Add(value_arraylist(0)(row)(9)) 'refno2
+                insertArray.Add(value_arraylist(0)(mySource)(8)) 'refno
+                insertArray.Add(value_arraylist(0)(mySource)(9)) 'refno2
                 insertArray.Add(value_arraylist(1)(row)(9)) 'qty
                 insertArray.Add(Function_Form.getNull(3)) 'cost
                 insertArray.Add(value_arraylist(1)(row)(12)) 'price

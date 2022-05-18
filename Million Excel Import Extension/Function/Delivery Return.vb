@@ -437,7 +437,7 @@ Public Class Delivery_Return_Form
 
             'amt
             If value_arraylist(1)(row)(27).Equals("{FORMULA_VALUE}") Then
-                Dim taxcode = dgvExcel.Rows(row).Cells("Tax Code").Value.ToString.Trim
+                Dim taxcode = value_arraylist(1)(row)(54)
                 Dim taxinclude As Boolean = False
                 If Not taxcode.Equals(String.Empty) Then
                     init()
@@ -566,7 +566,7 @@ Public Class Delivery_Return_Form
 
         Next
 
-        'Hardcore Formula sinv
+        'Hardcore Formula sdo
         For row As Integer = 0 To dgvExcel.RowCount - 1
             If Not value_arraylist(0)(row)(0).Equals("{INVALID ARRAY}") Then
 
@@ -578,16 +578,28 @@ Public Class Delivery_Return_Form
                     End If
                 Next
 
-                'sinv.discount
-                If value_arraylist(0)(row)(21).Equals("{FORMULA_VALUE}") Then
-                    Dim discount1 = CDbl(value_arraylist(0)(row)(19))
-                    Dim discount2 = CDbl(value_arraylist(0)(row)(20))
-                    Dim discount = discount1 * discount2
-                    value_arraylist(0)(row)(21) = Math.Round(discount, 2)
+                'sdo.address set address to default delivery address
+                If value_arraylist(0)(row)(11).ToString.Trim.Equals(String.Empty) Then
+                    Dim custcode = value_arraylist(0)(row)(9).ToString.Trim
+                    myConn.Open()
+                    Dim addrcommand = New SqlCommand("select daddr from customer WHERE custcode='" + custcode + "'", myConn)
+                    Dim addrreader As SqlDataReader = addrcommand.ExecuteReader
+                    While addrreader.Read()
+                        value_arraylist(0)(row)(11) = addrreader.GetValue(0)
+                    End While
+                    myConn.Close()
                 End If
 
-                'sinv.taxable
-                If value_arraylist(0)(row)(27).Equals("{FORMULA_VALUE}") Then
+                'sdo.discount
+                If value_arraylist(0)(row)(20).Equals("{FORMULA_VALUE}") Then
+                    Dim discount1 = CDbl(value_arraylist(0)(row)(18))
+                    Dim discount2 = CDbl(value_arraylist(0)(row)(19))
+                    Dim discount = discount1 * discount2
+                    value_arraylist(0)(row)(20) = Math.Round(discount, 2)
+                End If
+
+                'sdo.taxable
+                If value_arraylist(0)(row)(26).Equals("{FORMULA_VALUE}") Then
                     'get query target
 
                     Dim taxable As Double = 0
@@ -598,308 +610,120 @@ Public Class Delivery_Return_Form
                             taxable += nett_amt
                         End If
                     Next
-                    value_arraylist(0)(row)(27) = Math.Round(taxable, 2)
+                    value_arraylist(0)(row)(26) = Math.Round(taxable, 2)
                 End If
 
-                'sinv.tax
-                If value_arraylist(0)(row)(31).Equals("{FORMULA_VALUE}") Then
+                'sdo.tax
+                If value_arraylist(0)(row)(30).Equals("{FORMULA_VALUE}") Then
                     Dim tax As Double = 0
                     For Each targetRow As Integer In myTarget
                         Dim taxamt1 = value_arraylist(1)(targetRow)(20)
                         Dim taxamt2 = value_arraylist(1)(targetRow)(21)
                         tax += taxamt1 + taxamt2
                     Next
-                    value_arraylist(0)(row)(31) = Math.Round(tax, 2)
+                    value_arraylist(0)(row)(30) = Math.Round(tax, 2)
                 End If
 
-                'sinv.subtotal
-                If value_arraylist(0)(row)(33).Equals("{FORMULA_VALUE}") Then
+                'sdo.subtotal
+                If value_arraylist(0)(row)(32).Equals("{FORMULA_VALUE}") Then
                     Dim subtotal As Double = 0
                     For Each targetRow As Integer In myTarget
                         Dim amt = value_arraylist(1)(targetRow)(27)
                         subtotal += amt
                     Next
-                    value_arraylist(0)(row)(33) = Math.Round(subtotal, 2)
+                    value_arraylist(0)(row)(32) = Math.Round(subtotal, 2)
                 End If
 
-                'sinv.nett
-                If value_arraylist(0)(row)(34).Equals("{FORMULA_VALUE}") Then
+                'sdo.nett
+                If value_arraylist(0)(row)(33).Equals("{FORMULA_VALUE}") Then
                     Dim nett As Double = 0
                     For Each targetRow As Integer In myTarget
                         Dim nett_amt = value_arraylist(1)(targetRow)(26)
                         nett += nett_amt
                     Next
-                    value_arraylist(0)(row)(34) = Math.Round(nett, 2)
+                    value_arraylist(0)(row)(33) = Math.Round(nett, 2)
                 End If
 
-                'sinv.total
-                If value_arraylist(0)(row)(35).Equals("{FORMULA_VALUE}") Then
-                    Dim subtotal As Double = value_arraylist(0)(row)(33)
-                    Dim tax As Double = value_arraylist(0)(row)(31)
+                'sdo.total
+                If value_arraylist(0)(row)(34).Equals("{FORMULA_VALUE}") Then
+                    Dim subtotal As Double = value_arraylist(0)(row)(32)
+                    Dim tax As Double = value_arraylist(0)(row)(30)
                     'MsgBox(subtotal.ToString + vbTab + tax.ToString)
                     Dim total = subtotal + tax
-                    value_arraylist(0)(row)(35) = Math.Round(total, 2)
+                    value_arraylist(0)(row)(34) = Math.Round(total, 2)
                 End If
 
-                'sinv.local_gross
-                If value_arraylist(0)(row)(36).Equals("{FORMULA_VALUE}") Then
+                'sdo.local_gross
+                If value_arraylist(0)(row)(35).Equals("{FORMULA_VALUE}") Then
                     Dim local_gross As Double = 0
                     For Each targetRow As Integer In myTarget
                         Dim local_amt = value_arraylist(1)(targetRow)(36)
                         local_gross += local_amt
                     Next
-                    value_arraylist(0)(row)(36) = Math.Round(local_gross, 2)
+                    value_arraylist(0)(row)(35) = Math.Round(local_gross, 2)
                 End If
 
-                Dim fx_rate = value_arraylist(0)(row)(18)
+                Dim fx_rate = value_arraylist(0)(row)(17)
 
-                'sinv.local_discount
-                If value_arraylist(0)(row)(37).Equals("{FORMULA_VALUE}") Then
-                    Dim discount = value_arraylist(0)(row)(21)
+                'sdo.local_discount
+                If value_arraylist(0)(row)(36).Equals("{FORMULA_VALUE}") Then
+                    Dim discount = value_arraylist(0)(row)(20)
                     Dim local_discount = discount * fx_rate
-                    value_arraylist(0)(row)(37) = Math.Round(local_discount, 2)
+                    value_arraylist(0)(row)(36) = Math.Round(local_discount, 2)
                 End If
 
-                'sinv.local_nett
-                If value_arraylist(0)(row)(38).Equals("{FORMULA_VALUE}") Then
-                    Dim nett = value_arraylist(0)(row)(34)
+                'sdo.local_nett
+                If value_arraylist(0)(row)(37).Equals("{FORMULA_VALUE}") Then
+                    Dim nett = value_arraylist(0)(row)(33)
                     Dim local_nett = nett * fx_rate
-                    value_arraylist(0)(row)(38) = Math.Round(local_nett, 2)
+                    value_arraylist(0)(row)(37) = Math.Round(local_nett, 2)
                 End If
 
-                'sinv.local_tax1
-                If value_arraylist(0)(row)(39).Equals("{FORMULA_VALUE}") Then
-                    Dim tax1 = value_arraylist(0)(row)(28)
+                'sdo.local_tax1
+                If value_arraylist(0)(row)(38).Equals("{FORMULA_VALUE}") Then
+                    Dim tax1 = value_arraylist(0)(row)(27)
                     Dim local_tax1 = tax1 * fx_rate
-                    value_arraylist(0)(row)(39) = Math.Round(local_tax1, 2)
+                    value_arraylist(0)(row)(38) = Math.Round(local_tax1, 2)
                 End If
 
-                'sinv.local_tax2
-                If value_arraylist(0)(row)(40).Equals("{FORMULA_VALUE}") Then
-                    Dim tax2 = value_arraylist(0)(row)(29)
+                'sdo.local_tax2
+                If value_arraylist(0)(row)(39).Equals("{FORMULA_VALUE}") Then
+                    Dim tax2 = value_arraylist(0)(row)(28)
                     Dim local_tax2 = tax2 * fx_rate
-                    value_arraylist(0)(row)(40) = Math.Round(local_tax2, 2)
+                    value_arraylist(0)(row)(39) = Math.Round(local_tax2, 2)
                 End If
 
-                'sinv.local_tax
-                If value_arraylist(0)(row)(41).Equals("{FORMULA_VALUE}") Then
-                    Dim tax = value_arraylist(0)(row)(31)
+                'sdo.local_tax
+                If value_arraylist(0)(row)(40).Equals("{FORMULA_VALUE}") Then
+                    Dim tax = value_arraylist(0)(row)(30)
                     Dim local_tax = tax * fx_rate
-                    value_arraylist(0)(row)(41) = Math.Round(local_tax, 2)
+                    value_arraylist(0)(row)(40) = Math.Round(local_tax, 2)
                 End If
 
-                'sinv.local_rndoff
-                If value_arraylist(0)(row)(42).Equals("{FORMULA_VALUE}") Then
-                    Dim rndoff = value_arraylist(0)(row)(32)
+                'sdo.local_rndoff
+                If value_arraylist(0)(row)(41).Equals("{FORMULA_VALUE}") Then
+                    Dim rndoff = value_arraylist(0)(row)(31)
                     Dim local_rndoff = rndoff * fx_rate
-                    value_arraylist(0)(row)(42) = Math.Round(local_rndoff, 2)
+                    value_arraylist(0)(row)(41) = Math.Round(local_rndoff, 2)
                 End If
 
-                'sinv.local_total
-                If value_arraylist(0)(row)(43).Equals("{FORMULA_VALUE}") Then
-                    Dim total = value_arraylist(0)(row)(35)
+                'sdo.local_total
+                If value_arraylist(0)(row)(42).Equals("{FORMULA_VALUE}") Then
+                    Dim total = value_arraylist(0)(row)(34)
                     Dim local_total = total * fx_rate
-                    value_arraylist(0)(row)(43) = Math.Round(local_total, 2)
+                    value_arraylist(0)(row)(42) = Math.Round(local_total, 2)
                 End If
 
-                'sinv.local_totalrp
-                If value_arraylist(0)(row)(44).Equals("{FORMULA_VALUE}") Then
-                    Dim subtotal = value_arraylist(0)(row)(33)
+                'sdo.local_totalrp
+                If value_arraylist(0)(row)(43).Equals("{FORMULA_VALUE}") Then
+                    Dim subtotal = value_arraylist(0)(row)(32)
                     Dim local_totalrp = subtotal * fx_rate
-                    value_arraylist(0)(row)(44) = Math.Round(local_totalrp, 2)
+                    value_arraylist(0)(row)(43) = Math.Round(local_totalrp, 2)
                 End If
 
             End If
         Next
         'End Hardcode Formula
-
-
-        'For i As Integer = 0 To 0
-        '    For row As Integer = 0 To dgvExcel.RowCount - 1
-        '        For g As Integer = 0 To value_arraylist(i)(row).count - 1
-        '            Dim value_temp As String = value_arraylist(i)(row)(g).ToString.Trim
-        '            If value_temp.Equals("{FORMULA_VALUE}") Then
-        '                Dim formula_temp = formula_arraylist(i)(g).ToString.Trim
-        '                Dim finalized_temp = New List(Of String)(formula_temp.Split("?"c))
-        '                Dim cal_result = ""
-        '                Dim cal_type = ""
-        '                For Each local_formula As String In finalized_temp
-        '                    If local_formula.Contains("+") Or local_formula.Contains("-") Or local_formula.Contains("*") Then
-        '                        Dim expression = New List(Of String)(local_formula.Split(New [Char]() {"+"c, "*"c, "-"c}))
-        '                        Dim calculation = local_formula
-        '                        'MsgBox(local_formula)
-        '                        For Each express As String In expression
-        '                            Dim table_name_index = -1
-        '                            Dim table_value_index = -1
-        '                            Dim express_temp = (express.Replace("(", "")).Replace(")", "").Trim
-        '                            Dim cal_value_temp = ""
-        '                            If express_temp.Contains("~") Then
-        '                                Dim table_name = express_temp.Split("~")(0).Trim
-        '                                Dim table_value_name = express_temp.Split("~")(1).Trim
-        '                                For yu = 0 To queryTable.Count - 1
-        '                                    Dim search_table_name = queryTable(yu)(1)
-        '                                    If table_name.Equals(search_table_name) Then
-        '                                        table_name_index = yu
-        '                                    End If
-        '                                Next
-        '                                'table_name_index=找到quo还是quo_desc OUTPUT:0或者1 同辈：query.i value(这里)()()
-        '                                'getDescSource=找到这个desc是属于哪一个quo的(row) 例如：quo1拥有product1,2 quo2拥有product3,4,5 OUTPUT:0或者2 同辈：row value()(这里)()
-        '                                'table_value_index=从sql的0或1找到符合formula express value名字在valuearraylist的位置 value()()(这里)
-        '                                'value_arraylist=(type)(row)(value)
-        '                                table_value_index = sql_format_arraylist(table_name_index).IndexOf(table_value_name)
-
-        '                                Dim myTargets As New List(Of String)
-        '                                For Each target As String In rangeQuo
-        '                                    Dim rangeStart = target.Split(".")(0)
-        '                                    If rangeStart.Equals(row.ToString) Then
-        '                                        myTargets.Add(target.Split(".")(1))
-        '                                        'MsgBox(row.ToString + " is adding " + target.Split(".")(1) + " as its target")
-        '                                    End If
-        '                                Next
-        '                                For Each target As String In myTargets
-        '                                    Dim getValueOfTarget = value_arraylist(table_name_index)(CInt(target))(table_value_index).ToString.Trim
-        '                                    cal_value_temp += getValueOfTarget + "+"
-        '                                Next
-        '                                cal_value_temp = "(" + cal_value_temp.Substring(0, cal_value_temp.Length - 1) + ")"
-
-        '                                If cal_value_temp.Contains("{FORMULA_VALUE}") Then
-        '                                    MsgBox("No way formula_value gonna exists here!")
-        '                                    cal_value_temp = 0
-        '                                End If
-
-        '                                cal_type = "1"
-        '                            Else
-        '                                'valuearraylist(querytable,i)(table_name,0,1 % row)(table_index,values_index)
-        '                                'Dim getDescSource = CInt(rangeQuo(row).ToString.Split(".")(0))
-        '                                'table_name_index = 1
-        '                                table_name_index = i
-        '                                Dim table_value_name = express_temp.Trim
-        '                                table_value_index = sql_format_arraylist(table_name_index).IndexOf(table_value_name)
-        '                                If table_value_index <> -1 Then
-        '                                    cal_value_temp = value_arraylist(table_name_index)(row)(table_value_index).ToString.Trim
-        '                                    If cal_value_temp.Equals("{FORMULA_VALUE}") Then
-        '                                        MsgBox("WHY ARE YOU A FORMULA")
-        '                                        cal_value_temp = 0
-        '                                    End If
-        '                                Else
-        '                                    'MsgBox("404 not found" + vbNewLine + table_name_index.ToString + vbNewLine + row.ToString + vbNewLine + table_value_index.ToString + vbNewLine + table_value_name)
-        '                                End If
-
-        '                                cal_type = "2"
-        '                            End If
-        '                            'MsgBox("From " + express_temp.ToString + " TO " + cal_value_temp.ToString)
-        '                            If Not express_temp.Contains(".") Then
-        '                                calculation = calculation.Replace(express_temp, cal_value_temp)
-        '                            End If
-        '                        Next
-        '                        Try
-        '                            cal_result = New DataTable().Compute(calculation, Nothing)
-        '                            'MsgBox("After calculation and the result: " + cal_result)
-        '                        Catch ex As Exception
-        '                            MsgBox("This calculation has problem -> " + calculation + vbNewLine + local_formula, MsgBoxStyle.Exclamation)
-        '                            MsgBox(value_arraylist(0)(row)(33))
-        '                            'Dim str = ""
-        '                            'For Each temp As String In value_arraylist(0)(row)
-        '                            '    str += temp + vbTab
-        '                            'Next
-        '                            'MsgBox(str)
-        '                        End Try
-
-        '                        'MsgBox("Calculation:" + vbTab + calculation + vbNewLine + local_formula)
-        '                    Else
-        '                        '没有加减乘除的单个value
-        '                        Dim table_name_index = -1
-        '                        Dim table_value_index = -1
-        '                        Dim cal_value_temp = ""
-        '                        Dim calculation = local_formula
-        '                        If calculation.Contains("~") Then
-        '                            Dim table_name = calculation.Split("~")(0).Trim
-        '                            Dim table_value_name = calculation.Split("~")(1).Trim
-        '                            For yu = 0 To queryTable.Count - 1
-        '                                Dim search_table_name = queryTable(yu)(1)
-        '                                If table_name.Equals(search_table_name) Then
-        '                                    table_name_index = yu
-        '                                End If
-        '                            Next
-        '                            'table_name_index=找到quo还是quo_desc OUTPUT:0或者1 同辈：query.i value(这里)()()
-        '                            'getDescSource=找到这个desc是属于哪一个quo的(row) 例如：quo1拥有product1,2 quo2拥有product3,4,5 OUTPUT:0或者2 同辈：row value()(这里)()
-        '                            'table_value_index=从sql的0或1找到符合formula express value名字在valuearraylist的位置 value()()(这里)
-        '                            'value_arraylist=(type)(row)(value)
-        '                            table_value_index = sql_format_arraylist(table_name_index).IndexOf(table_value_name)
-
-        '                            Dim myTargets As New List(Of String)
-        '                            For Each target As String In rangeQuo
-        '                                Dim rangeStart = target.Split(".")(0)
-        '                                If rangeStart.Equals(row.ToString) Then
-        '                                    myTargets.Add(target.Split(".")(1))
-        '                                    'MsgBox(row.ToString + " is adding " + target.Split(".")(1) + " as its target")
-        '                                End If
-        '                            Next
-        '                            For Each target As String In myTargets
-        '                                Dim getValueOfTarget = value_arraylist(table_name_index)(CInt(target))(table_value_index).ToString.Trim
-        '                                cal_value_temp += getValueOfTarget + "+"
-        '                            Next
-        '                            cal_value_temp = "(" + cal_value_temp.Substring(0, cal_value_temp.Length - 1) + ")"
-        '                            'MsgBox("Expresses: " + expresses.Substring(0, expresses.Length - 1) + vbNewLine + local_formula)
-        '                            'Dim getDescSource = CInt(rangeQuo(row).ToString.Split(".")(0))
-
-        '                            'cal_value_temp = value_arraylist(table_name_index)(getDescSource)(table_value_index).ToString.Trim
-        '                            If cal_value_temp.Contains("{FORMULA_VALUE}") Then
-        '                                MsgBox("No way formula_value gonna exists here!")
-        '                                cal_value_temp = 0
-        '                            End If
-        '                            cal_type = "B1"
-        '                        Else
-        '                            'table_name_index=找到quo还是quo_desc OUTPUT:0或者1 同辈：query.i value(这里)()()
-        '                            'getDescSource=找到这个desc是属于哪一个quo的(row) 例如：quo1拥有product1,2 quo2拥有product3,4,5 OUTPUT:0或者2 同辈：row value()(这里)()
-        '                            'table_value_index=从sql的0或1找到符合formula express value名字在valuearraylist的位置 value()()(这里)
-        '                            'value_arraylist=(type)(row)(value)
-        '                            table_name_index = i
-        '                            Dim table_value_name = local_formula.Trim
-        '                            table_value_index = sql_format_arraylist(table_name_index).IndexOf(table_value_name)
-        '                            If table_value_index <> -1 Then
-        '                                cal_value_temp = value_arraylist(table_name_index)(row)(table_value_index).ToString.Trim
-        '                                If cal_value_temp.Equals("{FORMULA_VALUE}") Then
-        '                                    MsgBox("WHY ARE YOU A FORMULA")
-        '                                    cal_value_temp = 0
-        '                                End If
-        '                            Else
-        '                                MsgBox("单品 404 not found" + vbNewLine + table_name_index.ToString + vbNewLine + row.ToString + vbNewLine + table_value_index.ToString + vbNewLine + table_value_name)
-        '                            End If
-        '                            cal_type = "B2"
-        '                        End If
-        '                        If Not calculation.Contains(".") Then
-        '                            calculation = cal_value_temp
-        '                        End If
-        '                        Try
-        '                            cal_result = New DataTable().Compute(calculation, Nothing)
-        '                            'MsgBox("After calculation and the result: " + cal_result)
-        '                        Catch ex As Exception
-        '                            MsgBox("This calculation has problem -> " + calculation + vbNewLine + local_formula, MsgBoxStyle.Exclamation)
-        '                            MsgBox(value_arraylist(0)(row)(33))
-        '                            'Dim str = ""
-        '                            'For Each temp As String In value_arraylist(0)(row)
-        '                            '    str += temp + vbTab
-        '                            'Next
-        '                            'MsgBox(str)
-        '                        End Try
-        '                    End If
-
-        '                Next
-        '                If cal_type = "" Then
-        '                    MsgBox("Empty -> " + formula_temp + vbNewLine + finalized_temp(0).ToString)
-        '                End If
-        '                'MsgBox("Upgrade value: " + value_arraylist(i)(row)(g) + vbNewLine + "This calculation -> " + cal_result + vbNewLine + formula_temp + vbNewLine + "Cal Type: " + cal_type, MsgBoxStyle.Exclamation)
-        '                'value_arraylist(i)(row)(g) = Format(CDec(cal_result), "0.00").ToString
-        '                If CDec(cal_result) <> 0 Then
-        '                    value_arraylist(i)(row)(g) = Format(CDec(cal_result), "0.00").ToString
-        '                Else
-        '                    value_arraylist(i)(row)(g) = cal_result.ToString
-        '                End If
-        '            End If
-        '        Next
-        '    Next
-        'Next
 
         'Hardcore Taxable
         For row As Integer = 0 To dgvExcel.RowCount - 1
@@ -1044,25 +868,8 @@ Public Class Delivery_Return_Form
                 End If
             End If
 
-            'Delivery Order Desc
+            'Delivery Return Desc
             If Not value_arraylist(1)(row)(0).Equals(String.Empty) Then
-                'sdodet.doc_no / duplicate
-                'table = "sdodet"
-                'value_name = "doc_no"
-                'value = value_arraylist(1)(row)(2)
-                'If Not value.Trim.Equals(String.Empty) Then
-                '    If existed_checker(table, value_name, value) Then
-                '        execute_valid = False
-                '        exist_result += value_name + " '" + value + "' already existed in the database (" + table + ")!" + vbNewLine
-                '    End If
-                '    If Function_Form.repeatedExcelCell(dgvExcel, excel_format_arraylist(1)(2), value, row) Then
-                '        execute_valid = False
-                '        If Not exist_result.Contains(excel_format_arraylist(1)(2) + " '" + value + "' is repeated!") Then
-                '            exist_result += excel_format_arraylist(1)(2) + " '" + value + "' is repeated!" + vbNewLine
-                '        End If
-                '    End If
-                'End If
-
                 'product.prodcode / exist
                 table = "product"
                 value_name = "prodcode"
@@ -1131,7 +938,7 @@ Public Class Delivery_Return_Form
 
             End If
 
-            'Delivery Order Stock
+            'Delivery Return Stock
             If Not value_arraylist(2)(row)(0).Equals(String.Empty) Then
                 'product.prodcode / exist
                 table = "product"
@@ -1156,7 +963,7 @@ Public Class Delivery_Return_Form
                 End If
             End If
 
-            'Delivery Order Serial No
+            'Delivery Return Serial No
             If Not value_arraylist(3)(row)(0).Equals(String.Empty) Then
                 'prodsn.serialno / exist
                 table = "prodsn"
@@ -1218,10 +1025,11 @@ Public Class Delivery_Return_Form
                 For sn = 0 To serialnos.Count - 1
                     Dim serialno As String = serialnos(sn)
                     myConn.Open()
-                    Dim sncommand = New SqlCommand("SELECT * FROM stocksn WHERE serialno ='" + serialno + "' AND qty ='-1'", myConn)
+                    'select stocksn.serialno from stocksn LEFT JOIN prodsn ON stocksn.serialno = prodsn.serialno WHERE (stocksn.serialno = 'A0029A' AND stocksn.qty='-1') OR (prodsn.serialno = 'A0029A' AND prodsn.qty='-1')
+                    Dim sncommand = New SqlCommand("select stocksn.serialno from stocksn LEFT JOIN prodsn ON stocksn.serialno = prodsn.serialno WHERE (stocksn.serialno = '" + serialno + "' AND stocksn.qty='-1') OR (prodsn.serialno = '" + serialno + "' AND prodsn.qty='-1')", myConn)
                     Dim snreader As SqlDataReader = sncommand.ExecuteReader
                     While snreader.Read()
-                        msg_serial += vbTab + snreader.GetValue("serialno") + vbNewLine
+                        msg_serial += snreader.GetValue(0).ToString.Trim + vbTab
                         exist_serial = True
                     End While
                     myConn.Close()
@@ -1256,7 +1064,7 @@ Public Class Delivery_Return_Form
                     Dim serialNoProdCommand As String = "UPDATE prodsn SET "
                     Dim serialNoColumns = "qty='" + qty + "',"
                     serialNoColumns += "location='" + location + "',"
-                    serialNoColumns += "doc_type='DO',"
+                    serialNoColumns += "doc_type='DR',"
                     serialNoColumns += "doc_no='" + doc_no + "',"
                     serialNoColumns += "line_no='" + line_no + "',"
                     serialNoColumns += "doc_date='" + doc_date + "' "
@@ -1267,7 +1075,7 @@ Public Class Delivery_Return_Form
                     command.ExecuteNonQuery()
                     rowUpdateNum += 1
                     Dim serialNoStockdCommand As String = "INSERT INTO stocksn (prodcode,serialno,doc_type,doc_no,line_no,doc_date,qty,location) VALUES ('"
-                    serialNoStockdCommand += procode + "','" + serialno + "','DO','" + doc_no + "','" + line_no + "','" + doc_date + "','" + qty + "','" + location + "')"
+                    serialNoStockdCommand += procode + "','" + serialno + "','DR','" + doc_no + "','" + line_no + "','" + doc_date + "','" + qty + "','" + location + "')"
                     Dim command2 = New SqlCommand(serialNoStockdCommand, myConn)
                     command2.ExecuteNonQuery()
                     'MsgBox(serialNoStockdCommand)
@@ -1278,7 +1086,7 @@ Public Class Delivery_Return_Form
         Next
 
         'Quotation only end
-        For i As Integer = 0 To 2
+        For i As Integer = 0 To 1
             init()
             Using command As New SqlCommand("", myConn)
                 For row As Integer = 0 To dgvExcel.RowCount - 1
@@ -1326,8 +1134,70 @@ Public Class Delivery_Return_Form
                 Next
             End Using
         Next
+
+        'Delivery Return stock
+        For row As Integer = 0 To dgvExcel.RowCount - 1
+            If Not value_arraylist(1)(row)(4).ToString.Trim.Equals(String.Empty) Then
+                Dim mySource As Integer = -1
+                For Each target In rangeQuo
+                    If target.ToString.Split(".")(1).Equals(row.ToString) Then
+                        Dim sourceRow = CInt(target.ToString.Split(".")(0))
+                        mySource = sourceRow
+                    End If
+                Next
+
+                Dim insertArray As New ArrayList
+                insertArray.Add(value_arraylist(1)(row)(4)) 'prodcode
+                insertArray.Add(value_arraylist(1)(row)(1)) 'doc_type
+                insertArray.Add(value_arraylist(1)(row)(2)) 'doc_no
+
+                Dim dkeyFromDO As String = ""
+                Dim command_temp = New SqlCommand("SELECT TOP 1 dkey FROM sdodet WHERE doc_no ='" + value_arraylist(2)(row)(2) + "' AND line_no ='" + value_arraylist(2)(row)(4) + "'", myConn)
+                myConn.Open()
+                Dim reader_temp As SqlDataReader = command_temp.ExecuteReader
+                While reader_temp.Read()
+                    dkeyFromDO = reader_temp.GetValue(0).ToString
+                End While
+                myConn.Close()
+                value_arraylist(2)(row)(3) = dkeyFromDO
+                insertArray.Add(dkeyFromDO) 'dkey
+
+                insertArray.Add(value_arraylist(1)(row)(3)) 'line_no
+                insertArray.Add(value_arraylist(0)(mySource)(2)) 'doc_date
+                insertArray.Add(value_arraylist(0)(mySource)(10)) 'doc_desp
+                insertArray.Add(Function_Form.getNull(0)) 'doc_desp2
+                insertArray.Add(value_arraylist(0)(mySource)(9)) 'custcode
+                insertArray.Add(Function_Form.getNull(0)) 'suppcode
+                insertArray.Add(value_arraylist(0)(mySource)(7)) 'refno
+                insertArray.Add(value_arraylist(0)(mySource)(8)) 'refno2
+                insertArray.Add(value_arraylist(1)(row)(9)) 'qty
+                insertArray.Add(Function_Form.getNull(3)) 'cost
+                insertArray.Add(value_arraylist(1)(row)(12)) 'price
+                insertArray.Add(Function_Form.getNull(3)) 'local_amount
+                insertArray.Add(Function_Form.getNull(3)) 'utd_cost
+                insertArray.Add(value_arraylist(1)(row)(55)) 'location
+                insertArray.Add(value_arraylist(1)(row)(56)) 'batchcode
+                insertArray.Add(value_arraylist(1)(row)(58)) 'projcode
+                insertArray.Add(value_arraylist(1)(row)(59)) 'deptcode
+                insertArray.Add(Function_Form.getNull(0)) 'pkdoc_type
+                insertArray.Add(Function_Form.getNull(0)) 'pkdoc_no
+                insertArray.Add(Function_Form.getNull(3)) 'pkdkey
+                insertArray.Add(Function_Form.getNull(3)) 'bfseq
+                Dim stockCommand As String = queryTable(2)(2)
+                For Each query In insertArray
+                    stockCommand += "'" + query.ToString + "',"
+                Next
+                stockCommand = stockCommand.Substring(0, stockCommand.Length - 1) + ")"
+                Dim command = New SqlCommand(stockCommand, myConn)
+                myConn.Open()
+                command.ExecuteNonQuery()
+                rowInsertNum += 1
+                myConn.Close()
+            End If
+        Next
+
         Function_Form.promptImportSuccess(rowInsertNum, rowUpdateNum)
-        Function_Form.printExcelResult("Delivery_Order", queryTable, value_arraylist, sql_format_arraylist, dgvExcel)
+        Function_Form.printExcelResult("Delivery_Return", queryTable, value_arraylist, sql_format_arraylist, dgvExcel)
     End Sub
 
     Private Function existed_checker(table As String, sql_value As String, value As String)

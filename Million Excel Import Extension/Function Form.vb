@@ -10,7 +10,7 @@ Public Class Function_Form
     Private Shared statusConnection As Boolean
     Private Shared pwd_query As String
     Private Shared import_type As String
-    Private Sub openExcelImport(sender As Object, e As EventArgs) Handles btnQuotation.Click, btnDeliveryOrder.Click, btnSalesOrder.Click, btnSalesInvoice.Click, btnCashSales.Click, btnDebitNote.Click, btnCreditNote.Click
+    Private Sub openExcelImport(sender As Object, e As EventArgs) Handles btnQuotation.Click, btnDeliveryOrder.Click, btnSalesOrder.Click, btnSalesInvoice.Click, btnCashSales.Click, btnDebitNote.Click, btnCreditNote.Click, btnDeliveryReturn.Click
         Dim formName = sender.text
         If Not Main_Form.getFeatures.Contains(sender.text) Then
             MsgBox("You have not enough privilege to access!", MsgBoxStyle.Critical)
@@ -31,6 +31,8 @@ Public Class Function_Form
             form = New Debit_Note_Form
         ElseIf formName.Equals("Credit Note") Then
             form = New Credit_Note_Form
+        ElseIf formName.Equals("Delivery Return") Then
+            form = New Delivery_Return_Form
         End If
         If Main_Form.getStatusConnection And Not Main_Form.getDatabase.Equals(String.Empty) Then
             Main_Form.setImport_type(formName)
