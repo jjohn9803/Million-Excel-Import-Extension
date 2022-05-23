@@ -93,6 +93,10 @@ Public Class Main_Form
     End Sub
 
     Private Sub btnBackup_Click(sender As Object, e As EventArgs) Handles btnBackup.Click
+        If Not getStatusConnection() Then
+            MsgBox("Please connect the database before doing backup!", MsgBoxStyle.Critical)
+            Return
+        End If
         Dim confirmImport As DialogResult = MsgBox("Are you sure to backup database " + Chr(34) + getDatabase() + Chr(34) + " ?", MsgBoxStyle.YesNo, "")
         If confirmImport = DialogResult.No Then
             Return
