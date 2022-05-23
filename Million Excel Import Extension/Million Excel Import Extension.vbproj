@@ -207,6 +207,12 @@
     <Compile Include="Function\Delivery Return.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Function\Stock Receive.Designer.vb">
+      <DependentUpon>Stock Receive.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Function\Stock Receive.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Login.Designer.vb">
       <DependentUpon>Login.vb</DependentUpon>
     </Compile>
@@ -281,6 +287,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Function\Delivery Return.resx">
       <DependentUpon>Delivery Return.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Function\Stock Receive.resx">
+      <DependentUpon>Stock Receive.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Login.resx">
       <DependentUpon>Login.vb</DependentUpon>

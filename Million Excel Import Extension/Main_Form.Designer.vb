@@ -30,9 +30,9 @@ Partial Class Main_Form
         Me.txtDatabaseName = New System.Windows.Forms.TextBox()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.lblSQLStatus = New System.Windows.Forms.Label()
+        Me.btnBackup = New System.Windows.Forms.Button()
         Me.btnSetting = New System.Windows.Forms.Button()
         Me.panelMain = New System.Windows.Forms.Panel()
-        Me.btnBackup = New System.Windows.Forms.Button()
         Me.FlowLayoutPanel1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -48,7 +48,7 @@ Partial Class Main_Form
         Me.FlowLayoutPanel1.Controls.Add(Me.btnBackup)
         Me.FlowLayoutPanel1.Controls.Add(Me.btnSetting)
         Me.FlowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Bottom
-        Me.FlowLayoutPanel1.Location = New System.Drawing.Point(0, 447)
+        Me.FlowLayoutPanel1.Location = New System.Drawing.Point(0, 587)
         Me.FlowLayoutPanel1.Margin = New System.Windows.Forms.Padding(4)
         Me.FlowLayoutPanel1.Name = "FlowLayoutPanel1"
         Me.FlowLayoutPanel1.Size = New System.Drawing.Size(792, 126)
@@ -120,6 +120,18 @@ Partial Class Main_Form
         Me.lblSQLStatus.TabIndex = 38
         Me.lblSQLStatus.Text = "Disconnected"
         '
+        'btnBackup
+        '
+        Me.btnBackup.Font = New System.Drawing.Font("Yu Gothic Medium", 9.75!, System.Drawing.FontStyle.Bold)
+        Me.btnBackup.Location = New System.Drawing.Point(346, 57)
+        Me.btnBackup.Margin = New System.Windows.Forms.Padding(50, 16, 4, 4)
+        Me.btnBackup.Name = "btnBackup"
+        Me.btnBackup.Size = New System.Drawing.Size(160, 37)
+        Me.btnBackup.TabIndex = 40
+        Me.btnBackup.TabStop = False
+        Me.btnBackup.Text = "Backup"
+        Me.btnBackup.UseVisualStyleBackColor = True
+        '
         'btnSetting
         '
         Me.btnSetting.Font = New System.Drawing.Font("Yu Gothic Medium", 9.75!, System.Drawing.FontStyle.Bold)
@@ -138,26 +150,14 @@ Partial Class Main_Form
         Me.panelMain.Location = New System.Drawing.Point(0, 0)
         Me.panelMain.Margin = New System.Windows.Forms.Padding(4)
         Me.panelMain.Name = "panelMain"
-        Me.panelMain.Size = New System.Drawing.Size(792, 447)
+        Me.panelMain.Size = New System.Drawing.Size(792, 587)
         Me.panelMain.TabIndex = 35
-        '
-        'btnBackup
-        '
-        Me.btnBackup.Font = New System.Drawing.Font("Yu Gothic Medium", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.btnBackup.Location = New System.Drawing.Point(346, 57)
-        Me.btnBackup.Margin = New System.Windows.Forms.Padding(50, 16, 4, 4)
-        Me.btnBackup.Name = "btnBackup"
-        Me.btnBackup.Size = New System.Drawing.Size(160, 37)
-        Me.btnBackup.TabIndex = 40
-        Me.btnBackup.TabStop = False
-        Me.btnBackup.Text = "Backup"
-        Me.btnBackup.UseVisualStyleBackColor = True
         '
         'Main_Form
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(792, 573)
+        Me.ClientSize = New System.Drawing.Size(792, 713)
         Me.Controls.Add(Me.panelMain)
         Me.Controls.Add(Me.FlowLayoutPanel1)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle

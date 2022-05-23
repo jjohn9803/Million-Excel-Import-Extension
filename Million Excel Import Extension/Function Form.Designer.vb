@@ -31,6 +31,10 @@ Partial Class Function_Form
         Me.btnDebitNote = New System.Windows.Forms.Button()
         Me.btnCreditNote = New System.Windows.Forms.Button()
         Me.btnDeliveryReturn = New System.Windows.Forms.Button()
+        Me.btnStockReceive = New System.Windows.Forms.Button()
+        Me.btnStockIssue = New System.Windows.Forms.Button()
+        Me.btnStockAdjustment = New System.Windows.Forms.Button()
+        Me.btnStockTrasfer = New System.Windows.Forms.Button()
         Me.FlowLayoutPanel1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -44,11 +48,15 @@ Partial Class Function_Form
         Me.FlowLayoutPanel1.Controls.Add(Me.btnDebitNote)
         Me.FlowLayoutPanel1.Controls.Add(Me.btnCreditNote)
         Me.FlowLayoutPanel1.Controls.Add(Me.btnDeliveryReturn)
+        Me.FlowLayoutPanel1.Controls.Add(Me.btnStockReceive)
+        Me.FlowLayoutPanel1.Controls.Add(Me.btnStockIssue)
+        Me.FlowLayoutPanel1.Controls.Add(Me.btnStockAdjustment)
+        Me.FlowLayoutPanel1.Controls.Add(Me.btnStockTrasfer)
         Me.FlowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.FlowLayoutPanel1.Location = New System.Drawing.Point(0, 0)
         Me.FlowLayoutPanel1.Margin = New System.Windows.Forms.Padding(4)
         Me.FlowLayoutPanel1.Name = "FlowLayoutPanel1"
-        Me.FlowLayoutPanel1.Size = New System.Drawing.Size(872, 445)
+        Me.FlowLayoutPanel1.Size = New System.Drawing.Size(872, 606)
         Me.FlowLayoutPanel1.TabIndex = 3
         '
         'btnQuotation
@@ -147,11 +155,59 @@ Partial Class Function_Form
         Me.btnDeliveryReturn.Text = "Delivery Return"
         Me.btnDeliveryReturn.UseVisualStyleBackColor = True
         '
+        'btnStockReceive
+        '
+        Me.btnStockReceive.Font = New System.Drawing.Font("Microsoft YaHei", 12.0!)
+        Me.btnStockReceive.Location = New System.Drawing.Point(559, 331)
+        Me.btnStockReceive.Margin = New System.Windows.Forms.Padding(67, 37, 4, 37)
+        Me.btnStockReceive.Name = "btnStockReceive"
+        Me.btnStockReceive.Size = New System.Drawing.Size(175, 73)
+        Me.btnStockReceive.TabIndex = 11
+        Me.btnStockReceive.TabStop = False
+        Me.btnStockReceive.Text = "Stock Receive"
+        Me.btnStockReceive.UseVisualStyleBackColor = True
+        '
+        'btnStockIssue
+        '
+        Me.btnStockIssue.Font = New System.Drawing.Font("Microsoft YaHei", 12.0!)
+        Me.btnStockIssue.Location = New System.Drawing.Point(67, 478)
+        Me.btnStockIssue.Margin = New System.Windows.Forms.Padding(67, 37, 4, 37)
+        Me.btnStockIssue.Name = "btnStockIssue"
+        Me.btnStockIssue.Size = New System.Drawing.Size(175, 73)
+        Me.btnStockIssue.TabIndex = 12
+        Me.btnStockIssue.TabStop = False
+        Me.btnStockIssue.Text = "Stock Issue"
+        Me.btnStockIssue.UseVisualStyleBackColor = True
+        '
+        'btnStockAdjustment
+        '
+        Me.btnStockAdjustment.Font = New System.Drawing.Font("Microsoft YaHei", 12.0!)
+        Me.btnStockAdjustment.Location = New System.Drawing.Point(313, 478)
+        Me.btnStockAdjustment.Margin = New System.Windows.Forms.Padding(67, 37, 4, 37)
+        Me.btnStockAdjustment.Name = "btnStockAdjustment"
+        Me.btnStockAdjustment.Size = New System.Drawing.Size(175, 73)
+        Me.btnStockAdjustment.TabIndex = 13
+        Me.btnStockAdjustment.TabStop = False
+        Me.btnStockAdjustment.Text = "Stock Adjustment"
+        Me.btnStockAdjustment.UseVisualStyleBackColor = True
+        '
+        'btnStockTrasfer
+        '
+        Me.btnStockTrasfer.Font = New System.Drawing.Font("Microsoft YaHei", 12.0!)
+        Me.btnStockTrasfer.Location = New System.Drawing.Point(559, 478)
+        Me.btnStockTrasfer.Margin = New System.Windows.Forms.Padding(67, 37, 4, 37)
+        Me.btnStockTrasfer.Name = "btnStockTrasfer"
+        Me.btnStockTrasfer.Size = New System.Drawing.Size(175, 73)
+        Me.btnStockTrasfer.TabIndex = 14
+        Me.btnStockTrasfer.TabStop = False
+        Me.btnStockTrasfer.Text = "Stock Transfer"
+        Me.btnStockTrasfer.UseVisualStyleBackColor = True
+        '
         'Function_Form
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(872, 445)
+        Me.ClientSize = New System.Drawing.Size(872, 606)
         Me.Controls.Add(Me.FlowLayoutPanel1)
         Me.Margin = New System.Windows.Forms.Padding(4)
         Me.Name = "Function_Form"
@@ -170,4 +226,8 @@ Partial Class Function_Form
     Friend WithEvents btnDebitNote As Button
     Friend WithEvents btnCreditNote As Button
     Friend WithEvents btnDeliveryReturn As Button
+    Friend WithEvents btnStockReceive As Button
+    Friend WithEvents btnStockIssue As Button
+    Friend WithEvents btnStockAdjustment As Button
+    Friend WithEvents btnStockTrasfer As Button
 End Class

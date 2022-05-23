@@ -48,6 +48,7 @@ Public Class Function_Form
     End Sub
 
     Friend Sub printExcelResult(filename As String, queryTable As ArrayList, value_arraylist As ArrayList, sql_format_arraylist As ArrayList, dgvExcel As DataGridView)
+        Return
         Using workbook As New XLWorkbook
             Dim sheets As New ArrayList
 
