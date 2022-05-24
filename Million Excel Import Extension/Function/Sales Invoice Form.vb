@@ -84,41 +84,42 @@ Public Class Sales_Invoice_Form
     Private Sub btnImport_Click(sender As Object, e As EventArgs) Handles btnImport.Click
         Dim importType = "Sales Invoice"
         Dim tableExcelSetting As DataTableCollection
-        'Try
-        Using stream = File.Open(getMaintainSetting, FileMode.Open, FileAccess.Read)
-            Using reader As IExcelDataReader = ExcelReaderFactory.CreateReader(stream)
-                Dim result As DataSet = reader.AsDataSet(New ExcelDataSetConfiguration() With {
-                                                                         .ConfigureDataTable = Function(__) New ExcelDataTableConfiguration() With {
-                                                                         .UseHeaderRow = True}})
-                tableExcelSetting = result.Tables
-                Dim queryTable As New ArrayList
-                For i = 0 To 8
-                    queryTable.Add(New ArrayList)
-                Next
-                queryTable(0).add("Sales Invoice") '0
-                queryTable(0).add("sinv") '1
-                queryTable(1).add("Sales Invoice Desc")
-                queryTable(1).add("sinvdet")
-                queryTable(2).add("Sales Invoice Stock")
-                queryTable(2).add("stock")
-                queryTable(3).add("Sales Invoice AR") '0
-                queryTable(3).add("ar") '1
-                queryTable(4).add("Sales Invoice GL")
-                queryTable(4).add("gl")
-                queryTable(5).add("Sales Invoice GL Off")
-                queryTable(5).add("gloff")
-                queryTable(6).add("Sales Invoice GL Audit")
-                queryTable(6).add("glaudit")
-                queryTable(7).add("SI Product Serial No")
-                queryTable(7).add("prodsn")
-                queryTable(8).add("SI Stock Serial No")
-                queryTable(8).add("stocksn")
-                quotationWriteIntoSQL(tableExcelSetting, queryTable)
-            End Using
+        Dim stream As FileStream
+        Try
+            stream = File.Open(getMaintainSetting, FileMode.Open, FileAccess.Read)
+        Catch ex As Exception
+            MsgBox(ex.Message + vbNewLine + ex.StackTrace, MsgBoxStyle.Critical)
+            Return
+        End Try
+        Using reader As IExcelDataReader = ExcelReaderFactory.CreateReader(stream)
+            Dim result As DataSet = reader.AsDataSet(New ExcelDataSetConfiguration() With {
+                                                                     .ConfigureDataTable = Function(__) New ExcelDataTableConfiguration() With {
+                                                                     .UseHeaderRow = True}})
+            tableExcelSetting = result.Tables
+            Dim queryTable As New ArrayList
+            For i = 0 To 8
+                queryTable.Add(New ArrayList)
+            Next
+            queryTable(0).add("Sales Invoice") '0
+            queryTable(0).add("sinv") '1
+            queryTable(1).add("Sales Invoice Desc")
+            queryTable(1).add("sinvdet")
+            queryTable(2).add("Sales Invoice Stock")
+            queryTable(2).add("stock")
+            queryTable(3).add("Sales Invoice AR") '0
+            queryTable(3).add("ar") '1
+            queryTable(4).add("Sales Invoice GL")
+            queryTable(4).add("gl")
+            queryTable(5).add("Sales Invoice GL Off")
+            queryTable(5).add("gloff")
+            queryTable(6).add("Sales Invoice GL Audit")
+            queryTable(6).add("glaudit")
+            queryTable(7).add("SI Product Serial No")
+            queryTable(7).add("prodsn")
+            queryTable(8).add("SI Stock Serial No")
+            queryTable(8).add("stocksn")
+            quotationWriteIntoSQL(tableExcelSetting, queryTable)
         End Using
-        'Catch ex As Exception
-        '    MsgBox(ex.Message + vbNewLine + ex.StackTrace, MsgBoxStyle.Critical)
-        'End Try
     End Sub
     Private Sub quotationWriteIntoSQL(tableExcelSetting As DataTableCollection, queryTable As ArrayList)
         Dim value_arraylist = New ArrayList

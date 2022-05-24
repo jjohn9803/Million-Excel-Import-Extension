@@ -2,7 +2,7 @@
 Imports System.IO
 Imports ClosedXML.Excel
 Imports ExcelDataReader
-Public Class Stock_Receive_Form
+Public Class Stock_Adjustment_Form
     Dim tables As DataTableCollection
     Private serverName As String
     Private database As String
@@ -10,7 +10,7 @@ Public Class Stock_Receive_Form
     Private statusConnection As Boolean
     Private pwd_query As String
     Private import_type As String
-    Private Sub Stock_Receive_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+    Private Sub Stock_Adjustment_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         init()
     End Sub
     Private Sub init()
@@ -82,7 +82,7 @@ Public Class Stock_Receive_Form
         Return "maintain.xls"
     End Function
     Private Sub btnImport_Click(sender As Object, e As EventArgs) Handles btnImport.Click
-        Dim importType = "Stock Receive"
+        Dim importType = "Stock Adjustment"
         Dim tableExcelSetting As DataTableCollection
         Dim stream As FileStream
         Try
@@ -100,15 +100,15 @@ Public Class Stock_Receive_Form
             For i = 0 To 4
                 queryTable.Add(New ArrayList)
             Next
-            queryTable(0).add("SR ts") '0
+            queryTable(0).add("SA ts") '0
             queryTable(0).add("stkts") '1
-            queryTable(1).add("SR ts Desc")
+            queryTable(1).add("SA ts Desc")
             queryTable(1).add("stktsdet")
-            queryTable(2).add("SR Stock")
+            queryTable(2).add("SA Stock")
             queryTable(2).add("stock")
-            queryTable(3).add("SR Product Serial No")
+            queryTable(3).add("SA Product Serial No")
             queryTable(3).add("prodsn")
-            queryTable(4).add("SR Stock Serial No")
+            queryTable(4).add("SA Stock Serial No")
             queryTable(4).add("stocksn")
             quotationWriteIntoSQL(tableExcelSetting, queryTable)
         End Using
@@ -553,7 +553,7 @@ Public Class Stock_Receive_Form
                     Dim serialNoProdCommand As String = "UPDATE prodsn SET "
                     Dim serialNoColumns = "qty='" + qty + "',"
                     serialNoColumns += "location='" + location + "',"
-                    serialNoColumns += "doc_type='SR',"
+                    serialNoColumns += "doc_type='SA',"
                     serialNoColumns += "doc_no='" + doc_no + "',"
                     serialNoColumns += "line_no='" + line_no + "',"
                     serialNoColumns += "doc_date='" + doc_date + "' "
@@ -564,7 +564,7 @@ Public Class Stock_Receive_Form
                     command.ExecuteNonQuery()
                     rowUpdateNum += 1
                     Dim serialNoStockdCommand As String = "INSERT INTO stocksn (prodcode,serialno,doc_type,doc_no,line_no,doc_date,qty,location) VALUES ('"
-                    serialNoStockdCommand += procode + "','" + serialno + "','SR','" + doc_no + "','" + line_no + "','" + doc_date + "','" + qty + "','" + location + "')"
+                    serialNoStockdCommand += procode + "','" + serialno + "','SA','" + doc_no + "','" + line_no + "','" + doc_date + "','" + qty + "','" + location + "')"
                     Dim command2 = New SqlCommand(serialNoStockdCommand, myConn)
                     command2.ExecuteNonQuery()
                     rowInsertNum += 1
@@ -674,7 +674,7 @@ Public Class Stock_Receive_Form
         Next
 
         Function_Form.promptImportSuccess(rowInsertNum, rowUpdateNum)
-        Function_Form.printExcelResult("Stock_Receive", queryTable, value_arraylist, sql_format_arraylist, dgvExcel)
+        Function_Form.printExcelResult("Stock_Adjustment", queryTable, value_arraylist, sql_format_arraylist, dgvExcel)
     End Sub
     Private Function existed_checker(table As String, sql_value As String, value As String)
         myConn.Open()

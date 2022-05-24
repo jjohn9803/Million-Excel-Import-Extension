@@ -48,18 +48,18 @@ Partial Class Main_Form
         Me.FlowLayoutPanel1.Controls.Add(Me.btnBackup)
         Me.FlowLayoutPanel1.Controls.Add(Me.btnSetting)
         Me.FlowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Bottom
-        Me.FlowLayoutPanel1.Location = New System.Drawing.Point(0, 587)
+        Me.FlowLayoutPanel1.Location = New System.Drawing.Point(0, 517)
         Me.FlowLayoutPanel1.Margin = New System.Windows.Forms.Padding(4)
         Me.FlowLayoutPanel1.Name = "FlowLayoutPanel1"
-        Me.FlowLayoutPanel1.Size = New System.Drawing.Size(792, 126)
+        Me.FlowLayoutPanel1.Size = New System.Drawing.Size(1014, 126)
         Me.FlowLayoutPanel1.TabIndex = 34
         '
         'Label7
         '
         Me.Label7.AutoSize = True
         Me.Label7.Font = New System.Drawing.Font("Yu Gothic Medium", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label7.Location = New System.Drawing.Point(13, 18)
-        Me.Label7.Margin = New System.Windows.Forms.Padding(13, 18, 4, 0)
+        Me.Label7.Location = New System.Drawing.Point(80, 18)
+        Me.Label7.Margin = New System.Windows.Forms.Padding(80, 18, 4, 0)
         Me.Label7.Name = "Label7"
         Me.Label7.Size = New System.Drawing.Size(133, 22)
         Me.Label7.TabIndex = 30
@@ -67,11 +67,11 @@ Partial Class Main_Form
         '
         'txtServerName
         '
-        Me.txtServerName.Location = New System.Drawing.Point(154, 15)
-        Me.txtServerName.Margin = New System.Windows.Forms.Padding(4, 15, 4, 4)
+        Me.txtServerName.Location = New System.Drawing.Point(221, 16)
+        Me.txtServerName.Margin = New System.Windows.Forms.Padding(4, 16, 4, 4)
         Me.txtServerName.Name = "txtServerName"
         Me.txtServerName.ReadOnly = True
-        Me.txtServerName.Size = New System.Drawing.Size(197, 22)
+        Me.txtServerName.Size = New System.Drawing.Size(280, 22)
         Me.txtServerName.TabIndex = 0
         Me.txtServerName.TabStop = False
         '
@@ -79,8 +79,8 @@ Partial Class Main_Form
         '
         Me.Label2.AutoSize = True
         Me.Label2.Font = New System.Drawing.Font("Yu Gothic Medium", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label2.Location = New System.Drawing.Point(382, 18)
-        Me.Label2.Margin = New System.Windows.Forms.Padding(27, 18, 4, 0)
+        Me.Label2.Location = New System.Drawing.Point(555, 18)
+        Me.Label2.Margin = New System.Windows.Forms.Padding(50, 18, 4, 0)
         Me.Label2.Name = "Label2"
         Me.Label2.Size = New System.Drawing.Size(160, 22)
         Me.Label2.TabIndex = 35
@@ -88,11 +88,11 @@ Partial Class Main_Form
         '
         'txtDatabaseName
         '
-        Me.txtDatabaseName.Location = New System.Drawing.Point(550, 15)
-        Me.txtDatabaseName.Margin = New System.Windows.Forms.Padding(4, 15, 4, 4)
+        Me.txtDatabaseName.Location = New System.Drawing.Point(723, 16)
+        Me.txtDatabaseName.Margin = New System.Windows.Forms.Padding(4, 16, 4, 4)
         Me.txtDatabaseName.Name = "txtDatabaseName"
         Me.txtDatabaseName.ReadOnly = True
-        Me.txtDatabaseName.Size = New System.Drawing.Size(197, 22)
+        Me.txtDatabaseName.Size = New System.Drawing.Size(200, 22)
         Me.txtDatabaseName.TabIndex = 36
         Me.txtDatabaseName.TabStop = False
         '
@@ -100,8 +100,8 @@ Partial Class Main_Form
         '
         Me.Label1.AutoSize = True
         Me.Label1.Font = New System.Drawing.Font("Yu Gothic Medium", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.Label1.Location = New System.Drawing.Point(67, 66)
-        Me.Label1.Margin = New System.Windows.Forms.Padding(67, 25, 4, 0)
+        Me.Label1.Location = New System.Drawing.Point(150, 67)
+        Me.Label1.Margin = New System.Windows.Forms.Padding(150, 25, 4, 0)
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(79, 22)
         Me.Label1.TabIndex = 37
@@ -113,7 +113,7 @@ Partial Class Main_Form
         Me.lblSQLStatus.BackColor = System.Drawing.Color.Transparent
         Me.lblSQLStatus.Font = New System.Drawing.Font("Yu Gothic Medium", 9.75!, System.Drawing.FontStyle.Bold)
         Me.lblSQLStatus.ForeColor = System.Drawing.Color.DarkRed
-        Me.lblSQLStatus.Location = New System.Drawing.Point(161, 66)
+        Me.lblSQLStatus.Location = New System.Drawing.Point(244, 67)
         Me.lblSQLStatus.Margin = New System.Windows.Forms.Padding(11, 25, 4, 0)
         Me.lblSQLStatus.Name = "lblSQLStatus"
         Me.lblSQLStatus.Size = New System.Drawing.Size(131, 22)
@@ -123,8 +123,8 @@ Partial Class Main_Form
         'btnBackup
         '
         Me.btnBackup.Font = New System.Drawing.Font("Yu Gothic Medium", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.btnBackup.Location = New System.Drawing.Point(346, 57)
-        Me.btnBackup.Margin = New System.Windows.Forms.Padding(50, 16, 4, 4)
+        Me.btnBackup.Location = New System.Drawing.Point(479, 62)
+        Me.btnBackup.Margin = New System.Windows.Forms.Padding(100, 20, 4, 4)
         Me.btnBackup.Name = "btnBackup"
         Me.btnBackup.Size = New System.Drawing.Size(160, 37)
         Me.btnBackup.TabIndex = 40
@@ -135,8 +135,8 @@ Partial Class Main_Form
         'btnSetting
         '
         Me.btnSetting.Font = New System.Drawing.Font("Yu Gothic Medium", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.btnSetting.Location = New System.Drawing.Point(560, 57)
-        Me.btnSetting.Margin = New System.Windows.Forms.Padding(50, 16, 4, 4)
+        Me.btnSetting.Location = New System.Drawing.Point(693, 62)
+        Me.btnSetting.Margin = New System.Windows.Forms.Padding(50, 20, 4, 4)
         Me.btnSetting.Name = "btnSetting"
         Me.btnSetting.Size = New System.Drawing.Size(160, 37)
         Me.btnSetting.TabIndex = 39
@@ -150,14 +150,14 @@ Partial Class Main_Form
         Me.panelMain.Location = New System.Drawing.Point(0, 0)
         Me.panelMain.Margin = New System.Windows.Forms.Padding(4)
         Me.panelMain.Name = "panelMain"
-        Me.panelMain.Size = New System.Drawing.Size(792, 587)
+        Me.panelMain.Size = New System.Drawing.Size(1014, 517)
         Me.panelMain.TabIndex = 35
         '
         'Main_Form
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(792, 713)
+        Me.ClientSize = New System.Drawing.Size(1014, 643)
         Me.Controls.Add(Me.panelMain)
         Me.Controls.Add(Me.FlowLayoutPanel1)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle

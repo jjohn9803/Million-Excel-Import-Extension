@@ -85,35 +85,36 @@ Public Class Delivery_Return_Form
     Private Sub btnImport_Click(sender As Object, e As EventArgs) Handles btnImport.Click
         Dim importType = "Delivery Return"
         Dim tableExcelSetting As DataTableCollection
-        'Try
-        Using stream = File.Open(getMaintainSetting, FileMode.Open, FileAccess.Read)
-            Using reader As IExcelDataReader = ExcelReaderFactory.CreateReader(stream)
-                Dim result As DataSet = reader.AsDataSet(New ExcelDataSetConfiguration() With {
-                                                                        .ConfigureDataTable = Function(__) New ExcelDataTableConfiguration() With {
-                                                                        .UseHeaderRow = True}})
-                tableExcelSetting = result.Tables
-                Dim queryTable As New ArrayList
-                queryTable.Add(New ArrayList)
-                queryTable.Add(New ArrayList)
-                queryTable.Add(New ArrayList)
-                queryTable.Add(New ArrayList)
-                queryTable.Add(New ArrayList)
-                queryTable(0).add("Delivery Return") '0
-                queryTable(0).add("sdo") '1
-                queryTable(1).add("Delivery Return Desc")
-                queryTable(1).add("sdodet")
-                queryTable(2).add("Delivery Return Stock")
-                queryTable(2).add("stock")
-                queryTable(3).add("DR Product Serial No")
-                queryTable(3).add("prodsn")
-                queryTable(4).add("DR Stock Serial No")
-                queryTable(4).add("stocksn")
-                quotationWriteIntoSQL(tableExcelSetting, queryTable)
-            End Using
+        Dim stream As FileStream
+        Try
+            stream = File.Open(getMaintainSetting, FileMode.Open, FileAccess.Read)
+        Catch ex As Exception
+            MsgBox(ex.Message + vbNewLine + ex.StackTrace, MsgBoxStyle.Critical)
+            Return
+        End Try
+        Using reader As IExcelDataReader = ExcelReaderFactory.CreateReader(stream)
+            Dim result As DataSet = reader.AsDataSet(New ExcelDataSetConfiguration() With {
+                                                                    .ConfigureDataTable = Function(__) New ExcelDataTableConfiguration() With {
+                                                                    .UseHeaderRow = True}})
+            tableExcelSetting = result.Tables
+            Dim queryTable As New ArrayList
+            queryTable.Add(New ArrayList)
+            queryTable.Add(New ArrayList)
+            queryTable.Add(New ArrayList)
+            queryTable.Add(New ArrayList)
+            queryTable.Add(New ArrayList)
+            queryTable(0).add("Delivery Return") '0
+            queryTable(0).add("sdo") '1
+            queryTable(1).add("Delivery Return Desc")
+            queryTable(1).add("sdodet")
+            queryTable(2).add("Delivery Return Stock")
+            queryTable(2).add("stock")
+            queryTable(3).add("DR Product Serial No")
+            queryTable(3).add("prodsn")
+            queryTable(4).add("DR Stock Serial No")
+            queryTable(4).add("stocksn")
+            quotationWriteIntoSQL(tableExcelSetting, queryTable)
         End Using
-        'Catch ex As Exception
-        '    MsgBox(ex.Message + vbNewLine + ex.StackTrace, MsgBoxStyle.Critical)
-        'End Try
     End Sub
     Private Sub quotationWriteIntoSQL(tableExcelSetting As DataTableCollection, queryTable As ArrayList)
         Dim value_arraylist = New ArrayList

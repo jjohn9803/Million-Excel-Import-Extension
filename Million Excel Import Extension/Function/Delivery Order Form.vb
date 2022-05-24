@@ -85,35 +85,36 @@ Public Class Delivery_Order_Form
     Private Sub btnImport_Click(sender As Object, e As EventArgs) Handles btnImport.Click
         Dim importType = "Delivery Order"
         Dim tableExcelSetting As DataTableCollection
-        'Try
-        Using stream = File.Open(getMaintainSetting, FileMode.Open, FileAccess.Read)
-            Using reader As IExcelDataReader = ExcelReaderFactory.CreateReader(stream)
-                Dim result As DataSet = reader.AsDataSet(New ExcelDataSetConfiguration() With {
+        Dim stream As FileStream
+        Try
+            stream = File.Open(getMaintainSetting, FileMode.Open, FileAccess.Read)
+        Catch ex As Exception
+            MsgBox(ex.Message + vbNewLine + ex.StackTrace, MsgBoxStyle.Critical)
+            Return
+        End Try
+        Using reader As IExcelDataReader = ExcelReaderFactory.CreateReader(stream)
+            Dim result As DataSet = reader.AsDataSet(New ExcelDataSetConfiguration() With {
                                                                         .ConfigureDataTable = Function(__) New ExcelDataTableConfiguration() With {
                                                                         .UseHeaderRow = True}})
-                tableExcelSetting = result.Tables
-                Dim queryTable As New ArrayList
-                queryTable.Add(New ArrayList)
-                queryTable.Add(New ArrayList)
-                queryTable.Add(New ArrayList)
-                queryTable.Add(New ArrayList)
-                queryTable.Add(New ArrayList)
-                queryTable(0).add("Delivery Order") '0
-                queryTable(0).add("sdo") '1
-                queryTable(1).add("Delivery Order Desc")
-                queryTable(1).add("sdodet")
-                queryTable(2).add("Delivery Order Stock")
-                queryTable(2).add("stock")
-                queryTable(3).add("DO Product Serial No")
-                queryTable(3).add("prodsn")
-                queryTable(4).add("DO Stock Serial No")
-                queryTable(4).add("stocksn")
-                quotationWriteIntoSQL(tableExcelSetting, queryTable)
-            End Using
+            tableExcelSetting = result.Tables
+            Dim queryTable As New ArrayList
+            queryTable.Add(New ArrayList)
+            queryTable.Add(New ArrayList)
+            queryTable.Add(New ArrayList)
+            queryTable.Add(New ArrayList)
+            queryTable.Add(New ArrayList)
+            queryTable(0).add("Delivery Order") '0
+            queryTable(0).add("sdo") '1
+            queryTable(1).add("Delivery Order Desc")
+            queryTable(1).add("sdodet")
+            queryTable(2).add("Delivery Order Stock")
+            queryTable(2).add("stock")
+            queryTable(3).add("DO Product Serial No")
+            queryTable(3).add("prodsn")
+            queryTable(4).add("DO Stock Serial No")
+            queryTable(4).add("stocksn")
+            quotationWriteIntoSQL(tableExcelSetting, queryTable)
         End Using
-        'Catch ex As Exception
-        '    MsgBox(ex.Message + vbNewLine + ex.StackTrace, MsgBoxStyle.Critical)
-        'End Try
     End Sub
     Private Sub quotationWriteIntoSQL(tableExcelSetting As DataTableCollection, queryTable As ArrayList)
         Dim value_arraylist = New ArrayList

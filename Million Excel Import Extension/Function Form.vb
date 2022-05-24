@@ -10,7 +10,7 @@ Public Class Function_Form
     Private Shared statusConnection As Boolean
     Private Shared pwd_query As String
     Private Shared import_type As String
-    Private Sub openExcelImport(sender As Object, e As EventArgs) Handles btnQuotation.Click, btnDeliveryOrder.Click, btnSalesOrder.Click, btnSalesInvoice.Click, btnCashSales.Click, btnDebitNote.Click, btnCreditNote.Click, btnDeliveryReturn.Click
+    Private Sub openExcelImport(sender As Object, e As EventArgs) Handles btnCashSales.Click, btnCreditNote.Click, btnDebitNote.Click, btnDeliveryOrder.Click, btnDeliveryReturn.Click, btnQuotation.Click, btnSalesInvoice.Click, btnSalesOrder.Click, btnStockAdjustment.Click, btnStockIssue.Click, btnStockReceive.Click, btnStockTrasfer.Click
         Dim formName = sender.text
         If Not Main_Form.getFeatures.Contains(sender.text) Then
             MsgBox("You have not enough privilege to access!", MsgBoxStyle.Critical)
@@ -33,6 +33,15 @@ Public Class Function_Form
             form = New Credit_Note_Form
         ElseIf formName.Equals("Delivery Return") Then
             form = New Delivery_Return_Form
+        ElseIf formName.Equals("Stock Receive") Then
+            form = New Stock_Receive_Form
+        ElseIf formName.Equals("Stock Issue") Then
+            form = New Stock_Issue_Form
+        ElseIf formName.Equals("Stock Adjustment") Then
+            form = New Stock_Adjustment_Form
+        Else
+            MsgBox("You have not enough privilege to access!", MsgBoxStyle.Critical)
+            Return
         End If
         If Main_Form.getStatusConnection And Not Main_Form.getDatabase.Equals(String.Empty) Then
             Main_Form.setImport_type(formName)
@@ -92,7 +101,7 @@ Public Class Function_Form
     End Sub
     Public Shared Function validateExcelFormat(dgvExcel As DataGridView) As Boolean
         Dim integerColumn() As String = {"Credit Terms", "Batch Group", "Batch Code", "Quantity"}
-        Dim doubleColumn() As String = {"Exchange Rate", "Deposit", "Mode of Payment 1 Amount", "Mode of Payment 2 Amount", "Mode of Payment 3 Amount", "Mode of Payment 4 Amount", "Debt Amount", "Price", "Gross Amount", "Discount Percentage 1", "Discount Percentage 2", "Discount Percentage 3", "Discount Amount Total", "Amount", "Tax Amount Adjustment", "Cost"}
+        Dim doubleColumn() As String = {"Exchange Rate", "Deposit", "Mode of Payment 1 Amount", "Mode of Payment 2 Amount", "Mode of Payment 3 Amount", "Mode of Payment 4 Amount", "Debt Amount", "Price", "Gross Amount", "Discount Percentage 1", "Discount Percentage 2", "Discount Percentage 3", "Discount Amount Total", "Amount", "Tax Amount Adjustment", "Cost", "Unit Cost"}
         Dim dateColumn() As String = {"Date", "Delivery Date"}
         Dim result As Boolean = True
         Dim resultDate As Boolean = True

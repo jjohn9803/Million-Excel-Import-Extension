@@ -84,41 +84,42 @@ Public Class Cash_Sales_Form
     Private Sub btnImport_Click(sender As Object, e As EventArgs) Handles btnImport.Click
         Dim importType = "Cash Sales"
         Dim tableExcelSetting As DataTableCollection
-        'Try
-        Using stream = File.Open(getMaintainSetting, FileMode.Open, FileAccess.Read)
-            Using reader As IExcelDataReader = ExcelReaderFactory.CreateReader(stream)
-                Dim result As DataSet = reader.AsDataSet(New ExcelDataSetConfiguration() With {
+        Dim stream As FileStream
+        Try
+            stream = File.Open(getMaintainSetting, FileMode.Open, FileAccess.Read)
+        Catch ex As Exception
+            MsgBox(ex.Message + vbNewLine + ex.StackTrace, MsgBoxStyle.Critical)
+            Return
+        End Try
+        Using reader As IExcelDataReader = ExcelReaderFactory.CreateReader(stream)
+            Dim result As DataSet = reader.AsDataSet(New ExcelDataSetConfiguration() With {
                                                                              .ConfigureDataTable = Function(__) New ExcelDataTableConfiguration() With {
                                                                              .UseHeaderRow = True}})
-                tableExcelSetting = result.Tables
-                Dim queryTable As New ArrayList
-                For i = 0 To 8
-                    queryTable.Add(New ArrayList)
-                Next
-                queryTable(0).add("Cash Sales") '0
-                queryTable(0).add("sinv") '1
-                queryTable(1).add("Cash Sales Desc")
-                queryTable(1).add("sinvdet")
-                queryTable(2).add("Cash Sales Stock")
-                queryTable(2).add("stock")
-                queryTable(3).add("Cash Sales AR") '0
-                queryTable(3).add("ar") '1
-                queryTable(4).add("Cash Sales GL")
-                queryTable(4).add("gl")
-                queryTable(5).add("Cash Sales GL Off")
-                queryTable(5).add("gloff")
-                queryTable(6).add("Cash Sales GL Audit")
-                queryTable(6).add("glaudit")
-                queryTable(7).add("CS Product Serial No")
-                queryTable(7).add("prodsn")
-                queryTable(8).add("CS Stock Serial No")
-                queryTable(8).add("stocksn")
-                quotationWriteIntoSQL(tableExcelSetting, queryTable)
-            End Using
+            tableExcelSetting = result.Tables
+            Dim queryTable As New ArrayList
+            For i = 0 To 8
+                queryTable.Add(New ArrayList)
+            Next
+            queryTable(0).add("Cash Sales") '0
+            queryTable(0).add("sinv") '1
+            queryTable(1).add("Cash Sales Desc")
+            queryTable(1).add("sinvdet")
+            queryTable(2).add("Cash Sales Stock")
+            queryTable(2).add("stock")
+            queryTable(3).add("Cash Sales AR") '0
+            queryTable(3).add("ar") '1
+            queryTable(4).add("Cash Sales GL")
+            queryTable(4).add("gl")
+            queryTable(5).add("Cash Sales GL Off")
+            queryTable(5).add("gloff")
+            queryTable(6).add("Cash Sales GL Audit")
+            queryTable(6).add("glaudit")
+            queryTable(7).add("CS Product Serial No")
+            queryTable(7).add("prodsn")
+            queryTable(8).add("CS Stock Serial No")
+            queryTable(8).add("stocksn")
+            quotationWriteIntoSQL(tableExcelSetting, queryTable)
         End Using
-        'Catch ex As Exception
-        '    MsgBox(ex.Message + vbNewLine + ex.StackTrace, MsgBoxStyle.Critical)
-        'End Try
     End Sub
     Private Sub quotationWriteIntoSQL(tableExcelSetting As DataTableCollection, queryTable As ArrayList)
         Dim value_arraylist = New ArrayList
@@ -756,28 +757,6 @@ Public Class Cash_Sales_Form
                     If Not existed_checker(table, value_name, value) Then
                         execute_valid = False
                         exist_result += value_name + " '" + value + "' is not found in the database (" + table + ")!" + vbNewLine
-                    End If
-                End If
-
-                'custaddr.addr / exist
-                table = "custaddr"
-                value_name = "addr"
-                value = dgvExcel.Rows(row).Cells("Delivery Address").Value.ToString
-                Dim value2 = value_arraylist(0)(row)(10) 'custcode
-                If Not value.Trim.Equals(String.Empty) And Not value2.Trim.Equals(String.Empty) Then
-                    value = value.Replace(vbLf, vbCrLf)
-                    myConn.Open()
-                    Dim exist_value As Boolean = False
-                    Dim command = New SqlCommand("SELECT * FROM " + table + " WHERE cast(" + value_name + " as varchar(MAX)) ='" + value + "' AND custcode ='" + value2 + "'", myConn)
-                    Dim reader As SqlDataReader = command.ExecuteReader
-                    While reader.Read()
-                        exist_value = True
-                        value_arraylist(0)(row)(13) = reader.GetValue(0).ToString 'update addrkey
-                    End While
-                    myConn.Close()
-                    If Not exist_value Then
-                        execute_valid = False
-                        exist_result += value_name + " '" + value + "'(" + value2 + ") is not found in the database (" + table + ")!" + vbNewLine
                     End If
                 End If
 

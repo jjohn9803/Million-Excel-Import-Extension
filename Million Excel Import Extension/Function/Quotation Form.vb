@@ -86,26 +86,27 @@ Public Class Quotation_Form
     Private Sub btnImport_Click(sender As Object, e As EventArgs) Handles btnImport.Click
         Dim importType = "Quotation"
         Dim tableExcelSetting As DataTableCollection
+        Dim stream As FileStream
         Try
-            Using stream = File.Open(getMaintainSetting, FileMode.Open, FileAccess.Read)
-                Using reader As IExcelDataReader = ExcelReaderFactory.CreateReader(stream)
-                    Dim result As DataSet = reader.AsDataSet(New ExcelDataSetConfiguration() With {
-                                                                             .ConfigureDataTable = Function(__) New ExcelDataTableConfiguration() With {
-                                                                             .UseHeaderRow = True}})
-                    tableExcelSetting = result.Tables
-                    Dim queryTable As New ArrayList
-                    queryTable.Add(New ArrayList)
-                    queryTable.Add(New ArrayList)
-                    queryTable(0).add("Quotation") '0
-                    queryTable(0).add("squote") '1
-                    queryTable(1).add("Quotation Desc")
-                    queryTable(1).add("squotedet")
-                    quotationWriteIntoSQL(tableExcelSetting, queryTable)
-                End Using
-            End Using
+            stream = File.Open(getMaintainSetting, FileMode.Open, FileAccess.Read)
         Catch ex As Exception
             MsgBox(ex.Message + vbNewLine + ex.StackTrace, MsgBoxStyle.Critical)
+            Return
         End Try
+        Using reader As IExcelDataReader = ExcelReaderFactory.CreateReader(stream)
+            Dim result As DataSet = reader.AsDataSet(New ExcelDataSetConfiguration() With {
+                                                                             .ConfigureDataTable = Function(__) New ExcelDataTableConfiguration() With {
+                                                                             .UseHeaderRow = True}})
+            tableExcelSetting = result.Tables
+            Dim queryTable As New ArrayList
+            queryTable.Add(New ArrayList)
+            queryTable.Add(New ArrayList)
+            queryTable(0).add("Quotation") '0
+            queryTable(0).add("squote") '1
+            queryTable(1).add("Quotation Desc")
+            queryTable(1).add("squotedet")
+            quotationWriteIntoSQL(tableExcelSetting, queryTable)
+        End Using
     End Sub
     Private Sub quotationWriteIntoSQL(tableExcelSetting As DataTableCollection, queryTable As ArrayList)
         Dim value_arraylist = New ArrayList

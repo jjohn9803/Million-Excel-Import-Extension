@@ -84,41 +84,42 @@ Public Class Debit_Note_Form
     Private Sub btnImport_Click(sender As Object, e As EventArgs) Handles btnImport.Click
         Dim importType = "Debit Note"
         Dim tableExcelSetting As DataTableCollection
-        'Try
-        Using stream = File.Open(getMaintainSetting, FileMode.Open, FileAccess.Read)
-            Using reader As IExcelDataReader = ExcelReaderFactory.CreateReader(stream)
-                Dim result As DataSet = reader.AsDataSet(New ExcelDataSetConfiguration() With {
-                                                                    .ConfigureDataTable = Function(__) New ExcelDataTableConfiguration() With {
-                                                                    .UseHeaderRow = True}})
-                tableExcelSetting = result.Tables
-                Dim queryTable As New ArrayList
-                For i = 0 To 8
-                    queryTable.Add(New ArrayList)
-                Next
-                queryTable(0).add("Debit Note") '0
-                queryTable(0).add("sinv") '1
-                queryTable(1).add("Debit Note Desc")
-                queryTable(1).add("sinvdet")
-                queryTable(2).add("Debit Note Stock")
-                queryTable(2).add("stock")
-                queryTable(3).add("Debit Note AR") '0
-                queryTable(3).add("ar") '1
-                queryTable(4).add("Debit Note GL")
-                queryTable(4).add("gl")
-                queryTable(5).add("Debit Note GL Off")
-                queryTable(5).add("gloff")
-                queryTable(6).add("Debit Note GL Audit")
-                queryTable(6).add("glaudit")
-                queryTable(7).add("DN Product Serial No")
-                queryTable(7).add("prodsn")
-                queryTable(8).add("DN Stock Serial No")
-                queryTable(8).add("stocksn")
-                quotationWriteIntoSQL(tableExcelSetting, queryTable)
-            End Using
+        Dim stream As FileStream
+        Try
+            stream = File.Open(getMaintainSetting, FileMode.Open, FileAccess.Read)
+        Catch ex As Exception
+            MsgBox(ex.Message + vbNewLine + ex.StackTrace, MsgBoxStyle.Critical)
+            Return
+        End Try
+        Using reader As IExcelDataReader = ExcelReaderFactory.CreateReader(stream)
+            Dim result As DataSet = reader.AsDataSet(New ExcelDataSetConfiguration() With {
+                                                                .ConfigureDataTable = Function(__) New ExcelDataTableConfiguration() With {
+                                                                .UseHeaderRow = True}})
+            tableExcelSetting = result.Tables
+            Dim queryTable As New ArrayList
+            For i = 0 To 8
+                queryTable.Add(New ArrayList)
+            Next
+            queryTable(0).add("Debit Note") '0
+            queryTable(0).add("sinv") '1
+            queryTable(1).add("Debit Note Desc")
+            queryTable(1).add("sinvdet")
+            queryTable(2).add("Debit Note Stock")
+            queryTable(2).add("stock")
+            queryTable(3).add("Debit Note AR") '0
+            queryTable(3).add("ar") '1
+            queryTable(4).add("Debit Note GL")
+            queryTable(4).add("gl")
+            queryTable(5).add("Debit Note GL Off")
+            queryTable(5).add("gloff")
+            queryTable(6).add("Debit Note GL Audit")
+            queryTable(6).add("glaudit")
+            queryTable(7).add("DN Product Serial No")
+            queryTable(7).add("prodsn")
+            queryTable(8).add("DN Stock Serial No")
+            queryTable(8).add("stocksn")
+            quotationWriteIntoSQL(tableExcelSetting, queryTable)
         End Using
-        'Catch ex As Exception
-        '    MsgBox(ex.Message + vbNewLine + ex.StackTrace, MsgBoxStyle.Critical)
-        'End Try
     End Sub
     Private Sub quotationWriteIntoSQL(tableExcelSetting As DataTableCollection, queryTable As ArrayList)
         Dim value_arraylist = New ArrayList

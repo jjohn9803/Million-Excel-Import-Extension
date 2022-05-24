@@ -207,10 +207,28 @@
     <Compile Include="Function\Delivery Return.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Function\Stock Adjustment.Designer.vb">
+      <DependentUpon>Stock Adjustment.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Function\Stock Adjustment.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Function\Stock Issue.Designer.vb">
+      <DependentUpon>Stock Issue.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Function\Stock Issue.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Function\Stock Receive.Designer.vb">
       <DependentUpon>Stock Receive.vb</DependentUpon>
     </Compile>
     <Compile Include="Function\Stock Receive.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Function\Stock Transfer.Designer.vb">
+      <DependentUpon>Stock Transfer.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Function\Stock Transfer.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Login.Designer.vb">
@@ -288,8 +306,17 @@
     <EmbeddedResource Include="Function\Delivery Return.resx">
       <DependentUpon>Delivery Return.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Function\Stock Adjustment.resx">
+      <DependentUpon>Stock Adjustment.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Function\Stock Issue.resx">
+      <DependentUpon>Stock Issue.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Function\Stock Receive.resx">
       <DependentUpon>Stock Receive.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Function\Stock Transfer.resx">
+      <DependentUpon>Stock Transfer.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Login.resx">
       <DependentUpon>Login.vb</DependentUpon>

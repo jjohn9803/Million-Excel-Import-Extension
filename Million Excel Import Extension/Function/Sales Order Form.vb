@@ -85,26 +85,27 @@ Public Class Sales_Order_Form
     Private Sub btnImport_Click(sender As Object, e As EventArgs) Handles btnImport.Click
         Dim importType = "Sales Order"
         Dim tableExcelSetting As DataTableCollection
-        'Try
-        Using stream = File.Open(getMaintainSetting, FileMode.Open, FileAccess.Read)
-                Using reader As IExcelDataReader = ExcelReaderFactory.CreateReader(stream)
-                    Dim result As DataSet = reader.AsDataSet(New ExcelDataSetConfiguration() With {
-                                                                         .ConfigureDataTable = Function(__) New ExcelDataTableConfiguration() With {
-                                                                         .UseHeaderRow = True}})
-                    tableExcelSetting = result.Tables
-                    Dim queryTable As New ArrayList
-                    queryTable.Add(New ArrayList)
-                    queryTable.Add(New ArrayList)
-                    queryTable(0).add("Sales Order") '0
-                    queryTable(0).add("sorder") '1
-                    queryTable(1).add("Sales Order Desc")
-                    queryTable(1).add("sorderdet")
-                    quotationWriteIntoSQL(tableExcelSetting, queryTable)
-                End Using
-            End Using
-        'Catch ex As Exception
-        '    MsgBox(ex.Message + vbNewLine + ex.StackTrace, MsgBoxStyle.Critical)
-        'End Try
+        Dim stream As FileStream
+        Try
+            stream = File.Open(getMaintainSetting, FileMode.Open, FileAccess.Read)
+        Catch ex As Exception
+            MsgBox(ex.Message + vbNewLine + ex.StackTrace, MsgBoxStyle.Critical)
+            Return
+        End Try
+        Using reader As IExcelDataReader = ExcelReaderFactory.CreateReader(stream)
+            Dim result As DataSet = reader.AsDataSet(New ExcelDataSetConfiguration() With {
+                                                                 .ConfigureDataTable = Function(__) New ExcelDataTableConfiguration() With {
+                                                                 .UseHeaderRow = True}})
+            tableExcelSetting = result.Tables
+            Dim queryTable As New ArrayList
+            queryTable.Add(New ArrayList)
+            queryTable.Add(New ArrayList)
+            queryTable(0).add("Sales Order") '0
+            queryTable(0).add("sorder") '1
+            queryTable(1).add("Sales Order Desc")
+            queryTable(1).add("sorderdet")
+            quotationWriteIntoSQL(tableExcelSetting, queryTable)
+        End Using
     End Sub
     Private Sub quotationWriteIntoSQL(tableExcelSetting As DataTableCollection, queryTable As ArrayList)
         Dim value_arraylist = New ArrayList
