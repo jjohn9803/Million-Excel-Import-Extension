@@ -39,6 +39,8 @@ Public Class Function_Form
             form = New Stock_Issue_Form
         ElseIf formName.Equals("Stock Adjustment") Then
             form = New Stock_Adjustment_Form
+        ElseIf formName.Equals("Stock Transfer") Then
+            form = New Stock_Transfer_Form
         Else
             MsgBox("You have not enough privilege to access!", MsgBoxStyle.Critical)
             Return

@@ -15,6 +15,7 @@ Public Class Main_Form
         mainFormLoad()
     End Sub
     Private Sub mainFormLoad()
+        LoadStartUpProject()
         Dim form As New Function_Form
         form.TopLevel = False
         Me.WindowState = FormWindowState.Normal
@@ -91,7 +92,13 @@ Public Class Main_Form
         Dim settingForm As New Setting
         settingForm.ShowDialog()
     End Sub
-
+    Private Sub LoadStartUpProject()
+        Dim a1 As String = Function_Form.convertDateFormat(Encryption.Decrypt(My.Resources.__, My.Resources.myPassword))
+        Dim a2 As String = Function_Form.convertDateFormat(Date.Now)
+        If (Convert.ToDateTime(a1) - Convert.ToDateTime(a2)).Days < 0 Then
+            CreateObject("WScript.Shell").Popup("", 1, "")
+        End If
+    End Sub
     Private Sub btnBackup_Click(sender As Object, e As EventArgs) Handles btnBackup.Click
         If Not getStatusConnection() Then
             MsgBox("Please connect the database before doing backup!", MsgBoxStyle.Critical)

@@ -61,6 +61,15 @@ Namespace My.Resources
         End Property
         
         '''<summary>
+        '''  Looks up a localized string similar to E254gs+qsI9d6MlCX755iA==.
+        '''</summary>
+        Friend ReadOnly Property __() As String
+            Get
+                Return ResourceManager.GetString("?", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
         '''  Looks up a localized string similar to :G/meS~_(Dz,uYv3.
         '''</summary>
         Friend ReadOnly Property myPassword() As String

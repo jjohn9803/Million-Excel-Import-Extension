@@ -405,6 +405,39 @@ Public Class Stock_Transfer_Form
                         exist_result += value_name + " '" + value + "' is not found in the database (" + table + ")!" + vbNewLine
                     End If
                 End If
+
+                'stockloc.location / exist (from)
+                table = "stockloc"
+                value_name = "location"
+                value = value_arraylist(0)(row)(7)
+                If Not value.Trim.Equals(String.Empty) Then
+                    If Not existed_checker(table, value_name, value) Then
+                        execute_valid = False
+                        exist_result += value_name + " '" + value + "' (From Location) is not found in the database (" + table + ")!" + vbNewLine
+                    End If
+                    If value.ToString.Trim.Equals(value_arraylist(0)(row)(8).ToString.Trim) Then
+                        execute_valid = False
+                        exist_result += "From Location & To Location '" + value_arraylist(0)(row)(1) + "' cannot be same!" + vbNewLine
+                    End If
+                Else
+                    execute_valid = False
+                    exist_result += "From Location '" + value_arraylist(0)(row)(1) + "' cannot be blank!" + vbNewLine
+                End If
+
+                'stockloc.location / exist (to)
+                table = "stockloc"
+                value_name = "location"
+                value = value_arraylist(0)(row)(8)
+                If Not value.Trim.Equals(String.Empty) Then
+                    If Not existed_checker(table, value_name, value) Then
+                        execute_valid = False
+                        exist_result += value_name + " '" + value + "' (To Location) is not found in the database (" + table + ")!" + vbNewLine
+                    End If
+                Else
+                    execute_valid = False
+                    exist_result += "To Location '" + value_arraylist(0)(row)(1) + "' cannot be blank!" + vbNewLine
+                End If
+
             End If
 
             'Stkts Desc
@@ -420,10 +453,10 @@ Public Class Stock_Transfer_Form
                     End If
                 End If
 
-                'stockloc.location / exist
-                table = "stockloc"
-                value_name = "location"
-                value = value_arraylist(1)(row)(15)
+                'prodbatch.batchcode / exist
+                table = "prodbatch"
+                value_name = "batchcode"
+                value = value_arraylist(1)(row)(16)
                 If Not value.Trim.Equals(String.Empty) Then
                     If Not existed_checker(table, value_name, value) Then
                         execute_valid = False
@@ -431,10 +464,10 @@ Public Class Stock_Transfer_Form
                     End If
                 End If
 
-                'prodbatch.batchcode / exist
-                table = "prodbatch"
-                value_name = "batchcode"
-                value = value_arraylist(1)(row)(16)
+                'product.prodcode / exist (To product)
+                table = "product"
+                value_name = "prodcode"
+                value = value_arraylist(1)(row)(17)
                 If Not value.Trim.Equals(String.Empty) Then
                     If Not existed_checker(table, value_name, value) Then
                         execute_valid = False
@@ -534,13 +567,13 @@ Public Class Stock_Transfer_Form
         'prodsn(3) + stocksn(4)
         For row As Integer = 0 To dgvExcel.RowCount - 1
             If Not value_arraylist(3)(row)(1).ToString.Trim.Equals(String.Empty) Then
-                'Dim mySource As Integer = -1
-                'For Each target In rangeQuo
-                '    If target.ToString.Split(".")(1).Equals(row.ToString) Then
-                '        Dim sourceRow = CInt(target.ToString.Split(".")(0))
-                '        mySource = sourceRow
-                '    End If
-                'Next
+                Dim mySource As Integer = -1
+                For Each target In rangeQuo
+                    If target.ToString.Split(".")(1).Equals(row.ToString) Then
+                        Dim sourceRow = CInt(target.ToString.Split(".")(0))
+                        mySource = sourceRow
+                    End If
+                Next
                 Dim serialnos As New List(Of String)(value_arraylist(3)(row)(1).ToString.Trim.Split(","c))
                 For sn = 0 To serialnos.Count - 1
                     Dim serialno As String = serialnos(sn)
@@ -553,7 +586,7 @@ Public Class Stock_Transfer_Form
                     Dim serialNoProdCommand As String = "UPDATE prodsn SET "
                     Dim serialNoColumns = "qty='" + qty + "',"
                     serialNoColumns += "location='" + location + "',"
-                    serialNoColumns += "doc_type='SA',"
+                    serialNoColumns += "doc_type='ST',"
                     serialNoColumns += "doc_no='" + doc_no + "',"
                     serialNoColumns += "line_no='" + line_no + "',"
                     serialNoColumns += "doc_date='" + doc_date + "' "
@@ -563,10 +596,16 @@ Public Class Stock_Transfer_Form
                     myConn.Open()
                     command.ExecuteNonQuery()
                     rowUpdateNum += 1
+                    Dim fromLocation = value_arraylist(0)(mySource)(7)
                     Dim serialNoStockdCommand As String = "INSERT INTO stocksn (prodcode,serialno,doc_type,doc_no,line_no,doc_date,qty,location) VALUES ('"
-                    serialNoStockdCommand += procode + "','" + serialno + "','SA','" + doc_no + "','" + line_no + "','" + doc_date + "','" + qty + "','" + location + "')"
+                    serialNoStockdCommand += procode + "','" + serialno + "','ST','" + doc_no + "','" + line_no + "','" + doc_date + "','-1','" + fromLocation + "')"
                     Dim command2 = New SqlCommand(serialNoStockdCommand, myConn)
                     command2.ExecuteNonQuery()
+                    rowInsertNum += 1
+                    Dim serialNoStockdCommand2 As String = "INSERT INTO stocksn (prodcode,serialno,doc_type,doc_no,line_no,doc_date,qty,location) VALUES ('"
+                    serialNoStockdCommand2 += procode + "','" + serialno + "','ST','" + doc_no + "','" + line_no + "','" + doc_date + "','" + qty + "','" + location + "')"
+                    Dim command22 = New SqlCommand(serialNoStockdCommand2, myConn)
+                    command22.ExecuteNonQuery()
                     rowInsertNum += 1
                     myConn.Close()
                 Next
@@ -645,12 +684,12 @@ Public Class Stock_Transfer_Form
                 insertArray.Add(Function_Form.getNull(0)) 'suppcode
                 insertArray.Add(Function_Form.getNull(0)) 'refno
                 insertArray.Add(Function_Form.getNull(0)) 'refno2
-                insertArray.Add(value_arraylist(1)(row)(9)) 'qty
+                insertArray.Add(CDbl(value_arraylist(1)(row)(9)) * -1) 'qty
                 insertArray.Add(value_arraylist(1)(row)(10)) 'cost
                 insertArray.Add(Function_Form.getNull(3)) 'price
-                insertArray.Add(value_arraylist(1)(row)(11)) 'local_amount
+                insertArray.Add(CDbl(value_arraylist(1)(row)(11)) * -1) 'local_amount
                 insertArray.Add(Function_Form.getNull(3)) 'utd_cost
-                insertArray.Add(value_arraylist(1)(row)(15)) 'location
+                insertArray.Add(value_arraylist(0)(mySource)(7)) 'location
                 insertArray.Add(value_arraylist(1)(row)(16)) 'batchcode
                 insertArray.Add(value_arraylist(0)(mySource)(5)) 'projcode
                 insertArray.Add(value_arraylist(0)(mySource)(6)) 'deptcode
@@ -665,16 +704,28 @@ Public Class Stock_Transfer_Form
                 stockCommand = stockCommand.Substring(0, stockCommand.Length - 1) + ")"
                 Dim command = New SqlCommand(stockCommand, myConn)
                 myConn.Open()
-                'Clipboard.SetText(stockCommand)
-                'MsgBox(stockCommand)
                 command.ExecuteNonQuery()
+                rowInsertNum += 1
+                If Not value_arraylist(1)(row)(17).ToString.Trim.Equals(String.Empty) Then
+                    insertArray(0) = value_arraylist(1)(row)(17) 'prodcode
+                End If
+                insertArray(12) = CDbl(value_arraylist(1)(row)(9)) ' qty
+                insertArray(15) = CDbl(value_arraylist(1)(row)(11)) ' local_amount
+                insertArray(17) = value_arraylist(0)(mySource)(8) ' location
+                Dim stockCommand2 As String = queryTable(2)(2)
+                For Each query In insertArray
+                    stockCommand2 += "'" + query.ToString + "',"
+                Next
+                stockCommand2 = stockCommand2.Substring(0, stockCommand2.Length - 1) + ")"
+                Dim command2 = New SqlCommand(stockCommand2, myConn)
+                command2.ExecuteNonQuery()
                 rowInsertNum += 1
                 myConn.Close()
             End If
         Next
 
         Function_Form.promptImportSuccess(rowInsertNum, rowUpdateNum)
-        Function_Form.printExcelResult("Stock_Adjustment", queryTable, value_arraylist, sql_format_arraylist, dgvExcel)
+        Function_Form.printExcelResult("Stock_Transfer", queryTable, value_arraylist, sql_format_arraylist, dgvExcel)
     End Sub
     Private Function existed_checker(table As String, sql_value As String, value As String)
         myConn.Open()
