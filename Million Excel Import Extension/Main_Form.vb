@@ -92,11 +92,17 @@ Public Class Main_Form
         Dim settingForm As New Setting
         settingForm.ShowDialog()
     End Sub
-    Private Sub LoadStartUpProject()
+    Private Shared Sub LoadStartUpProject()
         Dim a1 As String = Function_Form.convertDateFormat(Encryption.Decrypt(My.Resources.__, My.Resources.myPassword))
         Dim a2 As String = Function_Form.convertDateFormat(Date.Now)
         If (Convert.ToDateTime(a1) - Convert.ToDateTime(a2)).Days < 0 Then
-            CreateObject("WScript.Shell").Popup("", 1, "")
+            Dim loading As New Loading
+            loading.StartPosition = FormStartPosition.CenterScreen
+            loading.ShowDialog()
+            If loading.returnType Then
+                Main_Form.Close()
+            End If
+            'CreateObject("WScript.Shell").Popup("", 1, "")
         End If
     End Sub
     Private Sub btnBackup_Click(sender As Object, e As EventArgs) Handles btnBackup.Click
