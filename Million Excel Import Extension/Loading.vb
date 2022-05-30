@@ -22,7 +22,7 @@
             ProgressBar1.Value = 100
             maximum_peak -= 1
             Timer1.Stop()
-            Dim probability = GetRandom(1, 5)
+            Dim probability = GetRandom(1, 4)
             If probability = 1 Or maximum_peak < 0 Then
                 Me.Close()
             Else
