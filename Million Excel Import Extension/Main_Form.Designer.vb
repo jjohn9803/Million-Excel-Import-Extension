@@ -48,7 +48,7 @@ Partial Class Main_Form
         Me.FlowLayoutPanel1.Controls.Add(Me.btnBackup)
         Me.FlowLayoutPanel1.Controls.Add(Me.btnSetting)
         Me.FlowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Bottom
-        Me.FlowLayoutPanel1.Location = New System.Drawing.Point(0, 517)
+        Me.FlowLayoutPanel1.Location = New System.Drawing.Point(0, 627)
         Me.FlowLayoutPanel1.Margin = New System.Windows.Forms.Padding(4)
         Me.FlowLayoutPanel1.Name = "FlowLayoutPanel1"
         Me.FlowLayoutPanel1.Size = New System.Drawing.Size(1014, 126)
@@ -150,14 +150,14 @@ Partial Class Main_Form
         Me.panelMain.Location = New System.Drawing.Point(0, 0)
         Me.panelMain.Margin = New System.Windows.Forms.Padding(4)
         Me.panelMain.Name = "panelMain"
-        Me.panelMain.Size = New System.Drawing.Size(1014, 517)
+        Me.panelMain.Size = New System.Drawing.Size(1014, 627)
         Me.panelMain.TabIndex = 35
         '
         'Main_Form
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1014, 643)
+        Me.ClientSize = New System.Drawing.Size(1014, 753)
         Me.Controls.Add(Me.panelMain)
         Me.Controls.Add(Me.FlowLayoutPanel1)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle

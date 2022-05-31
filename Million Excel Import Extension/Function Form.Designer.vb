@@ -25,9 +25,9 @@ Partial Class Function_Form
         Me.FlowLayoutPanel2 = New System.Windows.Forms.FlowLayoutPanel()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.btnStockReceive = New System.Windows.Forms.Button()
-        Me.btnStockTrasfer = New System.Windows.Forms.Button()
-        Me.btnStockAdjustment = New System.Windows.Forms.Button()
         Me.btnStockIssue = New System.Windows.Forms.Button()
+        Me.btnStockAdjustment = New System.Windows.Forms.Button()
+        Me.btnStockTrasfer = New System.Windows.Forms.Button()
         Me.FlowLayoutPanel1 = New System.Windows.Forms.FlowLayoutPanel()
         Me.btnQuotation = New System.Windows.Forms.Button()
         Me.btnSalesOrder = New System.Windows.Forms.Button()
@@ -37,8 +37,14 @@ Partial Class Function_Form
         Me.btnDebitNote = New System.Windows.Forms.Button()
         Me.btnCreditNote = New System.Windows.Forms.Button()
         Me.btnDeliveryReturn = New System.Windows.Forms.Button()
+        Me.FlowLayoutPanel3 = New System.Windows.Forms.FlowLayoutPanel()
+        Me.Label2 = New System.Windows.Forms.Label()
+        Me.Label3 = New System.Windows.Forms.Label()
+        Me.btnReceivePayment = New System.Windows.Forms.Button()
+        Me.btnPayBill = New System.Windows.Forms.Button()
         Me.FlowLayoutPanel2.SuspendLayout()
         Me.FlowLayoutPanel1.SuspendLayout()
+        Me.FlowLayoutPanel3.SuspendLayout()
         Me.SuspendLayout()
         '
         'FlowLayoutPanel2
@@ -49,10 +55,10 @@ Partial Class Function_Form
         Me.FlowLayoutPanel2.Controls.Add(Me.btnStockAdjustment)
         Me.FlowLayoutPanel2.Controls.Add(Me.btnStockTrasfer)
         Me.FlowLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Bottom
-        Me.FlowLayoutPanel2.Location = New System.Drawing.Point(0, 286)
+        Me.FlowLayoutPanel2.Location = New System.Drawing.Point(0, 283)
         Me.FlowLayoutPanel2.Margin = New System.Windows.Forms.Padding(4)
         Me.FlowLayoutPanel2.Name = "FlowLayoutPanel2"
-        Me.FlowLayoutPanel2.Size = New System.Drawing.Size(1014, 186)
+        Me.FlowLayoutPanel2.Size = New System.Drawing.Size(1014, 167)
         Me.FlowLayoutPanel2.TabIndex = 16
         '
         'Label1
@@ -69,8 +75,8 @@ Partial Class Function_Form
         'btnStockReceive
         '
         Me.btnStockReceive.Font = New System.Drawing.Font("Microsoft YaHei", 12.0!)
-        Me.btnStockReceive.Location = New System.Drawing.Point(67, 68)
-        Me.btnStockReceive.Margin = New System.Windows.Forms.Padding(67, 37, 4, 37)
+        Me.btnStockReceive.Location = New System.Drawing.Point(67, 51)
+        Me.btnStockReceive.Margin = New System.Windows.Forms.Padding(67, 20, 4, 37)
         Me.btnStockReceive.Name = "btnStockReceive"
         Me.btnStockReceive.Size = New System.Drawing.Size(175, 73)
         Me.btnStockReceive.TabIndex = 11
@@ -78,23 +84,23 @@ Partial Class Function_Form
         Me.btnStockReceive.Text = "Stock Receive"
         Me.btnStockReceive.UseVisualStyleBackColor = True
         '
-        'btnStockTrasfer
+        'btnStockIssue
         '
-        Me.btnStockTrasfer.Font = New System.Drawing.Font("Microsoft YaHei", 12.0!)
-        Me.btnStockTrasfer.Location = New System.Drawing.Point(805, 68)
-        Me.btnStockTrasfer.Margin = New System.Windows.Forms.Padding(67, 37, 4, 37)
-        Me.btnStockTrasfer.Name = "btnStockTrasfer"
-        Me.btnStockTrasfer.Size = New System.Drawing.Size(175, 73)
-        Me.btnStockTrasfer.TabIndex = 14
-        Me.btnStockTrasfer.TabStop = False
-        Me.btnStockTrasfer.Text = "Stock Transfer"
-        Me.btnStockTrasfer.UseVisualStyleBackColor = True
+        Me.btnStockIssue.Font = New System.Drawing.Font("Microsoft YaHei", 12.0!)
+        Me.btnStockIssue.Location = New System.Drawing.Point(313, 51)
+        Me.btnStockIssue.Margin = New System.Windows.Forms.Padding(67, 20, 4, 37)
+        Me.btnStockIssue.Name = "btnStockIssue"
+        Me.btnStockIssue.Size = New System.Drawing.Size(175, 73)
+        Me.btnStockIssue.TabIndex = 12
+        Me.btnStockIssue.TabStop = False
+        Me.btnStockIssue.Text = "Stock Issue"
+        Me.btnStockIssue.UseVisualStyleBackColor = True
         '
         'btnStockAdjustment
         '
         Me.btnStockAdjustment.Font = New System.Drawing.Font("Microsoft YaHei", 12.0!)
-        Me.btnStockAdjustment.Location = New System.Drawing.Point(559, 68)
-        Me.btnStockAdjustment.Margin = New System.Windows.Forms.Padding(67, 37, 4, 37)
+        Me.btnStockAdjustment.Location = New System.Drawing.Point(559, 51)
+        Me.btnStockAdjustment.Margin = New System.Windows.Forms.Padding(67, 20, 4, 37)
         Me.btnStockAdjustment.Name = "btnStockAdjustment"
         Me.btnStockAdjustment.Size = New System.Drawing.Size(175, 73)
         Me.btnStockAdjustment.TabIndex = 13
@@ -102,17 +108,17 @@ Partial Class Function_Form
         Me.btnStockAdjustment.Text = "Stock Adjustment"
         Me.btnStockAdjustment.UseVisualStyleBackColor = True
         '
-        'btnStockIssue
+        'btnStockTrasfer
         '
-        Me.btnStockIssue.Font = New System.Drawing.Font("Microsoft YaHei", 12.0!)
-        Me.btnStockIssue.Location = New System.Drawing.Point(313, 68)
-        Me.btnStockIssue.Margin = New System.Windows.Forms.Padding(67, 37, 4, 37)
-        Me.btnStockIssue.Name = "btnStockIssue"
-        Me.btnStockIssue.Size = New System.Drawing.Size(175, 73)
-        Me.btnStockIssue.TabIndex = 12
-        Me.btnStockIssue.TabStop = False
-        Me.btnStockIssue.Text = "Stock Issue"
-        Me.btnStockIssue.UseVisualStyleBackColor = True
+        Me.btnStockTrasfer.Font = New System.Drawing.Font("Microsoft YaHei", 12.0!)
+        Me.btnStockTrasfer.Location = New System.Drawing.Point(805, 51)
+        Me.btnStockTrasfer.Margin = New System.Windows.Forms.Padding(67, 20, 4, 37)
+        Me.btnStockTrasfer.Name = "btnStockTrasfer"
+        Me.btnStockTrasfer.Size = New System.Drawing.Size(175, 73)
+        Me.btnStockTrasfer.TabIndex = 14
+        Me.btnStockTrasfer.TabStop = False
+        Me.btnStockTrasfer.Text = "Stock Transfer"
+        Me.btnStockTrasfer.UseVisualStyleBackColor = True
         '
         'FlowLayoutPanel1
         '
@@ -124,11 +130,10 @@ Partial Class Function_Form
         Me.FlowLayoutPanel1.Controls.Add(Me.btnDebitNote)
         Me.FlowLayoutPanel1.Controls.Add(Me.btnCreditNote)
         Me.FlowLayoutPanel1.Controls.Add(Me.btnDeliveryReturn)
-        Me.FlowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.FlowLayoutPanel1.Location = New System.Drawing.Point(0, 0)
         Me.FlowLayoutPanel1.Margin = New System.Windows.Forms.Padding(4)
         Me.FlowLayoutPanel1.Name = "FlowLayoutPanel1"
-        Me.FlowLayoutPanel1.Size = New System.Drawing.Size(1014, 286)
+        Me.FlowLayoutPanel1.Size = New System.Drawing.Size(1014, 281)
         Me.FlowLayoutPanel1.TabIndex = 17
         '
         'btnQuotation
@@ -227,19 +232,80 @@ Partial Class Function_Form
         Me.btnDeliveryReturn.Text = "Delivery Return"
         Me.btnDeliveryReturn.UseVisualStyleBackColor = True
         '
+        'FlowLayoutPanel3
+        '
+        Me.FlowLayoutPanel3.Controls.Add(Me.Label2)
+        Me.FlowLayoutPanel3.Controls.Add(Me.Label3)
+        Me.FlowLayoutPanel3.Controls.Add(Me.btnReceivePayment)
+        Me.FlowLayoutPanel3.Controls.Add(Me.btnPayBill)
+        Me.FlowLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.FlowLayoutPanel3.Location = New System.Drawing.Point(0, 450)
+        Me.FlowLayoutPanel3.Name = "FlowLayoutPanel3"
+        Me.FlowLayoutPanel3.Size = New System.Drawing.Size(1014, 153)
+        Me.FlowLayoutPanel3.TabIndex = 11
+        '
+        'Label2
+        '
+        Me.Label2.AutoSize = True
+        Me.Label2.Font = New System.Drawing.Font("Microsoft YaHei", 13.8!, CType((System.Drawing.FontStyle.Bold Or System.Drawing.FontStyle.Underline), System.Drawing.FontStyle), System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label2.Location = New System.Drawing.Point(50, 0)
+        Me.Label2.Margin = New System.Windows.Forms.Padding(50, 0, 300, 0)
+        Me.Label2.Name = "Label2"
+        Me.Label2.Size = New System.Drawing.Size(102, 31)
+        Me.Label2.TabIndex = 16
+        Me.Label2.Text = "Debitor"
+        '
+        'Label3
+        '
+        Me.Label3.AutoSize = True
+        Me.Label3.Font = New System.Drawing.Font("Microsoft YaHei", 13.8!, CType((System.Drawing.FontStyle.Bold Or System.Drawing.FontStyle.Underline), System.Drawing.FontStyle), System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label3.Location = New System.Drawing.Point(502, 0)
+        Me.Label3.Margin = New System.Windows.Forms.Padding(50, 0, 350, 0)
+        Me.Label3.Name = "Label3"
+        Me.Label3.Size = New System.Drawing.Size(109, 31)
+        Me.Label3.TabIndex = 17
+        Me.Label3.Text = "Creditor"
+        '
+        'btnReceivePayment
+        '
+        Me.btnReceivePayment.Font = New System.Drawing.Font("Microsoft YaHei", 12.0!)
+        Me.btnReceivePayment.Location = New System.Drawing.Point(160, 51)
+        Me.btnReceivePayment.Margin = New System.Windows.Forms.Padding(160, 20, 290, 37)
+        Me.btnReceivePayment.Name = "btnReceivePayment"
+        Me.btnReceivePayment.Size = New System.Drawing.Size(183, 73)
+        Me.btnReceivePayment.TabIndex = 16
+        Me.btnReceivePayment.TabStop = False
+        Me.btnReceivePayment.Text = "Receive Payment"
+        Me.btnReceivePayment.UseVisualStyleBackColor = True
+        '
+        'btnPayBill
+        '
+        Me.btnPayBill.Font = New System.Drawing.Font("Microsoft YaHei", 12.0!)
+        Me.btnPayBill.Location = New System.Drawing.Point(633, 51)
+        Me.btnPayBill.Margin = New System.Windows.Forms.Padding(0, 20, 4, 37)
+        Me.btnPayBill.Name = "btnPayBill"
+        Me.btnPayBill.Size = New System.Drawing.Size(183, 73)
+        Me.btnPayBill.TabIndex = 18
+        Me.btnPayBill.TabStop = False
+        Me.btnPayBill.Text = "Pay Bill"
+        Me.btnPayBill.UseVisualStyleBackColor = True
+        '
         'Function_Form
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1014, 472)
+        Me.ClientSize = New System.Drawing.Size(1014, 603)
         Me.Controls.Add(Me.FlowLayoutPanel1)
         Me.Controls.Add(Me.FlowLayoutPanel2)
+        Me.Controls.Add(Me.FlowLayoutPanel3)
         Me.Margin = New System.Windows.Forms.Padding(4)
         Me.Name = "Function_Form"
         Me.Text = "Function_Form"
         Me.FlowLayoutPanel2.ResumeLayout(False)
         Me.FlowLayoutPanel2.PerformLayout()
         Me.FlowLayoutPanel1.ResumeLayout(False)
+        Me.FlowLayoutPanel3.ResumeLayout(False)
+        Me.FlowLayoutPanel3.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -259,4 +325,9 @@ Partial Class Function_Form
     Friend WithEvents btnDebitNote As Button
     Friend WithEvents btnCreditNote As Button
     Friend WithEvents btnDeliveryReturn As Button
+    Friend WithEvents FlowLayoutPanel3 As FlowLayoutPanel
+    Friend WithEvents Label2 As Label
+    Friend WithEvents Label3 As Label
+    Friend WithEvents btnReceivePayment As Button
+    Friend WithEvents btnPayBill As Button
 End Class

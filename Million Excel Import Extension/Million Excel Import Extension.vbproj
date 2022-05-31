@@ -171,28 +171,40 @@
     <Compile Include="Form1.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Function\Cash Sales.Designer.vb">
+    <Compile Include="Function\Creditor\Pay Bills.Designer.vb">
+      <DependentUpon>Pay Bills.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Function\Creditor\Pay Bills.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Function\Debitor\Receive Payment.Designer.vb">
+      <DependentUpon>Receive Payment.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Function\Debitor\Receive Payment.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Function\Sales\Cash Sales.Designer.vb">
       <DependentUpon>Cash Sales.vb</DependentUpon>
     </Compile>
-    <Compile Include="Function\Cash Sales.vb">
+    <Compile Include="Function\Sales\Cash Sales.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Function\Credit Note.Designer.vb">
+    <Compile Include="Function\Sales\Credit Note.Designer.vb">
       <DependentUpon>Credit Note.vb</DependentUpon>
     </Compile>
-    <Compile Include="Function\Credit Note.vb">
+    <Compile Include="Function\Sales\Credit Note.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Function\Debit Note.Designer.vb">
+    <Compile Include="Function\Sales\Debit Note.Designer.vb">
       <DependentUpon>Debit Note.vb</DependentUpon>
     </Compile>
-    <Compile Include="Function\Debit Note.vb">
+    <Compile Include="Function\Sales\Debit Note.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Function\Delivery Order Form.Designer.vb">
+    <Compile Include="Function\Sales\Delivery Order Form.Designer.vb">
       <DependentUpon>Delivery Order Form.vb</DependentUpon>
     </Compile>
-    <Compile Include="Function\Delivery Order Form.vb">
+    <Compile Include="Function\Sales\Delivery Order Form.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Encryption.vb" />
@@ -202,34 +214,34 @@
     <Compile Include="Function Form.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Function\Delivery Return.Designer.vb">
+    <Compile Include="Function\Sales\Delivery Return.Designer.vb">
       <DependentUpon>Delivery Return.vb</DependentUpon>
     </Compile>
-    <Compile Include="Function\Delivery Return.vb">
+    <Compile Include="Function\Sales\Delivery Return.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Function\Stock Adjustment.Designer.vb">
+    <Compile Include="Function\Stock\Stock Adjustment.Designer.vb">
       <DependentUpon>Stock Adjustment.vb</DependentUpon>
     </Compile>
-    <Compile Include="Function\Stock Adjustment.vb">
+    <Compile Include="Function\Stock\Stock Adjustment.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Function\Stock Issue.Designer.vb">
+    <Compile Include="Function\Stock\Stock Issue.Designer.vb">
       <DependentUpon>Stock Issue.vb</DependentUpon>
     </Compile>
-    <Compile Include="Function\Stock Issue.vb">
+    <Compile Include="Function\Stock\Stock Issue.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Function\Stock Receive.Designer.vb">
+    <Compile Include="Function\Stock\Stock Receive.Designer.vb">
       <DependentUpon>Stock Receive.vb</DependentUpon>
     </Compile>
-    <Compile Include="Function\Stock Receive.vb">
+    <Compile Include="Function\Stock\Stock Receive.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Function\Stock Transfer.Designer.vb">
+    <Compile Include="Function\Stock\Stock Transfer.Designer.vb">
       <DependentUpon>Stock Transfer.vb</DependentUpon>
     </Compile>
-    <Compile Include="Function\Stock Transfer.vb">
+    <Compile Include="Function\Stock\Stock Transfer.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Loading.Designer.vb">
@@ -260,22 +272,22 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Function\Quotation Form.Designer.vb">
+    <Compile Include="Function\Sales\Quotation Form.Designer.vb">
       <DependentUpon>Quotation Form.vb</DependentUpon>
     </Compile>
-    <Compile Include="Function\Quotation Form.vb">
+    <Compile Include="Function\Sales\Quotation Form.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Function\Sales Invoice Form.Designer.vb">
+    <Compile Include="Function\Sales\Sales Invoice Form.Designer.vb">
       <DependentUpon>Sales Invoice Form.vb</DependentUpon>
     </Compile>
-    <Compile Include="Function\Sales Invoice Form.vb">
+    <Compile Include="Function\Sales\Sales Invoice Form.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Function\Sales Order Form.Designer.vb">
+    <Compile Include="Function\Sales\Sales Order Form.Designer.vb">
       <DependentUpon>Sales Order Form.vb</DependentUpon>
     </Compile>
-    <Compile Include="Function\Sales Order Form.vb">
+    <Compile Include="Function\Sales\Sales Order Form.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Setting.Designer.vb">
@@ -295,34 +307,40 @@
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Function\Cash Sales.resx">
+    <EmbeddedResource Include="Function\Creditor\Pay Bills.resx">
+      <DependentUpon>Pay Bills.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Function\Debitor\Receive Payment.resx">
+      <DependentUpon>Receive Payment.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Function\Sales\Cash Sales.resx">
       <DependentUpon>Cash Sales.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Function\Credit Note.resx">
+    <EmbeddedResource Include="Function\Sales\Credit Note.resx">
       <DependentUpon>Credit Note.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Function\Debit Note.resx">
+    <EmbeddedResource Include="Function\Sales\Debit Note.resx">
       <DependentUpon>Debit Note.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Function\Delivery Order Form.resx">
+    <EmbeddedResource Include="Function\Sales\Delivery Order Form.resx">
       <DependentUpon>Delivery Order Form.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Function Form.resx">
       <DependentUpon>Function Form.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Function\Delivery Return.resx">
+    <EmbeddedResource Include="Function\Sales\Delivery Return.resx">
       <DependentUpon>Delivery Return.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Function\Stock Adjustment.resx">
+    <EmbeddedResource Include="Function\Stock\Stock Adjustment.resx">
       <DependentUpon>Stock Adjustment.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Function\Stock Issue.resx">
+    <EmbeddedResource Include="Function\Stock\Stock Issue.resx">
       <DependentUpon>Stock Issue.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Function\Stock Receive.resx">
+    <EmbeddedResource Include="Function\Stock\Stock Receive.resx">
       <DependentUpon>Stock Receive.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Function\Stock Transfer.resx">
+    <EmbeddedResource Include="Function\Stock\Stock Transfer.resx">
       <DependentUpon>Stock Transfer.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Loading.resx">
@@ -337,13 +355,13 @@
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Function\Quotation Form.resx">
+    <EmbeddedResource Include="Function\Sales\Quotation Form.resx">
       <DependentUpon>Quotation Form.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Function\Sales Invoice Form.resx">
+    <EmbeddedResource Include="Function\Sales\Sales Invoice Form.resx">
       <DependentUpon>Sales Invoice Form.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Function\Sales Order Form.resx">
+    <EmbeddedResource Include="Function\Sales\Sales Order Form.resx">
       <DependentUpon>Sales Order Form.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Setting.resx">

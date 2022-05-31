@@ -21,6 +21,25 @@
             e.Handled = True
         End If
     End Sub
+    Private Sub txtPassword_LostFocus(sender As Object, e As EventArgs) Handles txtPassword.LostFocus
+        lblCapsLock.Visible = False
+    End Sub
+    Private Sub txtPassword_GotFocus(sender As Object, e As EventArgs) Handles txtPassword.GotFocus
+        If Control.IsKeyLocked(Keys.CapsLock) Then
+            lblCapsLock.Visible = True
+        Else
+            lblCapsLock.Visible = False
+        End If
+    End Sub
+
+    Private Sub txtPassword_KeyUp(sender As Object, e As KeyEventArgs) Handles txtPassword.KeyUp, txtPassword.KeyDown
+        If Control.IsKeyLocked(Keys.CapsLock) Then
+            lblCapsLock.Visible = True
+        Else
+            lblCapsLock.Visible = False
+        End If
+    End Sub
+
     Private Function getStaffID() As String
         Return Encryption.Encrypt(txtStaffID.Text, My.Resources.myPassword)
     End Function

@@ -180,7 +180,7 @@ Partial Class Setting
         '
         Me.btnTestConnection.Font = New System.Drawing.Font("Ebrima", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btnTestConnection.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.btnTestConnection.Location = New System.Drawing.Point(55, 416)
+        Me.btnTestConnection.Location = New System.Drawing.Point(55, 446)
         Me.btnTestConnection.Margin = New System.Windows.Forms.Padding(4)
         Me.btnTestConnection.Name = "btnTestConnection"
         Me.btnTestConnection.Size = New System.Drawing.Size(200, 49)
@@ -191,7 +191,7 @@ Partial Class Setting
         'btnSave
         '
         Me.btnSave.Font = New System.Drawing.Font("Ebrima", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnSave.Location = New System.Drawing.Point(263, 416)
+        Me.btnSave.Location = New System.Drawing.Point(263, 446)
         Me.btnSave.Margin = New System.Windows.Forms.Padding(4)
         Me.btnSave.Name = "btnSave"
         Me.btnSave.Size = New System.Drawing.Size(200, 49)
@@ -202,7 +202,7 @@ Partial Class Setting
         'btnClose
         '
         Me.btnClose.Font = New System.Drawing.Font("Ebrima", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnClose.Location = New System.Drawing.Point(471, 416)
+        Me.btnClose.Location = New System.Drawing.Point(471, 446)
         Me.btnClose.Margin = New System.Windows.Forms.Padding(4)
         Me.btnClose.Name = "btnClose"
         Me.btnClose.Size = New System.Drawing.Size(200, 49)
@@ -226,12 +226,12 @@ Partial Class Setting
         Me.checkBoxFeature.ColumnWidth = 150
         Me.checkBoxFeature.Font = New System.Drawing.Font("Ebrima", 12.0!)
         Me.checkBoxFeature.FormattingEnabled = True
-        Me.checkBoxFeature.Items.AddRange(New Object() {"Quotation", "Sales Order", "Delivery Order", "Sales Invoice", "Cash Sales", "Debit Note", "Credit Note", "Delivery Return", "Stock Receive", "Stock Issue", "Stock Adjustment", "Stock Transfer"})
+        Me.checkBoxFeature.Items.AddRange(New Object() {"Quotation", "Sales Order", "Delivery Order", "Sales Invoice", "Cash Sales", "Debit Note", "Credit Note", "Delivery Return", "Stock Receive", "Stock Issue", "Stock Adjustment", "Stock Transfer", "Receive Payment", "Pay Bills"})
         Me.checkBoxFeature.Location = New System.Drawing.Point(55, 284)
         Me.checkBoxFeature.Margin = New System.Windows.Forms.Padding(4)
         Me.checkBoxFeature.MultiColumn = True
         Me.checkBoxFeature.Name = "checkBoxFeature"
-        Me.checkBoxFeature.Size = New System.Drawing.Size(615, 124)
+        Me.checkBoxFeature.Size = New System.Drawing.Size(615, 154)
         Me.checkBoxFeature.TabIndex = 8
         '
         'Setting
@@ -240,7 +240,7 @@ Partial Class Setting
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.AutoSize = True
         Me.BackColor = System.Drawing.SystemColors.Control
-        Me.ClientSize = New System.Drawing.Size(727, 482)
+        Me.ClientSize = New System.Drawing.Size(727, 516)
         Me.Controls.Add(Me.checkBoxFeature)
         Me.Controls.Add(Me.btnSearchServer)
         Me.Controls.Add(Me.Label2)
