@@ -227,7 +227,7 @@ Partial Class Pay_Bills
         Me.Controls.Add(Me.Panel2)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Name = "Pay_Bills"
-        Me.Text = "Pay Bills"
+        Me.Text = "Pay Bills (Creditor)"
         Me.Panel1.ResumeLayout(False)
         Me.FlowLayoutPanel1.ResumeLayout(False)
         Me.FlowLayoutPanel1.PerformLayout()

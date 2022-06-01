@@ -227,7 +227,7 @@ Partial Class Receive_Payment
         Me.Controls.Add(Me.Panel2)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Name = "Receive_Payment"
-        Me.Text = "Receive Payment"
+        Me.Text = "Receive Payment (Debitor)"
         Me.Panel1.ResumeLayout(False)
         Me.FlowLayoutPanel1.ResumeLayout(False)
         Me.FlowLayoutPanel1.PerformLayout()

@@ -42,6 +42,7 @@ Partial Class Function_Form
         Me.Label3 = New System.Windows.Forms.Label()
         Me.btnReceivePayment = New System.Windows.Forms.Button()
         Me.btnPayBill = New System.Windows.Forms.Button()
+        Me.Label4 = New System.Windows.Forms.Label()
         Me.FlowLayoutPanel2.SuspendLayout()
         Me.FlowLayoutPanel1.SuspendLayout()
         Me.FlowLayoutPanel3.SuspendLayout()
@@ -55,7 +56,7 @@ Partial Class Function_Form
         Me.FlowLayoutPanel2.Controls.Add(Me.btnStockAdjustment)
         Me.FlowLayoutPanel2.Controls.Add(Me.btnStockTrasfer)
         Me.FlowLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Bottom
-        Me.FlowLayoutPanel2.Location = New System.Drawing.Point(0, 283)
+        Me.FlowLayoutPanel2.Location = New System.Drawing.Point(0, 304)
         Me.FlowLayoutPanel2.Margin = New System.Windows.Forms.Padding(4)
         Me.FlowLayoutPanel2.Name = "FlowLayoutPanel2"
         Me.FlowLayoutPanel2.Size = New System.Drawing.Size(1014, 167)
@@ -122,6 +123,7 @@ Partial Class Function_Form
         '
         'FlowLayoutPanel1
         '
+        Me.FlowLayoutPanel1.Controls.Add(Me.Label4)
         Me.FlowLayoutPanel1.Controls.Add(Me.btnQuotation)
         Me.FlowLayoutPanel1.Controls.Add(Me.btnSalesOrder)
         Me.FlowLayoutPanel1.Controls.Add(Me.btnDeliveryOrder)
@@ -133,14 +135,14 @@ Partial Class Function_Form
         Me.FlowLayoutPanel1.Location = New System.Drawing.Point(0, 0)
         Me.FlowLayoutPanel1.Margin = New System.Windows.Forms.Padding(4)
         Me.FlowLayoutPanel1.Name = "FlowLayoutPanel1"
-        Me.FlowLayoutPanel1.Size = New System.Drawing.Size(1014, 281)
+        Me.FlowLayoutPanel1.Size = New System.Drawing.Size(1014, 305)
         Me.FlowLayoutPanel1.TabIndex = 17
         '
         'btnQuotation
         '
         Me.btnQuotation.Font = New System.Drawing.Font("Microsoft YaHei", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnQuotation.Location = New System.Drawing.Point(67, 37)
-        Me.btnQuotation.Margin = New System.Windows.Forms.Padding(67, 37, 4, 37)
+        Me.btnQuotation.Location = New System.Drawing.Point(67, 66)
+        Me.btnQuotation.Margin = New System.Windows.Forms.Padding(67, 20, 4, 37)
         Me.btnQuotation.Name = "btnQuotation"
         Me.btnQuotation.Size = New System.Drawing.Size(175, 73)
         Me.btnQuotation.TabIndex = 3
@@ -151,8 +153,8 @@ Partial Class Function_Form
         'btnSalesOrder
         '
         Me.btnSalesOrder.Font = New System.Drawing.Font("Microsoft YaHei", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnSalesOrder.Location = New System.Drawing.Point(313, 37)
-        Me.btnSalesOrder.Margin = New System.Windows.Forms.Padding(67, 37, 4, 37)
+        Me.btnSalesOrder.Location = New System.Drawing.Point(313, 66)
+        Me.btnSalesOrder.Margin = New System.Windows.Forms.Padding(67, 20, 4, 37)
         Me.btnSalesOrder.Name = "btnSalesOrder"
         Me.btnSalesOrder.Size = New System.Drawing.Size(175, 73)
         Me.btnSalesOrder.TabIndex = 4
@@ -163,8 +165,8 @@ Partial Class Function_Form
         'btnDeliveryOrder
         '
         Me.btnDeliveryOrder.Font = New System.Drawing.Font("Microsoft YaHei", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnDeliveryOrder.Location = New System.Drawing.Point(559, 37)
-        Me.btnDeliveryOrder.Margin = New System.Windows.Forms.Padding(67, 37, 4, 37)
+        Me.btnDeliveryOrder.Location = New System.Drawing.Point(559, 66)
+        Me.btnDeliveryOrder.Margin = New System.Windows.Forms.Padding(67, 20, 4, 37)
         Me.btnDeliveryOrder.Name = "btnDeliveryOrder"
         Me.btnDeliveryOrder.Size = New System.Drawing.Size(175, 73)
         Me.btnDeliveryOrder.TabIndex = 5
@@ -175,8 +177,8 @@ Partial Class Function_Form
         'btnSalesInvoice
         '
         Me.btnSalesInvoice.Font = New System.Drawing.Font("Microsoft YaHei", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnSalesInvoice.Location = New System.Drawing.Point(805, 37)
-        Me.btnSalesInvoice.Margin = New System.Windows.Forms.Padding(67, 37, 4, 37)
+        Me.btnSalesInvoice.Location = New System.Drawing.Point(805, 66)
+        Me.btnSalesInvoice.Margin = New System.Windows.Forms.Padding(67, 20, 4, 37)
         Me.btnSalesInvoice.Name = "btnSalesInvoice"
         Me.btnSalesInvoice.Size = New System.Drawing.Size(175, 73)
         Me.btnSalesInvoice.TabIndex = 6
@@ -187,8 +189,8 @@ Partial Class Function_Form
         'btnCashSales
         '
         Me.btnCashSales.Font = New System.Drawing.Font("Microsoft YaHei", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnCashSales.Location = New System.Drawing.Point(67, 184)
-        Me.btnCashSales.Margin = New System.Windows.Forms.Padding(67, 37, 4, 37)
+        Me.btnCashSales.Location = New System.Drawing.Point(67, 196)
+        Me.btnCashSales.Margin = New System.Windows.Forms.Padding(67, 20, 4, 37)
         Me.btnCashSales.Name = "btnCashSales"
         Me.btnCashSales.Size = New System.Drawing.Size(175, 73)
         Me.btnCashSales.TabIndex = 7
@@ -199,8 +201,8 @@ Partial Class Function_Form
         'btnDebitNote
         '
         Me.btnDebitNote.Font = New System.Drawing.Font("Microsoft YaHei", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnDebitNote.Location = New System.Drawing.Point(313, 184)
-        Me.btnDebitNote.Margin = New System.Windows.Forms.Padding(67, 37, 4, 37)
+        Me.btnDebitNote.Location = New System.Drawing.Point(313, 196)
+        Me.btnDebitNote.Margin = New System.Windows.Forms.Padding(67, 20, 4, 37)
         Me.btnDebitNote.Name = "btnDebitNote"
         Me.btnDebitNote.Size = New System.Drawing.Size(175, 73)
         Me.btnDebitNote.TabIndex = 8
@@ -211,8 +213,8 @@ Partial Class Function_Form
         'btnCreditNote
         '
         Me.btnCreditNote.Font = New System.Drawing.Font("Microsoft YaHei", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnCreditNote.Location = New System.Drawing.Point(559, 184)
-        Me.btnCreditNote.Margin = New System.Windows.Forms.Padding(67, 37, 4, 37)
+        Me.btnCreditNote.Location = New System.Drawing.Point(559, 196)
+        Me.btnCreditNote.Margin = New System.Windows.Forms.Padding(67, 20, 4, 37)
         Me.btnCreditNote.Name = "btnCreditNote"
         Me.btnCreditNote.Size = New System.Drawing.Size(175, 73)
         Me.btnCreditNote.TabIndex = 9
@@ -223,8 +225,8 @@ Partial Class Function_Form
         'btnDeliveryReturn
         '
         Me.btnDeliveryReturn.Font = New System.Drawing.Font("Microsoft YaHei", 12.0!)
-        Me.btnDeliveryReturn.Location = New System.Drawing.Point(805, 184)
-        Me.btnDeliveryReturn.Margin = New System.Windows.Forms.Padding(67, 37, 4, 37)
+        Me.btnDeliveryReturn.Location = New System.Drawing.Point(805, 196)
+        Me.btnDeliveryReturn.Margin = New System.Windows.Forms.Padding(67, 20, 4, 37)
         Me.btnDeliveryReturn.Name = "btnDeliveryReturn"
         Me.btnDeliveryReturn.Size = New System.Drawing.Size(175, 73)
         Me.btnDeliveryReturn.TabIndex = 10
@@ -239,7 +241,7 @@ Partial Class Function_Form
         Me.FlowLayoutPanel3.Controls.Add(Me.btnReceivePayment)
         Me.FlowLayoutPanel3.Controls.Add(Me.btnPayBill)
         Me.FlowLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Bottom
-        Me.FlowLayoutPanel3.Location = New System.Drawing.Point(0, 450)
+        Me.FlowLayoutPanel3.Location = New System.Drawing.Point(0, 471)
         Me.FlowLayoutPanel3.Name = "FlowLayoutPanel3"
         Me.FlowLayoutPanel3.Size = New System.Drawing.Size(1014, 153)
         Me.FlowLayoutPanel3.TabIndex = 11
@@ -251,15 +253,15 @@ Partial Class Function_Form
         Me.Label2.Location = New System.Drawing.Point(50, 0)
         Me.Label2.Margin = New System.Windows.Forms.Padding(50, 0, 300, 0)
         Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(102, 31)
+        Me.Label2.Size = New System.Drawing.Size(95, 31)
         Me.Label2.TabIndex = 16
-        Me.Label2.Text = "Debitor"
+        Me.Label2.Text = "Debtor"
         '
         'Label3
         '
         Me.Label3.AutoSize = True
         Me.Label3.Font = New System.Drawing.Font("Microsoft YaHei", 13.8!, CType((System.Drawing.FontStyle.Bold Or System.Drawing.FontStyle.Underline), System.Drawing.FontStyle), System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label3.Location = New System.Drawing.Point(502, 0)
+        Me.Label3.Location = New System.Drawing.Point(495, 0)
         Me.Label3.Margin = New System.Windows.Forms.Padding(50, 0, 350, 0)
         Me.Label3.Name = "Label3"
         Me.Label3.Size = New System.Drawing.Size(109, 31)
@@ -287,14 +289,25 @@ Partial Class Function_Form
         Me.btnPayBill.Size = New System.Drawing.Size(183, 73)
         Me.btnPayBill.TabIndex = 18
         Me.btnPayBill.TabStop = False
-        Me.btnPayBill.Text = "Pay Bill"
+        Me.btnPayBill.Text = "Pay Bills"
         Me.btnPayBill.UseVisualStyleBackColor = True
+        '
+        'Label4
+        '
+        Me.Label4.AutoSize = True
+        Me.Label4.Font = New System.Drawing.Font("Microsoft YaHei", 13.8!, CType((System.Drawing.FontStyle.Bold Or System.Drawing.FontStyle.Underline), System.Drawing.FontStyle), System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label4.Location = New System.Drawing.Point(50, 15)
+        Me.Label4.Margin = New System.Windows.Forms.Padding(50, 15, 1000, 0)
+        Me.Label4.Name = "Label4"
+        Me.Label4.Size = New System.Drawing.Size(72, 31)
+        Me.Label4.TabIndex = 16
+        Me.Label4.Text = "Sales"
         '
         'Function_Form
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1014, 603)
+        Me.ClientSize = New System.Drawing.Size(1014, 624)
         Me.Controls.Add(Me.FlowLayoutPanel1)
         Me.Controls.Add(Me.FlowLayoutPanel2)
         Me.Controls.Add(Me.FlowLayoutPanel3)
@@ -304,6 +317,7 @@ Partial Class Function_Form
         Me.FlowLayoutPanel2.ResumeLayout(False)
         Me.FlowLayoutPanel2.PerformLayout()
         Me.FlowLayoutPanel1.ResumeLayout(False)
+        Me.FlowLayoutPanel1.PerformLayout()
         Me.FlowLayoutPanel3.ResumeLayout(False)
         Me.FlowLayoutPanel3.PerformLayout()
         Me.ResumeLayout(False)
@@ -330,4 +344,5 @@ Partial Class Function_Form
     Friend WithEvents Label3 As Label
     Friend WithEvents btnReceivePayment As Button
     Friend WithEvents btnPayBill As Button
+    Friend WithEvents Label4 As Label
 End Class

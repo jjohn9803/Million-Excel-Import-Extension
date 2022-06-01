@@ -10,7 +10,7 @@ Public Class Function_Form
     Private Shared statusConnection As Boolean
     Private Shared pwd_query As String
     Private Shared import_type As String
-    Private Sub openExcelImport(sender As Object, e As EventArgs) Handles btnCashSales.Click, btnCreditNote.Click, btnDebitNote.Click, btnDeliveryOrder.Click, btnDeliveryReturn.Click, btnQuotation.Click, btnSalesInvoice.Click, btnSalesOrder.Click, btnStockAdjustment.Click, btnStockIssue.Click, btnStockReceive.Click, btnStockTrasfer.Click
+    Private Sub openExcelImport(sender As Object, e As EventArgs) Handles btnCashSales.Click, btnCreditNote.Click, btnDebitNote.Click, btnDeliveryOrder.Click, btnDeliveryReturn.Click, btnQuotation.Click, btnSalesInvoice.Click, btnSalesOrder.Click, btnStockAdjustment.Click, btnStockIssue.Click, btnStockReceive.Click, btnStockTrasfer.Click, btnPayBill.Click, btnReceivePayment.Click
         Dim formName = sender.text
         If Not Main_Form.getFeatures.Contains(sender.text) Then
             MsgBox("You have not enough privilege to access!", MsgBoxStyle.Critical)
@@ -41,16 +41,28 @@ Public Class Function_Form
             form = New Stock_Adjustment_Form
         ElseIf formName.Equals("Stock Transfer") Then
             form = New Stock_Transfer_Form
+        ElseIf formName.Equals("Receive Payment") Then
+            form = New Receive_Payment
+        ElseIf formName.Equals("Pay Bills") Then
+            form = New Pay_Bills
         Else
             MsgBox("You have not enough privilege to access!", MsgBoxStyle.Critical)
             Return
         End If
         If Main_Form.getStatusConnection And Not Main_Form.getDatabase.Equals(String.Empty) Then
             Main_Form.setImport_type(formName)
-            form.Text = formName
+            If formName.Contains("Stock") Then
+                form.Text = formName + " (Stock)"
+            ElseIf formName.Contains("Pay Bills") Then
+                form.Text = formName + " (Creditor)"
+            ElseIf formName.Contains("Receive Payment") Then
+                form.Text = formName + " (Debtor)"
+            Else
+                form.Text = formName + " (Sales)"
+            End If
             form.ShowDialog()
-        Else
-            MsgBox("Please connect to server and database before get into it!", MsgBoxStyle.Critical)
+            Else
+                MsgBox("Please connect to server and database before get into it!", MsgBoxStyle.Critical)
         End If
         'Dim form As ExcelImporter = New ExcelImporter
         'SQL_Connection_Form.import_type = sender.text
@@ -235,6 +247,37 @@ Public Class Function_Form
             End If
         Next
         Return repeat_valid
+    End Function
+    Public Shared Function getCurrDoc(doc_type As String) As String
+        serverName = Main_Form.getServerName
+        database = Main_Form.getDatabase
+        pwd_query = Main_Form.getPwd_query
+        myConn = New SqlConnection("Data Source=" + serverName + ";" & "Initial Catalog=" + database + ";" + pwd_query)
+        Dim curr_doc = ""
+        Dim prefix As String = ""
+        Dim curr_no As Integer = 0
+        Dim doc_width As String = ""
+        myConn.Open()
+        Dim cmd As New SqlCommand
+        cmd.CommandType = CommandType.Text
+        cmd.CommandText = "select prefix,curr_no,doc_width from defdocno WHERE doc_type='" + doc_type + "'"
+        cmd.Connection = myConn
+        Dim cmdreader As SqlDataReader = cmd.ExecuteReader
+        While cmdreader.Read()
+            prefix = cmdreader.GetValue(0).ToString.Trim
+            curr_no = CInt(cmdreader.GetValue(1).ToString.Trim)
+            doc_width = cmdreader.GetValue(2).ToString.Trim
+        End While
+        curr_doc = prefix + curr_no.ToString("D" + doc_width)
+        myConn.Close()
+        myConn.Open()
+        Dim cmd2 As New SqlCommand
+        cmd2.CommandType = CommandType.Text
+        cmd2.CommandText = "UPDATE defdocno SET curr_no='" + (curr_no + 1).ToString + "' WHERE doc_type='" + doc_type + "'"
+        cmd2.Connection = myConn
+        cmd2.ExecuteNonQuery() '
+        myConn.Close()
+        Return curr_doc
     End Function
     Public Shared Function getCurrDoc(prefix As String, curr_no As Integer, doc_width As Integer) As String
         Dim prefix_temp As String = prefix

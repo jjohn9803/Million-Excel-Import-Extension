@@ -82,7 +82,7 @@ Public Class Pay_Bills
         Return "maintain.xls"
     End Function
     Private Sub btnImport_Click(sender As Object, e As EventArgs) Handles btnImport.Click
-        Dim importType = "Stock Receive"
+        Dim importType = "Pay Bills"
         Dim tableExcelSetting As DataTableCollection
         Dim stream As FileStream
         Try
@@ -97,19 +97,15 @@ Public Class Pay_Bills
                                                                                 .UseHeaderRow = True}})
             tableExcelSetting = result.Tables
             Dim queryTable As New ArrayList
-            For i = 0 To 4
+            For i = 0 To 2
                 queryTable.Add(New ArrayList)
             Next
-            queryTable(0).add("SR ts") '0
-            queryTable(0).add("stkts") '1
-            queryTable(1).add("SR ts Desc")
-            queryTable(1).add("stktsdet")
-            queryTable(2).add("SR Stock")
-            queryTable(2).add("stock")
-            queryTable(3).add("SR Product Serial No")
-            queryTable(3).add("prodsn")
-            queryTable(4).add("SR Stock Serial No")
-            queryTable(4).add("stocksn")
+            queryTable(0).add("PB AP") '0
+            queryTable(0).add("ap") '1
+            queryTable(1).add("PB GL")
+            queryTable(1).add("gl")
+            queryTable(2).add("PB GL Off")
+            queryTable(2).add("gloff")
             quotationWriteIntoSQL(tableExcelSetting, queryTable)
         End Using
     End Sub
@@ -347,16 +343,29 @@ Public Class Pay_Bills
 
         'Hardcode Formula
         For row As Integer = 0 To dgvExcel.RowCount - 1
-            'stktsdet
-            'amt
-            If value_arraylist(1)(row)(11).Equals("{FORMULA_VALUE}") Then
-                Dim qty = value_arraylist(1)(row)(9)
-                Dim price = value_arraylist(1)(row)(10)
-                Dim amt = qty * price
-                value_arraylist(1)(row)(11) = Math.Round(amt, 2)
+            If Not value_arraylist(0)(row)(0).Equals("{INVALID ARRAY}") Then
+                Dim myTarget As New ArrayList
+                For Each target In rangeQuo
+                    If target.ToString.Split(".")(0).Equals(row.ToString) Then
+                        Dim targetRow = CInt(target.ToString.Split(".")(1))
+                        myTarget.Add(targetRow)
+                    End If
+                Next
+
+                'ap
+                'paid
+                If value_arraylist(0)(row)(22).Equals("{FORMULA_VALUE}") Then
+                    Dim paid As Double = 0
+                    For Each targetRow As Integer In myTarget
+                        Dim paid_amt = value_arraylist(2)(targetRow)(11)
+                        paid += paid_amt
+                    Next
+                    value_arraylist(0)(row)(22) = Math.Round(paid, 2)
+                End If
             End If
         Next
         'End Hardcode Formula
+
         'hardcore exist checker
         Dim execute_valid As Boolean = True
         Dim exist_result As String = ""
@@ -365,29 +374,53 @@ Public Class Pay_Bills
             Dim table As String
             Dim value_name As String
             Dim value As String
-            'Stkts
+            'ap
             If Not value_arraylist(0)(row)(0).Equals("{INVALID ARRAY}") Then
-                'stkts.doc_no / duplicate
-                table = "stkts"
-                value_name = "doc_no"
-                value = value_arraylist(0)(row)(1)
-                If Not value.Trim.Equals(String.Empty) Then
-                    If existed_checker(table, value_name, value) Then
-                        execute_valid = False
-                        exist_result += value_name + " '" + value + "' already existed in the database (" + table + ")!" + vbNewLine
+                Dim myTarget As New ArrayList
+                For Each target In rangeQuo
+                    If target.ToString.Split(".")(0).Equals(row.ToString) Then
+                        Dim targetRow = CInt(target.ToString.Split(".")(1))
+                        myTarget.Add(targetRow)
                     End If
-                    If Function_Form.repeatedExcelCell(dgvExcel, excel_format_arraylist(0)(1), value, row) Then
+                Next
+
+                'gldata.accno / exist
+                table = "gldata"
+                value_name = "accno"
+                value = dgvExcel.Rows(row).Cells("Bank / Cash Acc No.").Value.ToString.Trim
+                If Not value.Trim.Equals(String.Empty) Then
+                    If Not existed_checker(table, value_name, value) Then
                         execute_valid = False
-                        If Not exist_result.Contains(excel_format_arraylist(0)(1) + " '" + value + "' is repeated!") Then
-                            exist_result += excel_format_arraylist(0)(1) + " '" + value + "' is repeated!" + vbNewLine
-                        End If
+                        exist_result += value_name + " '" + value + "' is not found in the database (" + table + ")!" + vbNewLine
+                    End If
+                End If
+
+                'supplier.suppcode / exist
+                table = "supplier"
+                value_name = "suppcode"
+                value = value_arraylist(0)(row)(0)
+                If Not value.Trim.Equals(String.Empty) Then
+                    If Not existed_checker(table, value_name, value) Then
+                        execute_valid = False
+                        exist_result += value_name + " '" + value + "' is not found in the database (" + table + ")!" + vbNewLine
+                    End If
+                End If
+
+                'currency.curr_code / exist
+                table = "currency"
+                value_name = "curr_code"
+                value = value_arraylist(0)(row)(18)
+                If Not value.Trim.Equals(String.Empty) Then
+                    If Not existed_checker(table, value_name, value) Then
+                        execute_valid = False
+                        exist_result += value_name + " '" + value + "' is not found in the database (" + table + ")!" + vbNewLine
                     End If
                 End If
 
                 'project.projcode / exist
                 table = "project"
                 value_name = "projcode"
-                value = value_arraylist(0)(row)(5)
+                value = value_arraylist(0)(row)(31)
                 If Not value.Trim.Equals(String.Empty) Then
                     If Not existed_checker(table, value_name, value) Then
                         execute_valid = False
@@ -395,134 +428,110 @@ Public Class Pay_Bills
                     End If
                 End If
 
-                'deptment.deptcode / exist
-                table = "deptment"
-                value_name = "deptcode"
-                value = value_arraylist(0)(row)(6)
-                If Not value.Trim.Equals(String.Empty) Then
-                    If Not existed_checker(table, value_name, value) Then
-                        execute_valid = False
-                        exist_result += value_name + " '" + value + "' is not found in the database (" + table + ")!" + vbNewLine
-                    End If
-                End If
-            End If
+                '//
+                For Each targetRow As Integer In myTarget
+                    'gloff
+                    'pkdoc_type,pkdoc_date,pkfx_rate
+                    myConn.Open()
+                    Dim command = New SqlCommand("select doc_type,doc_date,fx_rate from pinv WHERE doc_no='" + value_arraylist(2)(targetRow)(6) + "'", myConn)
+                    Dim reader As SqlDataReader = command.ExecuteReader
+                    While reader.Read()
+                        value_arraylist(2)(targetRow)(5) = reader.GetValue(0).ToString.Trim()
+                        value_arraylist(2)(targetRow)(8) = reader.GetValue(1).ToString.Trim()
+                        value_arraylist(2)(targetRow)(10) = reader.GetValue(2).ToString.Trim()
+                    End While
+                    myConn.Close()
 
-            'Stkts Desc
-            If Not value_arraylist(1)(row)(0).Equals(String.Empty) Then
-                'product.prodcode / exist
-                table = "product"
-                value_name = "prodcode"
-                value = value_arraylist(1)(row)(4)
-                If Not value.Trim.Equals(String.Empty) Then
-                    If Not existed_checker(table, value_name, value) Then
-                        execute_valid = False
-                        exist_result += value_name + " '" + value + "' is not found in the database (" + table + ")!" + vbNewLine
-                    End If
-                End If
-
-                'stockloc.location / exist
-                table = "stockloc"
-                value_name = "location"
-                value = value_arraylist(1)(row)(15)
-                If Not value.Trim.Equals(String.Empty) Then
-                    If Not existed_checker(table, value_name, value) Then
-                        execute_valid = False
-                        exist_result += value_name + " '" + value + "' is not found in the database (" + table + ")!" + vbNewLine
-                    End If
-                End If
-
-                'prodbatch.batchcode / exist
-                table = "prodbatch"
-                value_name = "batchcode"
-                value = value_arraylist(1)(row)(16)
-                If Not value.Trim.Equals(String.Empty) Then
-                    If Not existed_checker(table, value_name, value) Then
-                        execute_valid = False
-                        exist_result += value_name + " '" + value + "' is not found in the database (" + table + ")!" + vbNewLine
-                    End If
-                End If
-            End If
-
-            'Serial No
-            If Not value_arraylist(3)(row)(0).Equals(String.Empty) Then
-                'prodsn.serialno / exist
-                table = "prodsn"
-                value_name = "serialno"
-                Dim values As New List(Of String)(value_arraylist(3)(row)(1).ToString.Trim.Split(","c))
-                For Each value_sn As String In values
-                    If Not value_sn.Trim.Equals(String.Empty) Then
-                        If Not existed_checker(table, value_name, value_sn) Then
+                    'pinv.doc_no / duplicate
+                    table = "pinv"
+                    value_name = "doc_no"
+                    value = value_arraylist(2)(targetRow)(6)
+                    If Not value.Trim.Equals(String.Empty) Then
+                        myConn.Open()
+                        Dim sncommand = New SqlCommand("select * from " + table + " WHERE suppcode='" + value_arraylist(0)(row)(0) + "' AND doc_no='" + value + "'", myConn)
+                        Dim snreader As SqlDataReader = sncommand.ExecuteReader
+                        Dim exist_acc = False
+                        While snreader.Read()
+                            exist_acc = True
+                        End While
+                        If Not exist_acc Then
                             execute_valid = False
-                            exist_result += value_name + " '" + value_sn + "' is not found in the database (" + table + ")!" + vbNewLine
+                            exist_result += value_name + " '" + value + "' is not found in the database (" + table + ")!" + vbNewLine
+                        End If
+                        myConn.Close()
+                    End If
+
+                    'gloff.pkdoc_no / duplicate
+                    table = "gloff"
+                    value_name = "pkdoc_no"
+                    value = value_arraylist(2)(targetRow)(6)
+                    If Not value.Trim.Equals(String.Empty) Then
+                        If existed_checker(table, value_name, value) Then
+                            execute_valid = False
+                            exist_result += value_name + " '" + value + "' has been used in the database (" + table + ")!" + vbNewLine
                         End If
                     End If
                 Next
+            End If
 
-                'stocksn.serialno / exist
-                table = "stocksn"
-                value_name = "serialno"
-                Dim values2 As New List(Of String)(value_arraylist(3)(row)(1).ToString.Trim.Split(","c))
-                For Each value_sn As String In values2
-                    If Not value_sn.Trim.Equals(String.Empty) Then
-                        If Not existed_checker(table, value_name, value_sn) Then
-                            execute_valid = False
-                            exist_result += value_name + " '" + value_sn + "' is not found in the database (" + table + ")!" + vbNewLine
-                        End If
-                    End If
-                Next
+            'gl
+            If Not value_arraylist(1)(row)(0).Equals("{INVALID ARRAY}") Then
+                'batchno
+                If value_arraylist(1)(row)(20).length = 2 Then
+                    Dim date1 = value_arraylist(1)(row)(4)
+                    Dim batchno = value_arraylist(1)(row)(20)
+                    value_arraylist(1)(row)(20) = Year(date1).ToString.Substring(2) + Month(date1).ToString("00") + batchno
+                End If
+
+                'desc1 supplier
+                myConn.Open()
+                Dim command = New SqlCommand("select name from supplier WHERE suppcode='" + value_arraylist(0)(row)(0) + "'", myConn)
+                Dim reader As SqlDataReader = command.ExecuteReader
+                While reader.Read()
+                    value_arraylist(1)(row)(8) = reader.GetValue(0).ToString.Trim()
+                End While
+                myConn.Close()
+
+                'desc2 bank/cash
+                myConn.Open()
+                Dim command2 = New SqlCommand("select accdesp from gldata WHERE accno='" + dgvExcel.Rows(row).Cells("Bank / Cash Acc No.").Value.ToString.Trim + "'", myConn)
+                Dim reader2 As SqlDataReader = command2.ExecuteReader
+                While reader2.Read()
+                    value_arraylist(1)(row)(9) = reader2.GetValue(0).ToString.Trim()
+                End While
+                myConn.Close()
             End If
         Next
+        'pay not exceed than total amt
+        For row As Integer = 0 To dgvExcel.RowCount - 1
+            If Not value_arraylist(0)(row)(0).Equals("{INVALID ARRAY}") Then
+                Dim startRange As Integer = -1
+                Dim endRange As Integer = -1
+                For Each range As String In rangeQuo
+                    If range.Split(".")(0).ToString.Trim.Equals(row.ToString.Trim) Then
+                        startRange = CInt(range.Split(".")(0).ToString.Trim)
+                        endRange = CInt(range.Split(".")(1).ToString.Trim)
+                    End If
+                Next
+                Dim amt As Double = value_arraylist(0)(row)(21)
+                Dim pay = 0
+                For i As Integer = startRange To endRange
+                    pay += CDbl(value_arraylist(2)(i)(11))
+                Next
+                If pay > amt Then
+                    execute_valid = False
+                    exist_result += "Payment cannot exceed total amount! (Row " + (row + 1).ToString + ")" + vbNewLine
+                End If
+            End If
+        Next
+
         If execute_valid = False Then
             MsgBox(exist_result + vbNewLine + "The operation has been stopped!", MsgBoxStyle.Exclamation)
             Return
         End If
 
         'endhardcore exist checker
-
         init()
-        Dim exist_serial As Boolean = False
-        Dim msg_serial As New ArrayList
-        For row As Integer = 0 To dgvExcel.RowCount - 1
-            If Not value_arraylist(3)(row)(1).ToString.Trim.Equals(String.Empty) Then
-                Dim serialnos As New List(Of String)(value_arraylist(3)(row)(1).ToString.Trim.Split(","c))
-                If serialnos.Count <> CInt(value_arraylist(1)(row)(9)) Then
-                    MsgBox("The serial no quantity (" + serialnos.Count.ToString + ") does not matched with items quantity(" + value_arraylist(1)(row)(9).ToString + ")" + vbNewLine + "The operation has been stopped!", MsgBoxStyle.Exclamation)
-                    Return
-                End If
-                For sn = 0 To serialnos.Count - 1
-                    Dim serialno As String = serialnos(sn)
-                    myConn.Open()
-                    Dim sncommand = New SqlCommand("SELECT * FROM stocksn WHERE serialno ='" + serialno + "' AND qty='-1'", myConn)
-                    Dim snreader As SqlDataReader = sncommand.ExecuteReader
-                    While snreader.Read()
-                        If Not msg_serial.Contains(snreader.GetValue(snreader.GetOrdinal("serialno")).ToString.Trim) Then
-                            msg_serial.Add(snreader.GetValue(snreader.GetOrdinal("serialno")).ToString.Trim)
-                        End If
-                        exist_serial = True
-                    End While
-                    myConn.Close()
-                    myConn.Open()
-                    Dim prodsncommand = New SqlCommand("SELECT * FROM prodsn WHERE qty='-1' AND serialno ='" + serialno + "'", myConn)
-                    Dim prodsnreader As SqlDataReader = prodsncommand.ExecuteReader
-                    While prodsnreader.Read()
-                        If Not msg_serial.Contains(prodsnreader.GetValue(prodsnreader.GetOrdinal("serialno")).ToString.Trim) Then
-                            msg_serial.Add(prodsnreader.GetValue(prodsnreader.GetOrdinal("serialno")).ToString.Trim)
-                        End If
-                        exist_serial = True
-                    End While
-                    myConn.Close()
-                Next
-            End If
-        Next
-        If exist_serial Then
-            Dim prompt_exist_serial As String = "The following serial no has been used:"
-            For Each serial As String In msg_serial
-                prompt_exist_serial += vbNewLine + serial
-            Next
-            MsgBox(prompt_exist_serial + vbNewLine + "The operation has been stopped!", MsgBoxStyle.Exclamation)
-            Return
-        End If
-
         Dim confirmImport As DialogResult = MsgBox("Are you sure to import data?", MsgBoxStyle.YesNo, "")
         If confirmImport = DialogResult.No Then
             Return
@@ -531,150 +540,328 @@ Public Class Pay_Bills
         Dim rowInsertNum = 0
         Dim rowUpdateNum = 0
 
-        'prodsn(3) + stocksn(4)
+        Dim gloffseq As New ArrayList
+        'gl
         For row As Integer = 0 To dgvExcel.RowCount - 1
-            If Not value_arraylist(3)(row)(1).ToString.Trim.Equals(String.Empty) Then
-                'Dim mySource As Integer = -1
-                'For Each target In rangeQuo
-                '    If target.ToString.Split(".")(1).Equals(row.ToString) Then
-                '        Dim sourceRow = CInt(target.ToString.Split(".")(0))
-                '        mySource = sourceRow
-                '    End If
-                'Next
-                Dim serialnos As New List(Of String)(value_arraylist(3)(row)(1).ToString.Trim.Split(","c))
-                For sn = 0 To serialnos.Count - 1
-                    Dim serialno As String = serialnos(sn)
-                    Dim qty = "1"
-                    Dim location = value_arraylist(3)(row)(4)
-                    Dim doc_no = value_arraylist(3)(row)(8)
-                    Dim line_no = value_arraylist(3)(row)(9)
-                    Dim doc_date = Function_Form.convertDateFormat(value_arraylist(3)(row)(10))
-                    Dim procode = value_arraylist(3)(row)(0)
-                    Dim serialNoProdCommand As String = "UPDATE prodsn SET "
-                    Dim serialNoColumns = "qty='" + qty + "',"
-                    serialNoColumns += "location='" + location + "',"
-                    serialNoColumns += "doc_type='SR',"
-                    serialNoColumns += "doc_no='" + doc_no + "',"
-                    serialNoColumns += "line_no='" + line_no + "',"
-                    serialNoColumns += "doc_date='" + doc_date + "' "
-                    serialNoColumns += "WHERE prodcode='" + procode + "' AND serialno='" + serialno + "'"
-                    serialNoProdCommand += serialNoColumns
-                    Dim command = New SqlCommand(serialNoProdCommand, myConn)
-                    myConn.Open()
-                    command.ExecuteNonQuery()
-                    rowUpdateNum += 1
-                    Dim serialNoStockdCommand As String = "INSERT INTO stocksn (prodcode,serialno,doc_type,doc_no,line_no,doc_date,qty,location) VALUES ('"
-                    serialNoStockdCommand += procode + "','" + serialno + "','SR','" + doc_no + "','" + line_no + "','" + doc_date + "','" + qty + "','" + location + "')"
-                    Dim command2 = New SqlCommand(serialNoStockdCommand, myConn)
-                    command2.ExecuteNonQuery()
-                    rowInsertNum += 1
-                    myConn.Close()
+            If Not value_arraylist(0)(row)(0).Equals("{INVALID ARRAY}") Then
+                Dim query_temp As New ArrayList
+                query_temp.Add(value_arraylist(0)(row)(19)) 'fx_rate
+                query_temp.Add(value_arraylist(0)(row)(18)) 'curr_code
+                query_temp.Add(value_arraylist(1)(row)(20)) 'batchno
+                query_temp.Add(value_arraylist(0)(row)(31)) 'projcode
+                query_temp.Add(Function_Form.getNull(0)) 'deptcode
+                query_temp.Add(Function_Form.getNull(0)) 'taxcode
+                query_temp.Add(Function_Form.getNull(3)) 'taxable
+                query_temp.Add(Function_Form.getNull(3)) 'fx_taxable
+                query_temp.Add(Function_Form.getNull(3)) 'link_seq
+                query_temp.Add("P") 'billtype
+                query_temp.Add(value_arraylist(0)(row)(13)) 'remark1
+                query_temp.Add(value_arraylist(0)(row)(14)) 'remark2
+                query_temp.Add(value_arraylist(0)(row)(15)) 'cheque_no
+                If value_arraylist(0)(row)(15).ToString.Trim.Equals(String.Empty) Then
+                    query_temp.Add(Function_Form.getNull(1)) 'chqrc_date
+                Else
+                    query_temp.Add(Function_Form.convertDateFormat(value_arraylist(0)(row)(4))) 'chqrc_date
+                End If
+                query_temp.Add(Function_Form.getNull(1)) 'koff_date
+                query_temp.Add(Function_Form.getNull(1)) 'recon_date
+                query_temp.Add(Function_Form.getNull(3)) 'recon_flag
+                query_temp.Add(Function_Form.getNull(0)) 'accmgr_id
+                query_temp.Add(Function_Form.getNull(0)) 'lkdoc_type
+                query_temp.Add(Function_Form.getNull(0)) 'lkdoc_no
+                query_temp.Add(Function_Form.getNull(3)) 'lkseq
+                query_temp.Add(Function_Form.getNull(3)) 'lock
+                query_temp.Add(Function_Form.getNull(3)) 'void
+                query_temp.Add(Function_Form.getNull(3)) 'exported
+                query_temp.Add("CRP") 'entry
+                query_temp.Add(Function_Form.getNull(3)) 'fastentry
+                query_temp.Add(Function_Form.getNull(3)) 'followdesp
+                query_temp.Add(Function_Form.getNull(3)) 'tsid
+                query_temp.Add(Function_Form.getNull(0)) 'spcode
+                query_temp.Add(Function_Form.getNull(1)) 'taxdate
+                query_temp.Add(Function_Form.getNull(1)) 'taxdate_bt
+                query_temp.Add(value_arraylist(1)(row)(49)) 'createdby
+                query_temp.Add(value_arraylist(1)(row)(50)) 'updatedby
+                query_temp.Add(Function_Form.getNull(2)) 'createdate
+                query_temp.Add(Function_Form.getNull(2)) 'lastupdate
+                Dim cmd_last = ""
+                For j = 0 To query_temp.Count - 1
+                    cmd_last += "'" + query_temp(j) + "',"
                 Next
-            End If
-        Next
+                cmd_last = cmd_last.Substring(0, cmd_last.Length - 1) + ")"
 
-        For i As Integer = 0 To 1
-            init()
-            Using command As New SqlCommand("", myConn)
-                For row As Integer = 0 To dgvExcel.RowCount - 1
-                    Using r As DataGridViewRow = dgvExcel.Rows(row)
-                        If Not value_arraylist(i)(row)(0).Equals("{INVALID ARRAY}") Then
-                            Dim query = ""
-                            For g As Integer = 0 To value_arraylist(i)(row).count - 1
-                                Dim value_temp As String = value_arraylist(i)(row)(g).ToString
-                                If sql_format_arraylist(i)(g).ToString.Trim.Equals("createdate") Or sql_format_arraylist(i)(g).ToString.Trim.Equals("lastupdate") Then
-                                    query += "'" + Function_Form.convertDateFormat(Date.Now.ToString) + "',"
-                                    value_arraylist(i)(row)(g) = Function_Form.convertDateFormat(Date.Now.ToString)
-                                ElseIf data_type_arraylist(i)(g).ToString.Trim.Contains("date") Then
-                                    query += "'" + Function_Form.convertDateFormat(value_temp) + "',"
-                                    value_arraylist(i)(row)(g) = Function_Form.convertDateFormat(value_temp)
-                                ElseIf Not (value_temp.Equals("{._!@#$%^&*()}")) Then
-                                    query += "'" + value_temp + "',"
-                                End If
-                            Next
-                            Dim command_text As String = queryTable(i)(2) + query
-                            command_text = command_text.Substring(0, command_text.Length - 1) + ")"
-                            command.CommandText = command_text
-                            myConn.Open()
-                            Try
-                                rowInsertNum += 1
-                                command.ExecuteNonQuery()
-                            Catch ex As Exception
-                                MsgBox(ex.Message + vbNewLine + command_text, MsgBoxStyle.Exclamation)
-                            End Try
-                            myConn.Close()
-                        End If
+                Dim queryAL As New ArrayList
+                Dim amount As Double = 0
+                Dim debit As Double = 0
+                Dim credit As Double = 0
+                Dim fx_rate As Double = 0
+                Dim fx_amount As Double = 0
+                Dim fx_debit As Double = 0
+                Dim fx_credit As Double = 0
+                Dim curr_doc As String = Function_Form.getCurrDoc("GL")
+                gloffseq.Add(value_arraylist(0)(row)(0) + "." + curr_doc + ".")
 
-                    End Using
+                'line 1
+                queryAL.Clear()
+                queryAL.Add(value_arraylist(0)(row)(0)) 'accno
+                queryAL.Add("GL") 'doc_type
+                queryAL.Add(curr_doc) 'doc_no
+                queryAL.Add(1) 'seq
+                queryAL.Add(Function_Form.convertDateFormat(value_arraylist(0)(row)(4))) 'doc_date
+                queryAL.Add(value_arraylist(0)(row)(6)) 'refno
+                queryAL.Add(value_arraylist(0)(row)(7)) 'refno2
+                queryAL.Add(Function_Form.getNull(0)) 'refno3
+                queryAL.Add(value_arraylist(1)(row)(8)) 'desp
+                queryAL.Add(value_arraylist(0)(row)(10)) 'desp2
+                queryAL.Add(Function_Form.getNull(0)) 'desp3
+                queryAL.Add(Function_Form.getNull(0)) 'desp4
+
+                amount = Math.Round(CDbl(value_arraylist(0)(row)(21)) * -1, 2)
+                queryAL.Add(amount) 'amount
+                debit = 0
+                credit = 0
+                If amount < 0 Then
+                    credit = amount * -1
+                Else
+                    debit = amount
+                End If
+                queryAL.Add(debit) 'debit
+                queryAL.Add(credit) 'credit
+                fx_rate = CDbl(value_arraylist(0)(row)(19))
+                fx_amount = Math.Round(amount * fx_rate * -1, 2)
+                fx_debit = 0
+                fx_credit = 0
+                If fx_amount < 0 Then
+                    fx_credit = fx_amount * -1
+                Else
+                    fx_debit = fx_amount
+                End If
+                fx_debit = fx_debit
+                fx_credit = fx_credit
+
+                queryAL.Add(fx_amount) 'fx_amount
+                queryAL.Add(fx_debit) 'fx_debit
+                queryAL.Add(fx_credit) 'fx_credit
+
+                Dim execmd As String = queryTable(1)(2)
+                For j = 0 To queryAL.Count - 1
+                    Try
+                        execmd += "'" + queryAL(j) + "',"
+                    Catch ex As InvalidCastException
+                        execmd += "'" + queryAL(j).ToString + "',"
+                    End Try
                 Next
-            End Using
-        Next
-
-        'stock
-        For row As Integer = 0 To dgvExcel.RowCount - 1
-            If Not value_arraylist(1)(row)(4).ToString.Trim.Equals(String.Empty) Then
-                Dim mySource As Integer = -1
-                For Each target In rangeQuo
-                    If target.ToString.Split(".")(1).Equals(row.ToString) Then
-                        Dim sourceRow = CInt(target.ToString.Split(".")(0))
-                        mySource = sourceRow
-                    End If
-                Next
-
-                Dim insertArray As New ArrayList
-                insertArray.Add(value_arraylist(1)(row)(4)) 'prodcode
-                insertArray.Add(value_arraylist(1)(row)(1)) 'doc_type
-                insertArray.Add(value_arraylist(1)(row)(2)) 'doc_no
-
-                Dim dkeyFromDO As String = ""
-                Dim command_temp = New SqlCommand("SELECT TOP 1 dkey FROM stktsdet WHERE doc_no ='" + value_arraylist(2)(row)(2) + "' AND line_no ='" + value_arraylist(2)(row)(4) + "'", myConn)
+                execmd = execmd + cmd_last
                 myConn.Open()
-                Dim reader_temp As SqlDataReader = command_temp.ExecuteReader
-                While reader_temp.Read()
-                    dkeyFromDO = reader_temp.GetValue(0).ToString
-                End While
+                Dim cmd1 = New SqlCommand(execmd, myConn)
+                cmd1.ExecuteNonQuery()
+                rowInsertNum += 1
                 myConn.Close()
-                value_arraylist(2)(row)(3) = dkeyFromDO
-                insertArray.Add(dkeyFromDO) 'dkey
 
-                insertArray.Add(value_arraylist(1)(row)(3)) 'line_no
-                insertArray.Add(value_arraylist(0)(mySource)(2)) 'doc_date
-                insertArray.Add(value_arraylist(0)(mySource)(3)) 'doc_desp
-                insertArray.Add(value_arraylist(0)(mySource)(4)) 'doc_desp2
-                insertArray.Add(Function_Form.getNull(0)) 'custcode
-                insertArray.Add(Function_Form.getNull(0)) 'suppcode
-                insertArray.Add(Function_Form.getNull(0)) 'refno
-                insertArray.Add(Function_Form.getNull(0)) 'refno2
-                insertArray.Add(value_arraylist(1)(row)(9)) 'qty
-                insertArray.Add(value_arraylist(1)(row)(10)) 'cost
-                insertArray.Add(Function_Form.getNull(3)) 'price
-                insertArray.Add(value_arraylist(1)(row)(11)) 'local_amount
-                insertArray.Add(Function_Form.getNull(3)) 'utd_cost
-                insertArray.Add(value_arraylist(1)(row)(15)) 'location
-                insertArray.Add(value_arraylist(1)(row)(16)) 'batchcode
-                insertArray.Add(value_arraylist(0)(mySource)(5)) 'projcode
-                insertArray.Add(value_arraylist(0)(mySource)(6)) 'deptcode
-                insertArray.Add(Function_Form.getNull(0)) 'pkdoc_type
-                insertArray.Add(Function_Form.getNull(0)) 'pkdoc_no
-                insertArray.Add(Function_Form.getNull(3)) 'pkdkey
-                insertArray.Add(Function_Form.getNull(3)) 'bfseq
-                Dim stockCommand As String = queryTable(2)(2)
-                For Each query In insertArray
-                    stockCommand += "'" + query.ToString + "',"
+                'line2
+                queryAL.Clear()
+                queryAL.Add(dgvExcel.Rows(row).Cells("Bank / Cash Acc No.").Value.ToString.Trim) 'accno
+                queryAL.Add("GL") 'doc_type
+                queryAL.Add(curr_doc) 'doc_no
+                queryAL.Add(2) 'seq
+                queryAL.Add(Function_Form.convertDateFormat(value_arraylist(0)(row)(4))) 'doc_date
+                queryAL.Add(value_arraylist(0)(row)(6)) 'refno
+                queryAL.Add(value_arraylist(0)(row)(7)) 'refno2
+                queryAL.Add(Function_Form.getNull(0)) 'refno3
+                queryAL.Add(value_arraylist(1)(row)(9)) 'desp
+                queryAL.Add(value_arraylist(0)(row)(10)) 'desp2
+                queryAL.Add(Function_Form.getNull(0)) 'desp3
+                queryAL.Add(Function_Form.getNull(0)) 'desp4
+
+                amount = Math.Round(CDbl(value_arraylist(0)(row)(21)), 2)
+                queryAL.Add(amount) 'amount
+                debit = 0
+                credit = 0
+                If amount < 0 Then
+                    credit = amount * -1
+                Else
+                    debit = amount
+                End If
+                queryAL.Add(debit) 'debit
+                queryAL.Add(credit) 'credit
+                fx_rate = CDbl(value_arraylist(0)(row)(19))
+                fx_amount = Math.Round(amount * fx_rate, 2)
+                fx_debit = 0
+                fx_credit = 0
+                If fx_amount < 0 Then
+                    fx_credit = fx_amount * -1
+                Else
+                    fx_debit = fx_amount
+                End If
+                fx_debit = fx_debit
+                fx_credit = fx_credit
+
+                queryAL.Add(fx_amount) 'fx_amount
+                queryAL.Add(fx_debit) 'fx_debit
+                queryAL.Add(fx_credit) 'fx_credit
+
+                execmd = queryTable(1)(2)
+                For j = 0 To queryAL.Count - 1
+                    Try
+                        execmd += "'" + queryAL(j) + "',"
+                    Catch ex As InvalidCastException
+                        execmd += "'" + queryAL(j).ToString + "',"
+                    End Try
                 Next
-                stockCommand = stockCommand.Substring(0, stockCommand.Length - 1) + ")"
-                Dim command = New SqlCommand(stockCommand, myConn)
+                execmd = execmd + cmd_last
                 myConn.Open()
-                'Clipboard.SetText(stockCommand)
-                'MsgBox(stockCommand)
-                command.ExecuteNonQuery()
+                Dim cmd2 = New SqlCommand(execmd, myConn)
+                cmd2.ExecuteNonQuery()
                 rowInsertNum += 1
                 myConn.Close()
             End If
         Next
 
+        'gloff
+        For row As Integer = 0 To dgvExcel.RowCount - 1
+            Dim queryGLOff As New ArrayList
+            Dim doc_no = ""
+            For Each seq_temp As String In gloffseq
+                If seq_temp.Split(".")(0).Trim.Equals(value_arraylist(0)(row)(0)) Then
+                    doc_no = seq_temp.Split(".")(1).Trim
+                End If
+            Next
+
+            queryGLOff.Add(value_arraylist(0)(row)(0)) 'accno
+            queryGLOff.Add("GL") 'doc_type
+            queryGLOff.Add(doc_no) 'doc_no
+            queryGLOff.Add(2) 'seq
+            queryGLOff.Add(Function_Form.convertDateFormat(value_arraylist(0)(row)(4))) 'doc_date
+            queryGLOff.Add(value_arraylist(0)(row)(0)) 'pkdoc_type
+            queryGLOff.Add(value_arraylist(2)(row)(5)) 'pkdoc_no
+            queryGLOff.Add(2) 'pkseq
+            queryGLOff.Add(Function_Form.convertDateFormat(value_arraylist(2)(row)(8))) 'pkdoc_date
+            queryGLOff.Add(-1) 'sign
+            queryGLOff.Add(value_arraylist(2)(row)(10)) 'pkfx_rate
+            queryGLOff.Add(value_arraylist(2)(row)(11)) 'paid
+            Dim fx_rate As Double = CDbl(value_arraylist(0)(row)(19))
+            Dim local_paid As Double = Math.Round(CDbl(value_arraylist(2)(row)(11)) * fx_rate, 2)
+            queryGLOff.Add(fx_rate) 'fx_rate
+            queryGLOff.Add(local_paid) 'local_paid
+            queryGLOff.Add(local_paid) 'local_amount
+            queryGLOff.Add(Function_Form.getNull(3)) 'fx_gainloss
+            queryGLOff.Add(Function_Form.getNull(3)) 'v_gainloss
+
+            If CDbl(value_arraylist(2)(row)(11)) = 0 Then
+                Continue For
+            End If
+
+            Dim gloff_cmd As String = queryTable(2)(2)
+            For j = 0 To queryGLOff.Count - 1
+                gloff_cmd += "'" + queryGLOff(j).ToString + "',"
+            Next
+            gloff_cmd = gloff_cmd.Substring(0, gloff_cmd.Length - 1) + ")"
+
+            myConn.Open()
+            Dim cmd_gloff = New SqlCommand(gloff_cmd, myConn)
+            cmd_gloff.ExecuteNonQuery()
+            rowInsertNum += 1
+            myConn.Close()
+        Next
+
+        'ap
+        For row As Integer = 0 To dgvExcel.RowCount - 1
+            If Not value_arraylist(0)(row)(0).Equals("{INVALID ARRAY}") Then
+                Dim startRange As Integer = -1
+                Dim endRange As Integer = -1
+                For Each range As String In rangeQuo
+                    If range.Split(".")(0).ToString.Trim.Equals(row.ToString.Trim) Then
+                        startRange = CInt(range.Split(".")(0).ToString.Trim)
+                        endRange = CInt(range.Split(".")(1).ToString.Trim)
+                    End If
+                Next
+
+                Dim queryAL As New ArrayList
+                Dim doc_no = ""
+                For Each seq_temp As String In gloffseq
+                    If seq_temp.Split(".")(0).Trim.Equals(value_arraylist(0)(row)(0)) Then
+                        doc_no = seq_temp.Split(".")(1).Trim
+                    End If
+                Next
+
+                queryAL.Clear()
+                queryAL.Add(value_arraylist(0)(row)(0)) 'suppcode
+                queryAL.Add("GL") 'doc_type
+                queryAL.Add(doc_no) 'doc_no
+                queryAL.Add(2) 'seq
+                queryAL.Add(Function_Form.convertDateFormat(value_arraylist(0)(row)(4))) 'doc_date
+                queryAL.Add(Function_Form.convertDateFormat(value_arraylist(0)(row)(4))) 'due_date
+                queryAL.Add(value_arraylist(0)(row)(6)) 'refno
+                queryAL.Add(value_arraylist(0)(row)(7)) 'refno2
+                queryAL.Add(Function_Form.getNull(0)) 'refno3
+                queryAL.Add(value_arraylist(1)(row)(9)) 'desp
+                queryAL.Add(value_arraylist(0)(row)(10)) 'desp2
+                queryAL.Add(Function_Form.getNull(0)) 'desp3
+                queryAL.Add(Function_Form.getNull(0)) 'desp4
+                queryAL.Add(Function_Form.getNull(0)) 'remark1
+                queryAL.Add(Function_Form.getNull(0)) 'remark2
+                If value_arraylist(0)(row)(15).ToString.Trim.Equals(String.Empty) Then
+                    queryAL.Add(Function_Form.getNull(1)) 'chqrc_date
+                Else
+                    queryAL.Add(Function_Form.convertDateFormat(value_arraylist(0)(row)(4))) 'chqrc_date
+                End If
+                queryAL.Add(Function_Form.getNull(1)) 'koff_date
+                queryAL.Add(value_arraylist(0)(row)(18)) 'curr_code
+                queryAL.Add(value_arraylist(0)(row)(19)) 'fx_rate
+                queryAL.Add(Function_Form.getNull(3)) 'fx_gainloss
+                queryAL.Add(Function_Form.getNull(1)) 'koff_date
+                Dim amount = Math.Round(CDbl(value_arraylist(0)(row)(21)), 2)
+                queryAL.Add(amount) 'amount
+                Dim paid As Double = 0
+                For i = startRange To endRange
+                    paid += CDbl(value_arraylist(2)(i)(11))
+                Next
+                paid = Math.Round(CDbl(paid), 2)
+                queryAL.Add(paid) 'paid
+                queryAL.Add(Math.Round(amount * CDbl(value_arraylist(0)(row)(19)), 2)) 'local_amount
+                queryAL.Add(Math.Round(paid * CDbl(value_arraylist(0)(row)(19)), 2)) 'local_paid
+                queryAL.Add(Function_Form.getNull(3)) 'taxable
+                queryAL.Add(Function_Form.getNull(3)) 'fx_taxable
+                queryAL.Add(Function_Form.getNull(3)) 'fx_tax
+                If paid >= amount Then
+                    queryAL.Add(1) 'knockoff
+                Else
+                    queryAL.Add(0) 'knockoff
+                End If
+                queryAL.Add(Function_Form.getNull(0)) 'accmgr_id
+                queryAL.Add(value_arraylist(0)(row)(31)) 'projcode
+                queryAL.Add(Function_Form.getNull(0)) 'deptcode
+                queryAL.Add("P") 'bill_type
+                queryAL.Add(Function_Form.getNull(0)) 'spcode
+                queryAL.Add(Function_Form.getNull(0)) 'source
+                queryAL.Add(Function_Form.getNull(0)) 'taxcode
+                queryAL.Add(Function_Form.getNull(1)) 'taxdate
+                queryAL.Add(Function_Form.getNull(1)) 'taxdate_bt
+                queryAL.Add(Function_Form.getNull(0)) 'tax_basis
+                queryAL.Add(Function_Form.getNull(0)) 'lkdoc_type
+                queryAL.Add(Function_Form.getNull(0)) 'lkdoc_no
+                queryAL.Add(Function_Form.getNull(3)) 'lkseq
+
+                Dim execmd As String = queryTable(0)(2)
+                For j = 0 To queryAL.Count - 1
+                    Try
+                        execmd += "'" + queryAL(j) + "',"
+                    Catch ex As InvalidCastException
+                        execmd += "'" + queryAL(j).ToString + "',"
+                    End Try
+                Next
+                execmd = execmd.Substring(0, execmd.Length - 1) + ")"
+                myConn.Open()
+                Dim cmd1 = New SqlCommand(execmd, myConn)
+                cmd1.ExecuteNonQuery()
+                rowInsertNum += 1
+                myConn.Close()
+            End If
+        Next
+
+
         Function_Form.promptImportSuccess(rowInsertNum, rowUpdateNum)
-        Function_Form.printExcelResult("Stock_Receive", queryTable, value_arraylist, sql_format_arraylist, dgvExcel)
+        Function_Form.printExcelResult("Pay_Bills", queryTable, value_arraylist, sql_format_arraylist, dgvExcel)
     End Sub
     Private Function existed_checker(table As String, sql_value As String, value As String)
         myConn.Open()
