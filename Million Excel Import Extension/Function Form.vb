@@ -49,6 +49,9 @@ Public Class Function_Form
             MsgBox("You have not enough privilege to access!", MsgBoxStyle.Critical)
             Return
         End If
+        If Not Main_Form.validationProduct Then
+            Threading.Thread.Sleep(3333)
+        End If
         If Main_Form.getStatusConnection And Not Main_Form.getDatabase.Equals(String.Empty) Then
             Main_Form.setImport_type(formName)
             If formName.Contains("Stock") Then
@@ -60,8 +63,9 @@ Public Class Function_Form
             Else
                 form.Text = formName + " (Sales)"
             End If
+            form.StartPosition = FormStartPosition.CenterScreen
             form.ShowDialog()
-            Else
+        Else
                 MsgBox("Please connect to server and database before get into it!", MsgBoxStyle.Critical)
         End If
         'Dim form As ExcelImporter = New ExcelImporter

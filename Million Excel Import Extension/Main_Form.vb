@@ -15,7 +15,6 @@ Public Class Main_Form
         mainFormLoad()
     End Sub
     Private Sub mainFormLoad()
-        LoadStartUpProject()
         Dim form As New Function_Form
         form.TopLevel = False
         Me.WindowState = FormWindowState.Normal
@@ -92,19 +91,21 @@ Public Class Main_Form
         Dim settingForm As New Setting
         settingForm.ShowDialog()
     End Sub
-    Private Shared Sub LoadStartUpProject()
+    Private Sub LoadStartUpProject()
+        Dim loading As New Loading
+        loading.ShowDialog()
+        If loading.returnType Then
+            Me.Close()
+        End If
+    End Sub
+    Public Function validationProduct() As Boolean
         Dim a1 As String = Function_Form.convertDateFormat(Encryption.Decrypt(My.Resources.__, My.Resources.myPassword))
         Dim a2 As String = Function_Form.convertDateFormat(Date.Now)
         If (Convert.ToDateTime(a1) - Convert.ToDateTime(a2)).Days < 0 Then
-            Dim loading As New Loading
-            loading.StartPosition = FormStartPosition.CenterScreen
-            loading.ShowDialog()
-            If loading.returnType Then
-                Main_Form.Close()
-            End If
-            'CreateObject("WScript.Shell").Popup("", 1, "")
+            Return False
         End If
-    End Sub
+        Return True
+    End Function
     Private Sub btnBackup_Click(sender As Object, e As EventArgs) Handles btnBackup.Click
         If Not getStatusConnection() Then
             MsgBox("Please connect the database before doing backup!", MsgBoxStyle.Critical)

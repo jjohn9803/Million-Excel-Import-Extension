@@ -430,45 +430,48 @@ Public Class Pay_Bills
 
                 '//
                 For Each targetRow As Integer In myTarget
-                    'gloff
-                    'pkdoc_type,pkdoc_date,pkfx_rate
-                    myConn.Open()
-                    Dim command = New SqlCommand("select doc_type,doc_date,fx_rate from pinv WHERE doc_no='" + value_arraylist(2)(targetRow)(6) + "'", myConn)
-                    Dim reader As SqlDataReader = command.ExecuteReader
-                    While reader.Read()
-                        value_arraylist(2)(targetRow)(5) = reader.GetValue(0).ToString.Trim()
-                        value_arraylist(2)(targetRow)(8) = reader.GetValue(1).ToString.Trim()
-                        value_arraylist(2)(targetRow)(10) = reader.GetValue(2).ToString.Trim()
-                    End While
-                    myConn.Close()
-
-                    'pinv.doc_no / duplicate
-                    table = "pinv"
-                    value_name = "doc_no"
-                    value = value_arraylist(2)(targetRow)(6)
-                    If Not value.Trim.Equals(String.Empty) Then
+                    If Not value_arraylist(2)(targetRow)(0).Equals("{INVALID ARRAY}") Then
+                        'gloff
+                        'pkdoc_type,pkdoc_date,pkfx_rate
                         myConn.Open()
-                        Dim sncommand = New SqlCommand("select * from " + table + " WHERE suppcode='" + value_arraylist(0)(row)(0) + "' AND doc_no='" + value + "'", myConn)
-                        Dim snreader As SqlDataReader = sncommand.ExecuteReader
-                        Dim exist_acc = False
-                        While snreader.Read()
-                            exist_acc = True
+                        Dim command = New SqlCommand("select distinct gl.doc_no,gl.doc_type,gl.doc_date,gl.fx_rate FROM ap LEFT JOIN gl ON ap.doc_no = gl.doc_no WHERE ap.doc_type!='BF' AND (ap.amount < 0 AND ap.amount!=ap.paid) AND ap.doc_no='" + value_arraylist(2)(targetRow)(6) + "'", myConn)
+                        Dim reader As SqlDataReader = command.ExecuteReader
+                        While reader.Read()
+                            value_arraylist(2)(targetRow)(6) = reader.GetValue(0).ToString.Trim()
+                            value_arraylist(2)(targetRow)(5) = reader.GetValue(1).ToString.Trim()
+                            value_arraylist(2)(targetRow)(8) = reader.GetValue(2).ToString.Trim()
+                            value_arraylist(2)(targetRow)(10) = reader.GetValue(3).ToString.Trim()
                         End While
-                        If Not exist_acc Then
-                            execute_valid = False
-                            exist_result += value_name + " '" + value + "' is not found in the database (" + table + ")!" + vbNewLine
-                        End If
                         myConn.Close()
-                    End If
 
-                    'gloff.pkdoc_no / duplicate
-                    table = "gloff"
-                    value_name = "pkdoc_no"
-                    value = value_arraylist(2)(targetRow)(6)
-                    If Not value.Trim.Equals(String.Empty) Then
-                        If existed_checker(table, value_name, value) Then
-                            execute_valid = False
-                            exist_result += value_name + " '" + value + "' has been used in the database (" + table + ")!" + vbNewLine
+                        'pinv.doc_no / duplicate
+                        table = "ap"
+                        value_name = "doc_no"
+                        value = value_arraylist(2)(targetRow)(6)
+                        If Not value.Trim.Equals(String.Empty) Then
+                            myConn.Open()
+                            Dim sncommand = New SqlCommand("select * from " + table + " WHERE suppcode='" + value_arraylist(0)(row)(0) + "' AND doc_no='" + value + "' AND paid<=0", myConn)
+                            Dim snreader As SqlDataReader = sncommand.ExecuteReader
+                            Dim exist_acc = False
+                            While snreader.Read()
+                                exist_acc = True
+                            End While
+                            If Not exist_acc Then
+                                execute_valid = False
+                                exist_result += value_name + " '" + value + "' is not found in the database (" + table + ")!" + vbNewLine
+                            End If
+                            myConn.Close()
+                        End If
+
+                        'gloff.pkdoc_no / duplicate
+                        table = "gloff"
+                        value_name = "pkdoc_no"
+                        value = value_arraylist(2)(targetRow)(6)
+                        If Not value.Trim.Equals(String.Empty) Then
+                            If existed_checker(table, value_name, value) Then
+                                execute_valid = False
+                                exist_result += value_name + " '" + value + "' has been used in the database (" + table + ")!" + vbNewLine
+                            End If
                         End If
                     End If
                 Next
@@ -480,7 +483,21 @@ Public Class Pay_Bills
                 If value_arraylist(1)(row)(20).length = 2 Then
                     Dim date1 = value_arraylist(1)(row)(4)
                     Dim batchno = value_arraylist(1)(row)(20)
-                    value_arraylist(1)(row)(20) = Year(date1).ToString.Substring(2) + Month(date1).ToString("00") + batchno
+                    Dim new_batchno = Year(date1).ToString.Substring(2) + Month(date1).ToString("00") + batchno
+                    value_arraylist(1)(row)(20) = new_batchno
+
+                    myConn.Open()
+                    Dim command_batchno = New SqlCommand("select * from glbatch WHERE batchno = '" + new_batchno + "'", myConn)
+                    Dim reader_batchno As SqlDataReader = command_batchno.ExecuteReader
+                    Dim batchno_valid = False
+                    While reader_batchno.Read()
+                        batchno_valid = True
+                    End While
+                    If batchno_valid = False Then
+                        execute_valid = False
+                        exist_result += "Batch No '" + new_batchno + "' is not found in the database (glbatch)!" + vbNewLine
+                    End If
+                    myConn.Close()
                 End If
 
                 'desc1 supplier
@@ -502,8 +519,9 @@ Public Class Pay_Bills
                 myConn.Close()
             End If
         Next
-        'pay not exceed than total amt
+
         For row As Integer = 0 To dgvExcel.RowCount - 1
+            'pay not exceed than total amt
             If Not value_arraylist(0)(row)(0).Equals("{INVALID ARRAY}") Then
                 Dim startRange As Integer = -1
                 Dim endRange As Integer = -1
@@ -515,13 +533,34 @@ Public Class Pay_Bills
                 Next
                 Dim amt As Double = value_arraylist(0)(row)(21)
                 Dim pay = 0
-                For i As Integer = startRange To endRange
-                    pay += CDbl(value_arraylist(2)(i)(11))
-                Next
+                If Not value_arraylist(2)(row)(0).Equals("{INVALID ARRAY}") Then
+                    For i As Integer = startRange To endRange
+                        pay += CDbl(value_arraylist(2)(i)(11))
+                    Next
+                End If
                 If pay > amt Then
                     execute_valid = False
-                    exist_result += "Payment cannot exceed total amount! (Row " + (row + 1).ToString + ")" + vbNewLine
+                    exist_result += "Payment amount cannot exceed total amount! (Row " + (row + 1).ToString + ")" + vbNewLine
                 End If
+            End If
+
+            'pay amount not exceed than bill amount
+            If Not value_arraylist(2)(row)(0).Equals("{INVALID ARRAY}") Then
+                Dim billno = value_arraylist(2)(row)(6)
+                Dim billamt As Double = value_arraylist(2)(row)(11)
+                myConn.Open()
+                Dim command_bill = New SqlCommand("select -amount from ap WHERE doc_no = '" + billno + "'", myConn)
+                Dim reader_bill As SqlDataReader = command_bill.ExecuteReader
+                Dim bill_valid = False
+                Dim bill_ap As Double = 0.00
+                While reader_bill.Read()
+                    bill_ap += CDbl(reader_bill.GetValue(0).ToString.Trim())
+                End While
+                If billamt > bill_ap Then
+                    execute_valid = False
+                    exist_result += "Payment amount (" + billamt.ToString("N2") + ") cannot exceed total amount of a bill (" + bill_ap.ToString("N2") + ")! (Row " + (row + 1).ToString + ")" + vbNewLine
+                End If
+                myConn.Close()
             End If
         Next
 
@@ -599,11 +638,11 @@ Public Class Pay_Bills
                 Dim fx_debit As Double = 0
                 Dim fx_credit As Double = 0
                 Dim curr_doc As String = Function_Form.getCurrDoc("GL")
-                gloffseq.Add(value_arraylist(0)(row)(0) + "." + curr_doc + ".")
+                gloffseq.Add(row.ToString + "." + curr_doc + ".")
 
                 'line 1
                 queryAL.Clear()
-                queryAL.Add(value_arraylist(0)(row)(0)) 'accno
+                queryAL.Add(dgvExcel.Rows(row).Cells("Bank / Cash Acc No.").Value.ToString.Trim) 'accno
                 queryAL.Add("GL") 'doc_type
                 queryAL.Add(curr_doc) 'doc_no
                 queryAL.Add(1) 'seq
@@ -628,7 +667,7 @@ Public Class Pay_Bills
                 queryAL.Add(debit) 'debit
                 queryAL.Add(credit) 'credit
                 fx_rate = CDbl(value_arraylist(0)(row)(19))
-                fx_amount = Math.Round(amount * fx_rate * -1, 2)
+                fx_amount = Math.Round(amount * fx_rate, 2)
                 fx_debit = 0
                 fx_credit = 0
                 If fx_amount < 0 Then
@@ -660,7 +699,7 @@ Public Class Pay_Bills
 
                 'line2
                 queryAL.Clear()
-                queryAL.Add(dgvExcel.Rows(row).Cells("Bank / Cash Acc No.").Value.ToString.Trim) 'accno
+                queryAL.Add(value_arraylist(0)(row)(0)) 'accno
                 queryAL.Add("GL") 'doc_type
                 queryAL.Add(curr_doc) 'doc_no
                 queryAL.Add(2) 'seq
@@ -719,49 +758,59 @@ Public Class Pay_Bills
 
         'gloff
         For row As Integer = 0 To dgvExcel.RowCount - 1
-            Dim queryGLOff As New ArrayList
-            Dim doc_no = ""
-            For Each seq_temp As String In gloffseq
-                If seq_temp.Split(".")(0).Trim.Equals(value_arraylist(0)(row)(0)) Then
-                    doc_no = seq_temp.Split(".")(1).Trim
+            If Not value_arraylist(2)(row)(0).Equals("{INVALID ARRAY}") Then
+                Dim mySource As Integer = -1
+                For Each target In rangeQuo
+                    If target.ToString.Split(".")(1).Equals(row.ToString) Then
+                        Dim sourceRow = CInt(target.ToString.Split(".")(0))
+                        mySource = sourceRow
+                    End If
+                Next
+
+                Dim queryGLOff As New ArrayList
+                Dim doc_no = ""
+                For Each seq_temp As String In gloffseq
+                    If seq_temp.Split(".")(0).Trim.Equals(mySource.ToString) Then
+                        doc_no = seq_temp.Split(".")(1).Trim
+                    End If
+                Next
+
+                queryGLOff.Add(value_arraylist(0)(mySource)(0)) 'accno
+                queryGLOff.Add("GL") 'doc_type
+                queryGLOff.Add(doc_no) 'doc_no
+                queryGLOff.Add(2) 'seq
+                queryGLOff.Add(Function_Form.convertDateFormat(value_arraylist(0)(mySource)(4))) 'doc_date
+                queryGLOff.Add(value_arraylist(2)(row)(5)) 'pkdoc_type
+                queryGLOff.Add(value_arraylist(2)(row)(6)) 'pkdoc_no
+                queryGLOff.Add(2) 'pkseq
+                queryGLOff.Add(Function_Form.convertDateFormat(value_arraylist(2)(row)(8))) 'pkdoc_date
+                queryGLOff.Add(-1) 'sign
+                queryGLOff.Add(value_arraylist(2)(row)(10)) 'pkfx_rate
+                queryGLOff.Add(value_arraylist(2)(row)(11)) 'paid
+                Dim fx_rate As Double = CDbl(value_arraylist(0)(mySource)(19))
+                Dim local_paid As Double = Math.Round(CDbl(value_arraylist(2)(row)(11)) * fx_rate, 2)
+                queryGLOff.Add(fx_rate) 'fx_rate
+                queryGLOff.Add(local_paid) 'local_paid
+                queryGLOff.Add(local_paid) 'local_amount
+                queryGLOff.Add(Function_Form.getNull(3)) 'fx_gainloss
+                queryGLOff.Add(Function_Form.getNull(3)) 'v_gainloss
+
+                If CDbl(value_arraylist(2)(row)(11)) = 0 Then
+                    Continue For
                 End If
-            Next
 
-            queryGLOff.Add(value_arraylist(0)(row)(0)) 'accno
-            queryGLOff.Add("GL") 'doc_type
-            queryGLOff.Add(doc_no) 'doc_no
-            queryGLOff.Add(2) 'seq
-            queryGLOff.Add(Function_Form.convertDateFormat(value_arraylist(0)(row)(4))) 'doc_date
-            queryGLOff.Add(value_arraylist(0)(row)(0)) 'pkdoc_type
-            queryGLOff.Add(value_arraylist(2)(row)(5)) 'pkdoc_no
-            queryGLOff.Add(2) 'pkseq
-            queryGLOff.Add(Function_Form.convertDateFormat(value_arraylist(2)(row)(8))) 'pkdoc_date
-            queryGLOff.Add(-1) 'sign
-            queryGLOff.Add(value_arraylist(2)(row)(10)) 'pkfx_rate
-            queryGLOff.Add(value_arraylist(2)(row)(11)) 'paid
-            Dim fx_rate As Double = CDbl(value_arraylist(0)(row)(19))
-            Dim local_paid As Double = Math.Round(CDbl(value_arraylist(2)(row)(11)) * fx_rate, 2)
-            queryGLOff.Add(fx_rate) 'fx_rate
-            queryGLOff.Add(local_paid) 'local_paid
-            queryGLOff.Add(local_paid) 'local_amount
-            queryGLOff.Add(Function_Form.getNull(3)) 'fx_gainloss
-            queryGLOff.Add(Function_Form.getNull(3)) 'v_gainloss
+                Dim gloff_cmd As String = queryTable(2)(2)
+                For j = 0 To queryGLOff.Count - 1
+                    gloff_cmd += "'" + queryGLOff(j).ToString + "',"
+                Next
+                gloff_cmd = gloff_cmd.Substring(0, gloff_cmd.Length - 1) + ")"
 
-            If CDbl(value_arraylist(2)(row)(11)) = 0 Then
-                Continue For
+                myConn.Open()
+                Dim cmd_gloff = New SqlCommand(gloff_cmd, myConn)
+                cmd_gloff.ExecuteNonQuery()
+                rowInsertNum += 1
+                myConn.Close()
             End If
-
-            Dim gloff_cmd As String = queryTable(2)(2)
-            For j = 0 To queryGLOff.Count - 1
-                gloff_cmd += "'" + queryGLOff(j).ToString + "',"
-            Next
-            gloff_cmd = gloff_cmd.Substring(0, gloff_cmd.Length - 1) + ")"
-
-            myConn.Open()
-            Dim cmd_gloff = New SqlCommand(gloff_cmd, myConn)
-            cmd_gloff.ExecuteNonQuery()
-            rowInsertNum += 1
-            myConn.Close()
         Next
 
         'ap
@@ -779,7 +828,7 @@ Public Class Pay_Bills
                 Dim queryAL As New ArrayList
                 Dim doc_no = ""
                 For Each seq_temp As String In gloffseq
-                    If seq_temp.Split(".")(0).Trim.Equals(value_arraylist(0)(row)(0)) Then
+                    If seq_temp.Split(".")(0).Trim.Equals(row.ToString) Then
                         doc_no = seq_temp.Split(".")(1).Trim
                     End If
                 Next
@@ -800,6 +849,7 @@ Public Class Pay_Bills
                 queryAL.Add(Function_Form.getNull(0)) 'desp4
                 queryAL.Add(Function_Form.getNull(0)) 'remark1
                 queryAL.Add(Function_Form.getNull(0)) 'remark2
+                queryAL.Add(value_arraylist(0)(row)(15)) 'cheque_no
                 If value_arraylist(0)(row)(15).ToString.Trim.Equals(String.Empty) Then
                     queryAL.Add(Function_Form.getNull(1)) 'chqrc_date
                 Else
@@ -809,18 +859,20 @@ Public Class Pay_Bills
                 queryAL.Add(value_arraylist(0)(row)(18)) 'curr_code
                 queryAL.Add(value_arraylist(0)(row)(19)) 'fx_rate
                 queryAL.Add(Function_Form.getNull(3)) 'fx_gainloss
-                queryAL.Add(Function_Form.getNull(1)) 'koff_date
                 Dim amount = Math.Round(CDbl(value_arraylist(0)(row)(21)), 2)
                 queryAL.Add(amount) 'amount
                 Dim paid As Double = 0
-                For i = startRange To endRange
-                    paid += CDbl(value_arraylist(2)(i)(11))
-                Next
+                If Not value_arraylist(2)(row)(0).Equals("{INVALID ARRAY}") Then
+                    For i = startRange To endRange
+                        paid += CDbl(value_arraylist(2)(i)(11))
+                    Next
+                End If
                 paid = Math.Round(CDbl(paid), 2)
                 queryAL.Add(paid) 'paid
                 queryAL.Add(Math.Round(amount * CDbl(value_arraylist(0)(row)(19)), 2)) 'local_amount
                 queryAL.Add(Math.Round(paid * CDbl(value_arraylist(0)(row)(19)), 2)) 'local_paid
                 queryAL.Add(Function_Form.getNull(3)) 'taxable
+                queryAL.Add(Function_Form.getNull(3)) 'tax
                 queryAL.Add(Function_Form.getNull(3)) 'fx_taxable
                 queryAL.Add(Function_Form.getNull(3)) 'fx_tax
                 If paid >= amount Then
@@ -858,7 +910,6 @@ Public Class Pay_Bills
                 myConn.Close()
             End If
         Next
-
 
         Function_Form.promptImportSuccess(rowInsertNum, rowUpdateNum)
         Function_Form.printExcelResult("Pay_Bills", queryTable, value_arraylist, sql_format_arraylist, dgvExcel)

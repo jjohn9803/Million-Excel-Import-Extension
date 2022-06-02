@@ -1,7 +1,7 @@
 ﻿Public Class Loading
     Private duration As Decimal
     Private total_duration As Decimal
-    Private maximum_peak As Integer = 10
+    Private maximum_peak As Integer = GetRandom(1, 5)
     Private url As String = "https://www.million.my/wp-content/uploads/2016/11/small-logo-1024x435-1.png"
     Public returnType As Integer = 0
     Private Sub Loading_Load(sender As Object, e As EventArgs) Handles Me.Load
@@ -12,7 +12,7 @@
         startTimer()
     End Sub
     Private Sub startTimer()
-        Dim time As Integer = GetRandom(500, 2000)
+        Dim time As Integer = GetRandom(600, 1200)
         Me.total_duration = time
         Me.duration = 0
         Timer1.Start()
@@ -22,11 +22,13 @@
             ProgressBar1.Value = 100
             maximum_peak -= 1
             Timer1.Stop()
-            Dim probability = GetRandom(1, 4)
-            If probability = 1 Or maximum_peak < 0 Then
-                Me.Close()
+            Dim waitDuration As New Timer()
+            waitDuration.Interval = 500
+            waitDuration.Start()
+            If maximum_peak <= 0 Then
+                AddHandler waitDuration.Tick, AddressOf closeForm
             Else
-                startTimer()
+                AddHandler waitDuration.Tick, AddressOf myTickEvent
             End If
         Else
             duration += Timer1.Interval
@@ -37,6 +39,14 @@
                 ProgressBar1.Value = process
             End If
         End If
+    End Sub
+    Private Sub closeForm(sender As Object, e As EventArgs)
+        sender.Stop()
+        Me.Close()
+    End Sub
+    Private Sub myTickEvent(sender As Object, e As EventArgs)
+        sender.Stop()
+        startTimer()
     End Sub
     Private Function GetRandom(ByVal Min As Integer, ByVal Max As Integer) As Integer
         Dim Generator As System.Random = New System.Random()

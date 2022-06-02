@@ -29,6 +29,7 @@ Partial Class Function_Form
         Me.btnStockAdjustment = New System.Windows.Forms.Button()
         Me.btnStockTrasfer = New System.Windows.Forms.Button()
         Me.FlowLayoutPanel1 = New System.Windows.Forms.FlowLayoutPanel()
+        Me.Label4 = New System.Windows.Forms.Label()
         Me.btnQuotation = New System.Windows.Forms.Button()
         Me.btnSalesOrder = New System.Windows.Forms.Button()
         Me.btnDeliveryOrder = New System.Windows.Forms.Button()
@@ -42,7 +43,6 @@ Partial Class Function_Form
         Me.Label3 = New System.Windows.Forms.Label()
         Me.btnReceivePayment = New System.Windows.Forms.Button()
         Me.btnPayBill = New System.Windows.Forms.Button()
-        Me.Label4 = New System.Windows.Forms.Label()
         Me.FlowLayoutPanel2.SuspendLayout()
         Me.FlowLayoutPanel1.SuspendLayout()
         Me.FlowLayoutPanel3.SuspendLayout()
@@ -137,6 +137,17 @@ Partial Class Function_Form
         Me.FlowLayoutPanel1.Name = "FlowLayoutPanel1"
         Me.FlowLayoutPanel1.Size = New System.Drawing.Size(1014, 305)
         Me.FlowLayoutPanel1.TabIndex = 17
+        '
+        'Label4
+        '
+        Me.Label4.AutoSize = True
+        Me.Label4.Font = New System.Drawing.Font("Microsoft YaHei", 13.8!, CType((System.Drawing.FontStyle.Bold Or System.Drawing.FontStyle.Underline), System.Drawing.FontStyle), System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label4.Location = New System.Drawing.Point(50, 15)
+        Me.Label4.Margin = New System.Windows.Forms.Padding(50, 15, 1000, 0)
+        Me.Label4.Name = "Label4"
+        Me.Label4.Size = New System.Drawing.Size(72, 31)
+        Me.Label4.TabIndex = 16
+        Me.Label4.Text = "Sales"
         '
         'btnQuotation
         '
@@ -241,6 +252,7 @@ Partial Class Function_Form
         Me.FlowLayoutPanel3.Controls.Add(Me.btnReceivePayment)
         Me.FlowLayoutPanel3.Controls.Add(Me.btnPayBill)
         Me.FlowLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.FlowLayoutPanel3.Enabled = False
         Me.FlowLayoutPanel3.Location = New System.Drawing.Point(0, 471)
         Me.FlowLayoutPanel3.Name = "FlowLayoutPanel3"
         Me.FlowLayoutPanel3.Size = New System.Drawing.Size(1014, 153)
@@ -291,17 +303,6 @@ Partial Class Function_Form
         Me.btnPayBill.TabStop = False
         Me.btnPayBill.Text = "Pay Bills"
         Me.btnPayBill.UseVisualStyleBackColor = True
-        '
-        'Label4
-        '
-        Me.Label4.AutoSize = True
-        Me.Label4.Font = New System.Drawing.Font("Microsoft YaHei", 13.8!, CType((System.Drawing.FontStyle.Bold Or System.Drawing.FontStyle.Underline), System.Drawing.FontStyle), System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label4.Location = New System.Drawing.Point(50, 15)
-        Me.Label4.Margin = New System.Windows.Forms.Padding(50, 15, 1000, 0)
-        Me.Label4.Name = "Label4"
-        Me.Label4.Size = New System.Drawing.Size(72, 31)
-        Me.Label4.TabIndex = 16
-        Me.Label4.Text = "Sales"
         '
         'Function_Form
         '
